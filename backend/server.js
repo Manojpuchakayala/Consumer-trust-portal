@@ -1,5 +1,6 @@
 const express = require("express");
 const path = require("path");
+const fs = require("fs");
 const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config();
@@ -106,7 +107,19 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// 404 Handler
+// Serve frontend production build if dist directory exists
+const frontendDist = path.join(__dirname, "../frontend/dist");
+if (fs.existsSync(frontendDist)) {
+  app.use(express.static(frontendDist));
+  app.use((req, res, next) => {
+    if (req.method === "GET" && !req.originalUrl.startsWith("/api") && !req.originalUrl.startsWith("/uploads")) {
+      return res.sendFile(path.join(frontendDist, "index.html"));
+    }
+    next();
+  });
+}
+
+// 404 Handler for undefined API routes
 app.use((req, res) => {
   res.status(404).json({
     success: false,

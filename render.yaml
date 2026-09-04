@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: consumer-trust-portal
+    runtime: node
+    plan: free
+    buildCommand: npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: 465
+      - key: SMTP_SECURE
+        value: "true"
+      - key: SMTP_USER
+        value: manojpuchakayala321@gmail.com
