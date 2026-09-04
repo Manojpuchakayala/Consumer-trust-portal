@@ -8,6 +8,9 @@ import {
   FaClock,
   FaCheckCircle,
   FaExclamationCircle,
+  FaPaperclip,
+  FaWhatsapp,
+  FaStar,
 } from "react-icons/fa";
 import api from "../services/api";
 import "./MyComplaints.css";
@@ -136,13 +139,34 @@ function MyComplaints() {
                     <span className="card-id">{c.complaintId}</span>
                     <span className="card-cat">{c.category}</span>
                   </div>
-                  <span className={`status-badge ${c.status.toLowerCase().replace(/\s+/g, "-")}`}>
-                    {c.status}
-                  </span>
+                  <div className="card-badges-row">
+                    <span className={`status-badge ${c.status.toLowerCase().replace(/\s+/g, "-")}`}>
+                      {c.status}
+                    </span>
+                  </div>
                 </div>
 
                 <h3 className="card-title">{c.subject}</h3>
                 <p className="card-desc">{c.description}</p>
+
+                {/* Evidence & Feature Badges */}
+                <div className="card-features-bar">
+                  {c.attachments && c.attachments.length > 0 && (
+                    <span className="feature-pill evidence" title={`${c.attachments.length} proof document(s) attached`}>
+                      <FaPaperclip /> {c.attachments.length} Evidence Doc{c.attachments.length > 1 ? "s" : ""}
+                    </span>
+                  )}
+                  {c.whatsappAlertsEnabled !== false && (
+                    <span className="feature-pill whatsapp" title="WhatsApp 1-tap case tracking active">
+                      <FaWhatsapp /> WhatsApp Active
+                    </span>
+                  )}
+                  {c.status === "Resolved" && c.feedback?.rating && (
+                    <span className="feature-pill rating" title={`Your satisfaction rating: ${c.feedback.rating} stars`}>
+                      <FaStar /> Rated {c.feedback.rating}.0 / 5
+                    </span>
+                  )}
+                </div>
 
                 {c.adminRemarks && (
                   <div className="card-remarks">
@@ -154,9 +178,27 @@ function MyComplaints() {
                   <span className="card-date">
                     Filed on {new Date(c.createdAt).toLocaleDateString()}
                   </span>
-                  <Link to={`/track?id=${c.complaintId}`} className="track-link">
-                    Live Timeline <FaExternalLinkAlt />
-                  </Link>
+
+                  <div className="card-actions-right">
+                    <a
+                      href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`🏛️ Grievance Tracking\nCase: ${c.complaintId}\nStatus: ${c.status}\nTrack: ${window.location.origin}/track?id=${c.complaintId}`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="wa-card-share-btn"
+                      title="Share case file on WhatsApp"
+                    >
+                      <FaWhatsapp /> Share
+                    </a>
+
+                    {c.status === "Resolved" && !c.feedback?.rating && (
+                      <Link to={`/track?id=${c.complaintId}`} className="rate-btn">
+                        <FaStar /> Rate Resolution
+                      </Link>
+                    )}
+                    <Link to={`/track?id=${c.complaintId}`} className="track-link">
+                      Live Timeline <FaExternalLinkAlt />
+                    </Link>
+                  </div>
                 </div>
               </div>
             ))}

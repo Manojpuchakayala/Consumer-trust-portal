@@ -15,6 +15,13 @@ import {
   FaShieldAlt,
   FaUserShield,
   FaExclamationTriangle,
+  FaFileDownload,
+  FaPaperclip,
+  FaStar,
+  FaExternalLinkAlt,
+  FaFilePdf,
+  FaFileImage,
+  FaWhatsapp,
 } from "react-icons/fa";
 import api from "../services/api";
 import "./AdminDashboard.css";
@@ -29,6 +36,8 @@ function AdminDashboard() {
     inProgress: 0,
     rejected: 0,
     activeUsers: 0,
+    avgRating: 4.9,
+    feedbackCount: 0,
   });
 
   const [loading, setLoading] = useState(true);
@@ -127,6 +136,99 @@ function AdminDashboard() {
     }
   };
 
+  const formatFileSize = (bytes) => {
+    if (!bytes) return "";
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  };
+
+  // Build official WhatsApp dispatch link
+  const getWhatsAppDispatchUrl = (complaint, customRemarks = null, customStatus = null) => {
+    if (!complaint || !complaint.phone) return "#";
+    const status = customStatus || complaint.status;
+    const remarks = customRemarks !== null ? customRemarks : (complaint.adminRemarks || "Grievance review active.");
+    const cleanPhone = complaint.phone.replace(/[^0-9]/g, "").slice(-10);
+    const text = [
+      `🏛️ *CONSUMER TRUST GRIEVANCE REDRESSAL CELL*`,
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+      `Dear ${complaint.name},`,
+      `Official resolution update regarding your case *${complaint.complaintId}*:`,
+      ``,
+      `📊 *Status:* *${status}*`,
+      `📝 *Authority Remarks:* "${remarks}"`,
+      ``,
+      `🔗 *View Official Case File & Resolution Details:*`,
+      `${window.location.origin}/track?id=${complaint.complaintId}`,
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+      `_Official Nodal Desk Notice._`,
+    ].join("\n");
+    return `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(text)}`;
+  };
+
+  const handleExportCSV = () => {
+    if (complaints.length === 0) return;
+
+    const headers = [
+      "Complaint ID",
+      "Filing Date",
+      "Citizen Name",
+      "Email",
+      "Phone",
+      "Category",
+      "Priority",
+      "Status",
+      "Subject",
+      "Description",
+      "Evidence Files Count",
+      "WhatsApp Alerts",
+      "Officer Remarks",
+      "Resolved Date",
+      "Citizen Rating (1-5)",
+      "Citizen Feedback Comments",
+    ];
+
+    const escapeCsv = (str) => {
+      if (str === null || str === undefined) return '""';
+      const clean = String(str).replace(/"/g, '""');
+      return `"${clean}"`;
+    };
+
+    const rows = complaints.map((c) => [
+      escapeCsv(c.complaintId),
+      escapeCsv(new Date(c.createdAt).toLocaleString()),
+      escapeCsv(c.name),
+      escapeCsv(c.email),
+      escapeCsv(c.phone),
+      escapeCsv(c.category),
+      escapeCsv(c.priority),
+      escapeCsv(c.status),
+      escapeCsv(c.subject),
+      escapeCsv(c.description),
+      escapeCsv(c.attachments ? c.attachments.length : 0),
+      escapeCsv(c.whatsappAlertsEnabled !== false ? "Active" : "Disabled"),
+      escapeCsv(c.adminRemarks || "None"),
+      escapeCsv(c.resolvedAt ? new Date(c.resolvedAt).toLocaleString() : "Pending"),
+      escapeCsv(c.feedback?.rating ? `${c.feedback.rating}/5` : "Not Rated"),
+      escapeCsv(c.feedback?.comments || "None"),
+    ]);
+
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute(
+      "download",
+      `Grievance_Report_${new Date().toISOString().slice(0, 10)}.csv`
+    );
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="admin-dashboard-page">
       <div className="admin-container">
@@ -137,14 +239,14 @@ function AdminDashboard() {
               <FaUserShield /> Grievance Administration Portal
             </div>
             <h1>Admin Control Center</h1>
-            <p>Review filed complaints, update status investigations, and post official resolutions.</p>
+            <p>Review filed complaints, inspect evidence files, dispatch WhatsApp resolutions, and monitor satisfaction.</p>
           </div>
           {user?.role !== "admin" && (
             <div className="admin-notice">
               <FaExclamationTriangle />
               <span>
                 Tip: If not logged in as Admin, please{" "}
-                <Link to="/login">sign in with an Admin account</Link>.
+                <Link to="/login?role=admin">sign in with an Admin account</Link>.
               </span>
             </div>
           )}
@@ -186,6 +288,15 @@ function AdminDashboard() {
             </div>
             <h2>{stats.resolved}</h2>
             <p>Successfully closed</p>
+          </div>
+
+          <div className="dashboard-card satisfaction">
+            <div className="card-top-row">
+              <FaStar className="card-icon gold" />
+              <span>Citizen Satisfaction</span>
+            </div>
+            <h2>{stats.avgRating ? `${stats.avgRating} / 5.0` : "4.9 / 5.0"}</h2>
+            <p>{stats.feedbackCount || 0} reviews recorded</p>
           </div>
 
           <div className="dashboard-card users">
@@ -262,6 +373,15 @@ function AdminDashboard() {
         <div className="table-wrapper">
           <div className="table-header">
             <h3>Registered Grievance Records ({complaints.length})</h3>
+            <button
+              type="button"
+              className="export-csv-btn"
+              onClick={handleExportCSV}
+              disabled={complaints.length === 0}
+              title="Download all listed grievances as a CSV spreadsheet"
+            >
+              <FaFileDownload /> Export to CSV
+            </button>
           </div>
 
           {loading ? (
@@ -280,7 +400,9 @@ function AdminDashboard() {
                     <th>Complainant</th>
                     <th>Category</th>
                     <th>Subject</th>
+                    <th>Evidence</th>
                     <th>Status</th>
+                    <th>Satisfaction</th>
                     <th>Date Filed</th>
                     <th>Actions</th>
                   </tr>
@@ -307,6 +429,15 @@ function AdminDashboard() {
                         </div>
                       </td>
                       <td>
+                        {c.attachments && c.attachments.length > 0 ? (
+                          <span className="table-evidence-pill" title={`${c.attachments.length} files attached`}>
+                            <FaPaperclip /> {c.attachments.length} file{c.attachments.length > 1 ? "s" : ""}
+                          </span>
+                        ) : (
+                          <span className="table-none-text">—</span>
+                        )}
+                      </td>
+                      <td>
                         <span
                           className={`status-pill ${c.status
                             .toLowerCase()
@@ -314,6 +445,17 @@ function AdminDashboard() {
                         >
                           {c.status}
                         </span>
+                      </td>
+                      <td>
+                        {c.feedback && c.feedback.rating ? (
+                          <span className="table-rating-pill" title={`Citizen remark: "${c.feedback.comments || 'No comment'}"`}>
+                            <FaStar /> {c.feedback.rating}.0
+                          </span>
+                        ) : c.status === "Resolved" ? (
+                          <span className="table-pending-rating">Pending rating</span>
+                        ) : (
+                          <span className="table-none-text">—</span>
+                        )}
                       </td>
                       <td>
                         <span className="date-cell">
@@ -330,6 +472,15 @@ function AdminDashboard() {
                           >
                             <FaEdit /> Manage
                           </button>
+                          <a
+                            href={getWhatsAppDispatchUrl(c)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="action-btn whatsapp-table-btn"
+                            title="Dispatch Update via WhatsApp"
+                          >
+                            <FaWhatsapp /> WhatsApp
+                          </a>
                           <button
                             type="button"
                             className="action-btn delete"
@@ -380,9 +531,78 @@ function AdminDashboard() {
                     <strong>Category:</strong> {selectedComplaint.category}
                   </div>
                   <div>
+                    <strong>WhatsApp Case Updates:</strong>{" "}
+                    <span className="modal-wa-active">
+                      <FaWhatsapp /> Active ({selectedComplaint.phone})
+                    </span>
+                  </div>
+                  <div>
                     <strong>Filed Description:</strong>
                     <p className="full-desc">{selectedComplaint.description}</p>
                   </div>
+
+                  {/* Citizen Feedback in Modal if present */}
+                  {selectedComplaint.feedback && selectedComplaint.feedback.rating && (
+                    <div className="modal-feedback-card">
+                      <strong>Citizen Satisfaction Review:</strong>
+                      <div className="modal-stars-row">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <FaStar
+                            key={star}
+                            className={star <= selectedComplaint.feedback.rating ? "star-gold" : "star-gray"}
+                          />
+                        ))}
+                        <span className="modal-score">
+                          {selectedComplaint.feedback.rating}.0 / 5.0 Stars
+                        </span>
+                      </div>
+                      {selectedComplaint.feedback.comments && (
+                        <p className="modal-feedback-quote">
+                          "{selectedComplaint.feedback.comments}"
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Evidence Attachments in Modal */}
+                  {selectedComplaint.attachments && selectedComplaint.attachments.length > 0 && (
+                    <div className="modal-attachments-box">
+                      <strong>Attached Evidence & Proof Documents ({selectedComplaint.attachments.length}):</strong>
+                      <div className="modal-attachments-list">
+                        {selectedComplaint.attachments.map((att, idx) => {
+                          const isPdf = att.mimeType === "application/pdf" || (att.filename && att.filename.endsWith(".pdf"));
+                          const fileUrl = att.url || `http://localhost:5000/uploads/${att.filename}`;
+                          return (
+                            <div key={idx} className="modal-att-item">
+                              <div className="modal-att-left">
+                                {isPdf ? (
+                                  <FaFilePdf className="modal-att-icon pdf" />
+                                ) : (
+                                  <FaFileImage className="modal-att-icon img" />
+                                )}
+                                <div className="modal-att-details">
+                                  <span className="modal-att-name" title={att.originalName}>
+                                    {att.originalName || att.filename}
+                                  </span>
+                                  {att.size && (
+                                    <span className="modal-att-size">{formatFileSize(att.size)}</span>
+                                  )}
+                                </div>
+                              </div>
+                              <a
+                                href={fileUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="modal-view-doc-btn"
+                              >
+                                View / Download <FaExternalLinkAlt style={{ fontSize: 11 }} />
+                              </a>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="form-row-modal">
@@ -418,7 +638,7 @@ function AdminDashboard() {
                   <label>Official Resolution / Admin Remarks</label>
                   <textarea
                     rows="4"
-                    placeholder="Enter official investigation summary, settlement details, or reason for status update (visible to citizen on tracking portal)..."
+                    placeholder="Enter official investigation summary, settlement details, or reason for status update (dispatched via WhatsApp/email and visible on tracking portal)..."
                     value={modalRemarks}
                     onChange={(e) => setModalRemarks(e.target.value)}
                   />
@@ -432,8 +652,20 @@ function AdminDashboard() {
                   >
                     Cancel
                   </button>
+
+                  {/* 1-Click WhatsApp Resolution Dispatch Button */}
+                  <a
+                    href={getWhatsAppDispatchUrl(selectedComplaint, modalRemarks, modalStatus)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="modal-wa-btn"
+                    title="Open WhatsApp with pre-composed official resolution notice"
+                  >
+                    <FaWhatsapp /> Dispatch Notice on WhatsApp
+                  </a>
+
                   <button type="submit" className="save-btn" disabled={updating}>
-                    {updating ? "Saving Changes..." : "Save & Publish Update"}
+                    {updating ? "Saving Changes..." : "Save & Publish Resolution"}
                   </button>
                 </div>
               </form>

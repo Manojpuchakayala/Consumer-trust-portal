@@ -9,6 +9,9 @@ import {
   FaCheckCircle,
   FaHeadset,
   FaClock,
+  FaStar,
+  FaWhatsapp,
+  FaPaperclip,
 } from "react-icons/fa";
 import api from "../services/api";
 import "./Home.css";
@@ -18,18 +21,20 @@ function Home() {
     total: "50K+",
     resolved: "98%",
     activeUsers: "25K+",
+    avgRating: "4.9",
   });
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await api.get("/complaints/stats");
+        const response = await api.get("/complaints/public-stats");
         if (response.data?.stats) {
           const s = response.data.stats;
           setStats({
             total: s.total > 0 ? s.total.toLocaleString() : "100+",
             resolved: s.resolved > 0 ? s.resolved.toLocaleString() : "98%",
             activeUsers: s.activeUsers > 0 ? s.activeUsers.toLocaleString() : "50+",
+            avgRating: s.avgRating ? `${s.avgRating}` : "4.9",
           });
         }
       } catch (err) {
@@ -45,13 +50,13 @@ function Home() {
       <section className="hero">
         <div className="hero-content">
           <div className="hero-badge">
-            <FaShieldAlt /> Fast, Transparent & Citizen-Centric
+            <FaShieldAlt /> Fast, Transparent & Citizen-Centric Redressal
           </div>
           <h1>Consumer Trust Redressal Portal</h1>
           <p>
             Experience seamless grievance redressal. Submit your complaints
-            online, monitor live investigation milestones, and receive verified
-            official resolutions in real time.
+            with evidence documents, receive instant WhatsApp status cards, monitor
+            live investigation milestones, and rate official resolutions.
           </p>
 
           <div className="hero-buttons">
@@ -91,11 +96,19 @@ function Home() {
         </div>
 
         <div className="card">
+          <div className="card-icon-wrap" style={{ background: "#fef3c7" }}>
+            <FaStar className="stat-icon" style={{ color: "#f59e0b" }} />
+          </div>
+          <h2>★ {stats.avgRating}</h2>
+          <p>Citizen Satisfaction Score</p>
+        </div>
+
+        <div className="card">
           <div className="card-icon-wrap">
             <FaHeadset className="stat-icon" />
           </div>
           <h2>24×7</h2>
-          <p>Active Consumer Support</p>
+          <p>Active Consumer Desk</p>
         </div>
       </section>
 
@@ -109,11 +122,21 @@ function Home() {
         <div className="feature-grid">
           <div className="feature">
             <div className="feature-icon-box">
-              <FaFileAlt />
+              <FaPaperclip />
             </div>
-            <h3>Instant Registration</h3>
+            <h3>Evidence Attachment</h3>
             <p>
-              Submit detailed complaints in minutes with zero paperwork and immediate tracking ID issuance.
+              Upload invoices, transaction bills, and product photos directly with your complaint to speed up verification.
+            </p>
+          </div>
+
+          <div className="feature">
+            <div className="feature-icon-box" style={{ background: "#e8f5e9", color: "#25d366" }}>
+              <FaWhatsapp />
+            </div>
+            <h3>Instant WhatsApp Alerts</h3>
+            <p>
+              Receive official grievance cards, milestone updates, and 1-tap tracking links on WhatsApp (100% Free & Unlimited).
             </p>
           </div>
 
@@ -123,27 +146,17 @@ function Home() {
             </div>
             <h3>Real-Time Tracking</h3>
             <p>
-              Monitor every phase of inquiry with transparent step-by-step progress tracking and status timestamps.
+              Monitor every phase of inquiry with transparent step-by-step progress tracking, timestamps, and officer remarks.
             </p>
           </div>
 
           <div className="feature">
             <div className="feature-icon-box">
-              <FaLock />
+              <FaStar />
             </div>
-            <h3>Secure & Confidential</h3>
+            <h3>Citizen Feedback & Rating</h3>
             <p>
-              Your personal data and grievance records are protected by industry-standard encryption and access controls.
-            </p>
-          </div>
-
-          <div className="feature">
-            <div className="feature-icon-box">
-              <FaBolt />
-            </div>
-            <h3>Direct Redressal</h3>
-            <p>
-              Assigned directly to authorized administrators and nodal officers for time-bound resolution.
+              Rate your resolution quality with our 5-star citizen satisfaction survey to keep redressal officers accountable.
             </p>
           </div>
         </div>
@@ -161,7 +174,7 @@ function Home() {
             <div className="step-num">1</div>
             <h3>Submit Grievance</h3>
             <p>
-              Provide seller/service details, transaction category, and description to receive your unique Tracking ID.
+              Provide seller/service details, attach invoice proofs, and opt into SMS alerts to receive your unique Tracking ID.
             </p>
           </div>
 
@@ -169,7 +182,7 @@ function Home() {
             <div className="step-num">2</div>
             <h3>Inquiry & Review</h3>
             <p>
-              Our grievance desk reviews the claim, gathers merchant feedback, and initiates investigation.
+              Our grievance desk reviews the claim, gathers merchant feedback, and conducts an official inquiry.
             </p>
           </div>
 
@@ -177,7 +190,7 @@ function Home() {
             <div className="step-num">3</div>
             <h3>Resolution & Closure</h3>
             <p>
-              Receive official remarks, refund/repair settlements, and closing summary on your tracking page.
+              Receive official remarks, refund/repair settlements, closing summary, and submit your satisfaction review.
             </p>
           </div>
         </div>

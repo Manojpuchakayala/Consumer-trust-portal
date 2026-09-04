@@ -274,3 +274,103 @@
 .track-link:hover {
   text-decoration: underline;
 }
+
+/* Card Features Bar */
+.card-features-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.feature-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.feature-pill.evidence {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
+.feature-pill.sms {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.feature-pill.rating {
+  background: #fefce8;
+  color: #b45309;
+  border: 1px solid #fef08a;
+}
+
+.card-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rate-btn {
+  background: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fcd34d;
+  padding: 4px 12px;
+  border-radius: 16px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s ease;
+}
+
+.rate-btn:hover {
+  background: #fde68a;
+  color: #92400e;
+}
+
+/* WhatsApp Pill in MyComplaints */
+.feature-pill.whatsapp {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #86efac;
+}
+
+.feature-pill.whatsapp svg {
+  color: #25d366;
+}
+
+.wa-card-share-btn {
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #86efac;
+  padding: 4px 10px;
+  border-radius: 16px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s ease;
+}
+
+.wa-card-share-btn svg {
+  color: #25d366;
+  font-size: 14px;
+}
+
+.wa-card-share-btn:hover {
+  background: #dcfce7;
+  color: #14532d;
+  transform: translateY(-1px);
+}

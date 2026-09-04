@@ -1,4 +1,12 @@
 const mongoose = require("mongoose");
+const dns = require("dns");
+
+// Optimize DNS lookup for MongoDB Atlas SRV records
+try {
+  dns.setServers(["8.8.8.8", "1.1.1.1"]);
+} catch (e) {
+  // Fallback to default
+}
 
 const connectDB = async () => {
   try {
@@ -9,11 +17,7 @@ const connectDB = async () => {
       return;
     }
 
-    const conn = await mongoose.connect(mongoURI, {
-      serverSelectionTimeoutMS: 5000,
-      autoIndex: true,
-    });
-
+    const conn = await mongoose.connect(mongoURI);
     console.log(`✅ MongoDB Connected: ${conn.connection.host} | Database: ${conn.connection.name}`);
   } catch (error) {
     console.error("❌ MongoDB Connection Error:", error.message);

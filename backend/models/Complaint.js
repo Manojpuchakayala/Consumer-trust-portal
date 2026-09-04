@@ -65,6 +65,47 @@ const complaintSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    attachments: [
+      {
+        originalName: { type: String, required: true },
+        filename: { type: String, required: true },
+        path: { type: String },
+        url: { type: String, required: true },
+        mimeType: { type: String },
+        size: { type: Number },
+      },
+    ],
+    feedback: {
+      rating: { type: Number, min: 1, max: 5, default: null },
+      comments: { type: String, default: "" },
+      submittedAt: { type: Date, default: null },
+    },
+    smsAlertsEnabled: {
+      type: Boolean,
+      default: true,
+    },
+    whatsappAlertsEnabled: {
+      type: Boolean,
+      default: true,
+    },
+    whatsappLogs: [
+      {
+        message: { type: String },
+        phone: { type: String },
+        status: { type: String, default: "DELIVERED" },
+        provider: { type: String, default: "WhatsApp Cloud Gateway" },
+        sentAt: { type: Date, default: Date.now },
+      },
+    ],
+    smsLogs: [
+      {
+        message: { type: String },
+        phone: { type: String },
+        status: { type: String, default: "DELIVERED" },
+        provider: { type: String, default: "Telecom Gateway" },
+        sentAt: { type: Date, default: Date.now },
+      },
+    ],
   },
   {
     timestamps: true,

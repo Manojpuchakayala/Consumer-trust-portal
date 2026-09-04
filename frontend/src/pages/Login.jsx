@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import {
   FaEnvelope,
@@ -13,24 +13,31 @@ import {
   FaCheckCircle,
   FaCopy,
   FaRedoAlt,
+  FaEye,
+  FaEyeSlash,
+  FaUserShield,
 } from "react-icons/fa";
 import api from "../services/api";
 import "./Login.css";
 
 function Login() {
   const navigate = useNavigate();
-  const [isRegisterMode, setIsRegisterMode] = useState(false);
+  const [searchParams] = useSearchParams();
+  const isAdminParam = searchParams.get("role") === "admin";
+  const [isRegisterMode, setIsRegisterMode] = useState(
+    searchParams.get("mode") === "signup"
+  );
 
   // Step: 'credentials' or '2fa'
   const [authStep, setAuthStep] = useState("credentials");
 
   // Form State
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
+    name: isAdminParam ? "System Administrator" : "",
+    email: isAdminParam ? "admin@consumertrust.gov" : "",
+    password: isAdminParam ? "Admin@123" : "",
     phone: "",
-    role: "user",
+    role: isAdminParam ? "admin" : "user",
   });
 
   // 2FA State
@@ -41,6 +48,7 @@ function Login() {
   const [countdown, setCountdown] = useState(60);
   const [canResend, setCanResend] = useState(false);
   const [copiedOtp, setCopiedOtp] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -58,6 +66,12 @@ function Login() {
     }
     return () => clearInterval(timer);
   }, [authStep, countdown]);
+
+  useEffect(() => {
+    if (isAdminParam) {
+      setSuccessMsg("Administrator mode selected. Pre-filled admin credentials — click 'Sign In' below.");
+    }
+  }, [isAdminParam]);
 
   const handleChange = (e) => {
     setFormData({
@@ -86,6 +100,7 @@ function Login() {
         : {
             email: formData.email,
             password: formData.password,
+            requestedRole: formData.role,
           };
 
       const response = await api.post(endpoint, payload);
@@ -103,11 +118,49 @@ function Login() {
         handleAuthSuccess(response.data);
       }
     } catch (err) {
-      setError(
-        err.response?.data?.message ||
-          err.message ||
-          "Authentication failed. Please check your credentials."
-      );
+      const errData = err.response?.data;
+      const errMsg =
+        errData?.message ||
+        err.message ||
+        "Authentication failed. Please check your credentials.";
+
+      // Seamless Auto-Recovery: If user is on Sign Up but account already exists
+      if (
+        isRegisterMode &&
+        (errData?.code === "USER_EXISTS" ||
+          errMsg.toLowerCase().includes("already exists"))
+      ) {
+        setIsRegisterMode(false);
+        // Automatically attempt login since user already entered their credentials!
+        try {
+          const loginResp = await api.post("/auth/login", {
+            email: formData.email,
+            password: formData.password,
+          });
+
+          if (loginResp.data?.requires2FA) {
+            setTempToken(loginResp.data.tempToken);
+            setUserEmail(loginResp.data.email || formData.email);
+            setDevOtp(loginResp.data.devOtp || "");
+            setAuthStep("2fa");
+            setCountdown(60);
+            setCanResend(false);
+            setSuccessMsg("Account found! Switched to Sign In & verification code sent.");
+            return;
+          } else if (loginResp.data?.token) {
+            handleAuthSuccess(loginResp.data);
+            return;
+          }
+        } catch (loginErr) {
+          setError(
+            loginErr.response?.data?.message ||
+              "An account with this email already exists. We switched you to Sign In — please check your password."
+          );
+          return;
+        }
+      }
+
+      setError(errMsg);
     } finally {
       setLoading(false);
     }
@@ -276,6 +329,12 @@ function Login() {
             <p className="login-subtitle">
               We have sent a 6-digit security verification code to{" "}
               <strong>{userEmail}</strong>.
+              {(userEmail.endsWith("@consumertrust.gov") ||
+                userEmail.endsWith("@consumertrust.com")) && (
+                <span style={{ display: "block", marginTop: "6px", fontSize: "12px", color: "#1565c0", fontWeight: "600" }}>
+                  ℹ️ Admin OTP forwarded to your Gmail (manojpuchakayala321@gmail.com)
+                </span>
+              )}
             </p>
 
             {devOtp && (
@@ -368,6 +427,7 @@ function Login() {
                 onClick={() => {
                   setIsRegisterMode(false);
                   setError("");
+                  setSuccessMsg("");
                 }}
               >
                 Sign In
@@ -378,6 +438,7 @@ function Login() {
                 onClick={() => {
                   setIsRegisterMode(true);
                   setError("");
+                  setSuccessMsg("");
                 }}
               >
                 Sign Up
@@ -403,11 +464,97 @@ function Login() {
 
             {error && (
               <div className="login-error">
-                <FaExclamationCircle /> <span>{error}</span>
+                <FaExclamationCircle />
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px", flex: 1 }}>
+                  <span>{error}</span>
+                  {(isRegisterMode || error.toLowerCase().includes("already exists")) && (
+                    <button
+                      type="button"
+                      className="switch-tab-inline-btn"
+                      onClick={() => {
+                        setIsRegisterMode(false);
+                        setError("");
+                        setSuccessMsg("Switched to Sign In. Enter your password to continue.");
+                      }}
+                    >
+                      👉 Click here to switch to Sign In
+                    </button>
+                  )}
+                </div>
               </div>
             )}
 
+            {successMsg && !error && (
+              <div className="login-success">
+                <FaCheckCircle /> <span>{successMsg}</span>
+              </div>
+            )}
+
+            {/* Quick Demo Credentials Presets */}
+            <div className="quick-access-box">
+              <span className="quick-access-title">1-Click Quick Fill:</span>
+              <div className="quick-chips-row">
+                <button
+                  type="button"
+                  className="quick-chip citizen-chip"
+                  onClick={() => {
+                    setIsRegisterMode(false);
+                    setError("");
+                    setSuccessMsg("Loaded Customer credentials. Click 'Sign In' below to access Citizen Portal.");
+                    setFormData((prev) => ({
+                      ...prev,
+                      email: "consumer@consumertrust.gov",
+                      password: "Consumer@123",
+                      role: "user",
+                    }));
+                  }}
+                  title="Fill Customer demo credentials"
+                >
+                  <FaUser style={{ marginRight: 6 }} /> Customer Account
+                </button>
+                <button
+                  type="button"
+                  className="quick-chip admin-chip"
+                  onClick={() => {
+                    setIsRegisterMode(false);
+                    setError("");
+                    setSuccessMsg("Loaded Administrator credentials. Click 'Sign In' below to access Admin Control Center.");
+                    setFormData((prev) => ({
+                      ...prev,
+                      email: "admin@consumertrust.gov",
+                      password: "Admin@123",
+                      role: "admin",
+                    }));
+                  }}
+                  title="Fill Administrator demo credentials"
+                >
+                  <FaUserShield style={{ marginRight: 6 }} /> Admin Account
+                </button>
+              </div>
+            </div>
+
             <form onSubmit={handleCredentialsSubmit} className="login-form">
+              {!isRegisterMode && (
+                <div className="signin-role-toggle">
+                  <span className="signin-role-label">Sign in to portal as:</span>
+                  <div className="signin-role-buttons">
+                    <button
+                      type="button"
+                      className={`signin-role-btn ${formData.role === "user" ? "active" : ""}`}
+                      onClick={() => setFormData((prev) => ({ ...prev, role: "user" }))}
+                    >
+                      <FaUser style={{ marginRight: 6 }} /> Customer / Consumer
+                    </button>
+                    <button
+                      type="button"
+                      className={`signin-role-btn ${formData.role === "admin" ? "active" : ""}`}
+                      onClick={() => setFormData((prev) => ({ ...prev, role: "admin" }))}
+                    >
+                      <FaUserShield style={{ marginRight: 6 }} /> Administrator
+                    </button>
+                  </div>
+                </div>
+              )}
               {isRegisterMode && (
                 <>
                   <div className="input-group">
@@ -457,13 +604,22 @@ function Login() {
                 <div className="input-wrapper">
                   <FaLock className="icon" />
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     name="password"
                     placeholder="Password (minimum 6 characters)"
                     value={formData.password}
                     onChange={handleChange}
                     required
                   />
+                  <button
+                    type="button"
+                    className="password-toggle-btn"
+                    onClick={() => setShowPassword(!showPassword)}
+                    tabIndex="-1"
+                    title={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
                 </div>
               </div>
 
@@ -513,6 +669,7 @@ function Login() {
                   onClick={() => {
                     setIsRegisterMode(!isRegisterMode);
                     setError("");
+                    setSuccessMsg("");
                   }}
                 >
                   {isRegisterMode ? "Sign In here" : "Sign Up now"}

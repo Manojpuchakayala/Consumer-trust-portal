@@ -405,3 +405,814 @@
     grid-template-columns: 1fr;
   }
 }
+
+.track-case-actions {
+  margin-top: 25px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.print-case-btn {
+  background: #1e3a8a;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 10px rgba(30, 58, 138, 0.2);
+}
+
+.print-case-btn:hover {
+  background: #172554;
+  transform: translateY(-1px);
+}
+
+@media print {
+  nav, footer, .navbar, .search-card, .track-header, .no-print {
+    display: none !important;
+  }
+
+  body, .track-page, .track-container, .complaint-card {
+    background: white !important;
+    box-shadow: none !important;
+    border: 1px solid #cbd5e1 !important;
+    padding: 20px !important;
+    margin: 0 !important;
+  }
+}
+
+/* SMS Alert Status Badge on Tracking Page */
+.sms-track-alert {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 24px;
+  font-size: 13.5px;
+}
+
+.sms-track-alert svg {
+  font-size: 18px;
+  color: #16a34a;
+  flex-shrink: 0;
+}
+
+/* Evidence Section */
+.evidence-section {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.evidence-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  color: #1e293b;
+}
+
+.evidence-header h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.evidence-icon {
+  color: #2563eb;
+  font-size: 18px;
+}
+
+.evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.evidence-card {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+}
+
+.evidence-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.evidence-preview {
+  height: 120px;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.img-preview-box {
+  width: 100%;
+  height: 100%;
+}
+
+.img-preview-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pdf-preview-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: #dc2626;
+}
+
+.pdf-large-icon {
+  font-size: 38px;
+}
+
+.pdf-preview-box span {
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.evidence-meta {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-grow: 1;
+}
+
+.evidence-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.evidence-size {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.evidence-view-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  color: #2563eb;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.evidence-view-link:hover {
+  text-decoration: underline;
+  color: #1d4ed8;
+}
+
+/* Citizen Feedback Section */
+.citizen-feedback-section {
+  margin-top: 25px;
+  margin-bottom: 25px;
+}
+
+.feedback-recorded-card {
+  background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+  border: 1.5px solid #6ee7b7;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.08);
+}
+
+.feedback-recorded-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.feedback-check-icon {
+  font-size: 32px;
+  color: #059669;
+}
+
+.feedback-recorded-top h4 {
+  margin: 0;
+  color: #065f46;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.feedback-recorded-top p {
+  margin: 2px 0 0;
+  color: #047857;
+  font-size: 13px;
+}
+
+.recorded-rating-stars {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.star-gold {
+  color: #f59e0b;
+  font-size: 20px;
+}
+
+.star-gray {
+  color: #cbd5e1;
+  font-size: 20px;
+}
+
+.recorded-score {
+  margin-left: 8px;
+  font-weight: 700;
+  font-size: 14px;
+  color: #065f46;
+}
+
+.recorded-comments {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+
+.recorded-comments strong {
+  display: block;
+  font-size: 12px;
+  color: #374151;
+  margin-bottom: 4px;
+}
+
+.recorded-comments p {
+  margin: 0;
+  font-size: 13.5px;
+  color: #1f2937;
+  font-style: italic;
+}
+
+.feedback-date {
+  display: block;
+  font-size: 11.5px;
+  color: #6b7280;
+}
+
+/* Feedback Form Card */
+.feedback-form-card {
+  background: linear-gradient(135deg, #fffbeb, #fef3c7);
+  border: 1.5px solid #fcd34d;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.1);
+}
+
+.feedback-form-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.star-icon-header {
+  font-size: 28px;
+  color: #d97706;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.feedback-form-header h3 {
+  margin: 0;
+  color: #92400e;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.feedback-form-header p {
+  margin: 4px 0 0;
+  color: #78350f;
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.feedback-success-msg {
+  background: #dcfce7;
+  color: #166534;
+  padding: 10px 14px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  margin-bottom: 16px;
+}
+
+.feedback-error-msg {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 10px 14px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  margin-bottom: 16px;
+}
+
+.feedback-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.star-rating-selector label,
+.feedback-comments-input label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #78350f;
+  margin-bottom: 8px;
+}
+
+.stars-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.star-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease;
+}
+
+.star-btn:hover {
+  transform: scale(1.25);
+}
+
+.star-gold-interactive {
+  color: #f59e0b;
+  font-size: 26px;
+}
+
+.star-gray-interactive {
+  color: #d1d5db;
+  font-size: 26px;
+}
+
+.rating-label {
+  margin-left: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  color: #92400e;
+}
+
+.feedback-comments-input textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #fbbf24;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13.5px;
+  background: #ffffff;
+  color: #1f2937;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.feedback-comments-input textarea:focus {
+  border-color: #d97706;
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
+}
+
+.submit-feedback-btn {
+  background: linear-gradient(90deg, #d97706, #b45309);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(180, 83, 9, 0.25);
+  transition: all 0.2s ease;
+}
+
+.submit-feedback-btn:hover:not(:disabled) {
+  background: #92400e;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(180, 83, 9, 0.35);
+}
+
+.submit-feedback-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* SMS Track Card & Messages List */
+.sms-track-card {
+  background: #f0fdf4;
+  border: 1.5px solid #86efac;
+  border-radius: 14px;
+  padding: 18px 20px;
+  margin-bottom: 24px;
+}
+
+.sms-track-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.sms-track-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sms-header-icon {
+  font-size: 24px;
+  color: #16a34a;
+  flex-shrink: 0;
+}
+
+.sms-track-title strong {
+  display: block;
+  font-size: 14.5px;
+  color: #166534;
+}
+
+.sms-track-title span {
+  font-size: 12.5px;
+  color: #374151;
+}
+
+.sms-count-badge {
+  background: #dcfce7;
+  color: #15803d;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  border: 1px solid #bbf7d0;
+}
+
+.sms-messages-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.sms-bubble {
+  background: #ffffff;
+  border: 1px solid #bbf7d0;
+  border-left: 4px solid #16a34a;
+  border-radius: 10px;
+  padding: 12px 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.sms-bubble-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: #6b7280;
+  margin-bottom: 6px;
+}
+
+.sms-sender {
+  font-weight: 700;
+  color: #166534;
+  letter-spacing: 0.5px;
+}
+
+.sms-text {
+  margin: 0;
+  font-size: 13.5px;
+  color: #1f2937;
+  line-height: 1.5;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+}
+
+.sms-bubble-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px dotted #e5e7eb;
+  font-size: 11.5px;
+}
+
+.sms-status-delivered {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.sms-to {
+  color: #6b7280;
+}
+
+.sms-telecom-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: #4b5563;
+  line-height: 1.4;
+}
+
+.sms-telecom-notice svg {
+  color: #16a34a;
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.sms-telecom-notice strong {
+  color: #166534;
+  margin-right: 4px;
+}
+
+.sms-telecom-notice code {
+  background: #e5e7eb;
+  padding: 1px 4px;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #1f2937;
+}
+
+.sms-fallback-note {
+  background: #ffffff;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 13px;
+  color: #374151;
+  margin-bottom: 12px;
+}
+
+/* WhatsApp Grievance Live Sync Card */
+.whatsapp-track-card {
+  background: linear-gradient(135deg, #f0fdf4, #e8f5e9);
+  border: 1.5px solid #25d366;
+  border-radius: 16px;
+  padding: 22px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 18px rgba(37, 211, 102, 0.12);
+}
+
+.whatsapp-track-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.whatsapp-track-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.whatsapp-circle-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #25d366;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.35);
+}
+
+.whatsapp-track-info h4 {
+  margin: 0;
+  font-size: 16.5px;
+  font-weight: 700;
+  color: #166534;
+}
+
+.whatsapp-track-info p {
+  margin: 3px 0 0;
+  font-size: 13px;
+  color: #374151;
+  max-width: 520px;
+}
+
+.wa-active-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #dcfce7;
+  color: #15803d;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid #86efac;
+}
+
+.whatsapp-track-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.wa-track-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #25d366;
+  color: white;
+  padding: 12px 22px;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+}
+
+.wa-track-btn-primary:hover {
+  background: #1eb854;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(37, 211, 102, 0.45);
+}
+
+.wa-track-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  color: #166534;
+  border: 1.5px solid #25d366;
+  padding: 12px 20px;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+
+.wa-track-btn-secondary:hover {
+  background: #dcfce7;
+  transform: translateY(-2px);
+}
+
+.wa-track-btn-web {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #128c7e;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 12px rgba(18, 140, 126, 0.25);
+}
+
+.wa-track-btn-web:hover {
+  background: #075e54;
+  transform: translateY(-2px);
+}
+
+.wa-track-btn-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  color: #166534;
+  border: 1.5px solid #25d366;
+  padding: 12px 20px;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.wa-track-btn-copy:hover {
+  background: #dcfce7;
+  transform: translateY(-2px);
+}
+
+/* Direct 1-Tap Tracking Link Box */
+.wa-direct-link-box {
+  background: #ffffff;
+  border: 1.5px solid #86efac;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+}
+
+.wa-direct-link-title {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #166534;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.wa-direct-link-input-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.wa-direct-link-input {
+  flex: 1;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: #2563eb;
+  font-weight: 600;
+  outline: none;
+}
+
+.wa-copy-link-btn {
+  background: #0f172a;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+
+.wa-copy-link-btn:hover {
+  background: #334155;
+}
+
+.whatsapp-track-tips {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 12.5px;
+  color: #166534;
+  line-height: 1.5;
+}

@@ -9,10 +9,13 @@ const {
   googleAuth,
 } = require("../controllers/authController");
 
-router.post("/register", register);
-router.post("/login", login);
+const { authRateLimiter, otpRateLimiter } = require("../middleware/rateLimiter");
+
+// Apply rate limiting to critical authentication entry points
+router.post("/register", authRateLimiter, register);
+router.post("/login", authRateLimiter, login);
 router.post("/verify-otp", verifyOtp);
-router.post("/resend-otp", resendOtp);
+router.post("/resend-otp", otpRateLimiter, resendOtp);
 router.post("/google", googleAuth);
 
 module.exports = router;
