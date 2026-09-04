@@ -65,7 +65,7 @@ app.get("/", (req, res) => {
       name: mongoose.connection.name || "consumer_trust",
     },
     version: "1.2.0",
-    frontendUrl: "http://localhost:5173",
+    frontendUrl: process.env.FRONTEND_URL || "http://localhost:5173",
     features: ["Two-Step Verification (2FA OTP)", "Google OAuth 2.0 Sign-In", "Live Complaint Redressal"],
     availableEndpoints: {
       health: "/api/health",
