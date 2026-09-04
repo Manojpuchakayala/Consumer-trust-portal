@@ -1,0 +1,32 @@
+================================================================================
+  CONSUMER TRUST : NATIONAL CITIZEN GRIEVANCE REDRESSAL PLATFORM
+  Official Cloud Deployment Links & System Reference Guide
+================================================================================
+
+1. LIVE FRONTEND APPLICATION (Vercel Global CDN)
+   • Main Platform:             https://consumer-trust-portal.vercel.app
+   • Register Complaint:        https://consumer-trust-portal.vercel.app/register
+   • Track Grievance (Direct):  https://consumer-trust-portal.vercel.app/track?id=CT-2026-76665
+   • My Complaints:             https://consumer-trust-portal.vercel.app/my-complaints
+   • Citizen Login:             https://consumer-trust-portal.vercel.app/login
+   • Admin Control Center:      https://consumer-trust-portal.vercel.app/admin
+
+2. LIVE BACKEND API & CLOUD DATABASE (Render Cloud + MongoDB Atlas)
+   • API Root:                  https://consumer-trust-api.onrender.com/
+   • Health & DB Endpoint:      https://consumer-trust-api.onrender.com/api/health
+   • Public Tracking API:       https://consumer-trust-api.onrender.com/api/complaints/track/CT-2026-76665
+   • GitHub Repository:         https://github.com/Manojpuchakayala/Consumer-trust-portal
+   • Cloud Database:            consumer-trust-db.rxdifnq.mongodb.net/consumer_trust
+
+3. DEMO ACCESS CREDENTIALS
+   • Administrator:             admin@consumertrust.gov / Admin@123
+   • Citizen (Manoj):           manojpuchakayala321@gmail.com / User@123
+   • Active Test Complaint ID:  CT-2026-76665 (Status: Pending)
+
+4. 100% FREE WHATSAPP 1-TAP TRACKING SYSTEM (AMAZON / SWIGGY STYLE)
+   • Features:                  Official WhatsApp Grievance Cards, Milestone Updates,
+                                1-Tap Live Tracking Links (Zero SMS Cost, Worldwide).
+   • Multi-Option Hub:          1-Click "Send to WhatsApp", "Open in WhatsApp Web",
+                                "Copy Full Report", and "Direct Tracking Link".
+
+================================================================================

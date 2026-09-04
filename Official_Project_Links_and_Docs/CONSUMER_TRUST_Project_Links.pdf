@@ -1,0 +1,370 @@
+%PDF-1.3
+%ºß¬à
+3 0 obj
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/MediaBox [0 0 595.2799999999999727 841.8899999999999864]
+/Contents 4 0 R
+>>
+endobj
+4 0 obj
+<<
+/Length 3102
+>>
+stream
+0.5670000000000001 w
+0 G
+BT
+/F1 20 Tf
+23. TL
+0.118 0.227 0.541 rg
+56.6929133858267775 771.0238582677164914 Td
+(CONSUMER TRUST PORTAL) Tj
+ET
+BT
+/F1 12 Tf
+13.7999999999999989 TL
+0.392 0.455 0.545 rg
+56.6929133858267775 745.5120472440944468 Td
+(Official Cloud Deployment & System Reference Links) Tj
+ET
+0.8 0.84 0.88 RG
+56.6929133858267775 734.1734645669290558 m
+538.5826771653544256 734.1734645669290558 l
+S
+BT
+/F1 14 Tf
+16.0999999999999979 TL
+0.059 0.09 0.165 rg
+56.6929133858267775 700.15771653543311 Td
+(1. LIVE FRONTEND APPLICATION \(Vercel CDN\)) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.145 0.388 0.922 rg
+70.8661417322834666 677.480551181102328 Td
+(Main Website: https://consumer-trust-portal.vercel.app) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.145 0.388 0.922 rg
+70.8661417322834666 654.8033858267716596 Td
+(Register Grievance: https://consumer-trust-portal.vercel.app/register) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.145 0.388 0.922 rg
+70.8661417322834666 632.1262204724408775 Td
+(Direct 1-Tap Tracking: https://consumer-trust-portal.vercel.app/track?id=CT-2026-76665) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.145 0.388 0.922 rg
+70.8661417322834666 609.4490551181102092 Td
+(Admin Control Center: https://consumer-trust-portal.vercel.app/admin) Tj
+ET
+BT
+/F1 14 Tf
+16.0999999999999979 TL
+0.059 0.09 0.165 rg
+56.6929133858267775 564.0947244094487587 Td
+(2. LIVE BACKEND & CLOUD DATABASE \(Render Cloud\)) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.145 0.388 0.922 rg
+70.8661417322834666 541.4175590551180903 Td
+(API Root: https://consumer-trust-api.onrender.com/) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.145 0.388 0.922 rg
+70.8661417322834666 518.7403937007873083 Td
+(Health Check: https://consumer-trust-api.onrender.com/api/health) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.145 0.388 0.922 rg
+70.8661417322834666 496.0632283464566399 Td
+(GitHub Repository: https://github.com/Manojpuchakayala/Consumer-trust-portal) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.145 0.388 0.922 rg
+70.8661417322834666 473.3860629921259147 Td
+(Cloud Database: MongoDB Atlas \(Cluster: consumer-trust-db\)) Tj
+ET
+BT
+/F1 14 Tf
+16.0999999999999979 TL
+0.059 0.09 0.165 rg
+56.6929133858267775 428.0317322834645211 Td
+(3. DEMO ACCESS CREDENTIALS) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.2 0.255 0.333 rg
+70.8661417322834666 405.3545669291337958 Td
+(Administrator: admin@consumertrust.gov | Password: Admin@123) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.2 0.255 0.333 rg
+70.8661417322834666 382.6774015748030706 Td
+(Citizen Account: manojpuchakayala321@gmail.com | Password: User@123) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.2 0.255 0.333 rg
+70.8661417322834666 360.0002362204724022 Td
+(Verified Active Case: CT-2026-76665 \(Status: Pending Investigation\)) Tj
+ET
+BT
+/F1 14 Tf
+16.0999999999999979 TL
+0.059 0.09 0.165 rg
+56.6929133858267775 314.6459055118109518 Td
+(4. 100% FREE WHATSAPP 1-TAP TRACKING SYSTEM) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.086 0.396 0.204 rg
+70.8661417322834666 291.9687401574802834 Td
+(Instant WhatsApp Grievance Cards, Zero Carrier Recharge, 1-Tap Tracking Links.) Tj
+ET
+BT
+/F1 10 Tf
+11.5 TL
+0.086 0.396 0.204 rg
+70.8661417322834666 269.2915748031495013 Td
+(Multi-Option Hub: Direct Web Link, WhatsApp Web, and 1-Click Report Copy.) Tj
+ET
+endstream
+endobj
+1 0 obj
+<</Type /Pages
+/Kids [3 0 R ]
+/Count 1
+>>
+endobj
+5 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+6 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+7 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-Oblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+8 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-BoldOblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+9 0 obj
+<<
+/Type /Font
+/BaseFont /Courier
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+10 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+11 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-Oblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+12 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-BoldOblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+13 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Roman
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+14 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+15 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Italic
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+16 0 obj
+<<
+/Type /Font
+/BaseFont /Times-BoldItalic
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+17 0 obj
+<<
+/Type /Font
+/BaseFont /ZapfDingbats
+/Subtype /Type1
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+18 0 obj
+<<
+/Type /Font
+/BaseFont /Symbol
+/Subtype /Type1
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+2 0 obj
+<<
+/ProcSet [/PDF /Text /ImageB /ImageC /ImageI]
+/Font <<
+/F1 5 0 R
+/F2 6 0 R
+/F3 7 0 R
+/F4 8 0 R
+/F5 9 0 R
+/F6 10 0 R
+/F7 11 0 R
+/F8 12 0 R
+/F9 13 0 R
+/F10 14 0 R
+/F11 15 0 R
+/F12 16 0 R
+/F13 17 0 R
+/F14 18 0 R
+>>
+/XObject <<
+>>
+>>
+endobj
+19 0 obj
+<<
+/Producer (jsPDF 2.5.2)
+/CreationDate (D:20260904190102+05'30')
+>>
+endobj
+20 0 obj
+<<
+/Type /Catalog
+/Pages 1 0 R
+/OpenAction [3 0 R /FitH null]
+/PageLayout /OneColumn
+>>
+endobj
+xref
+0 21
+0000000000 65535 f 
+0000003306 00000 n 
+0000005123 00000 n 
+0000000015 00000 n 
+0000000152 00000 n 
+0000003363 00000 n 
+0000003488 00000 n 
+0000003618 00000 n 
+0000003751 00000 n 
+0000003888 00000 n 
+0000004011 00000 n 
+0000004140 00000 n 
+0000004272 00000 n 
+0000004408 00000 n 
+0000004536 00000 n 
+0000004663 00000 n 
+0000004792 00000 n 
+0000004925 00000 n 
+0000005027 00000 n 
+0000005371 00000 n 
+0000005457 00000 n 
+trailer
+<<
+/Size 21
+/Root 20 0 R
+/Info 19 0 R
+/ID [ <E50E923FEDF987EC3088EAEAA9E6F7BD> <E50E923FEDF987EC3088EAEAA9E6F7BD> ]
+>>
+startxref
+5561
+%%EOF
