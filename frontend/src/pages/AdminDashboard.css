@@ -92,6 +92,10 @@
   margin-bottom: 12px;
 }
 
+.card-top-row span {
+  white-space: nowrap;
+}
+
 .card-top-row .card-icon {
   font-size: 22px;
 }
@@ -621,6 +625,44 @@
 .table-none-text {
   color: #94a3b8;
   font-size: 14px;
+}
+
+/* Status Pill in Table and Details */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+}
+
+.status-pill.pending {
+  background: #fff8e1;
+  color: #f57f17;
+  border: 1px solid #ffe082;
+}
+
+.status-pill.in-progress {
+  background: #e1f5fe;
+  color: #0277bd;
+  border: 1px solid #81d4fa;
+}
+
+.status-pill.resolved {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #a5d6a7;
+}
+
+.status-pill.rejected {
+  background: #ffebee;
+  color: #c62828;
+  border: 1px solid #ef9a9a;
 }
 
 /* Modal SMS and Feedback Badges */

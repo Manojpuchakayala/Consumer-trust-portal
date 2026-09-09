@@ -52,9 +52,21 @@
 
 .mini-stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
   margin-bottom: 30px;
+}
+
+@media (max-width: 768px) {
+  .mini-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .mini-stats {
+    grid-template-columns: 1fr;
+  }
 }
 
 .mini-card {
@@ -77,6 +89,7 @@
   font-size: 13px;
   color: #78909c;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .mini-card.pending .mini-num { color: #f57f17; }
@@ -215,6 +228,10 @@
   padding: 4px 12px;
   border-radius: 20px;
   text-transform: uppercase;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .status-badge.pending { background: #fff8e1; color: #f57f17; }

@@ -91,6 +91,7 @@
   transition: all 0.25s ease;
   display: flex;
   align-items: center;
+  white-space: nowrap;
 }
 
 .nav-links a:hover,
