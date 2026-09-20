@@ -1,4 +1,4 @@
-﻿/**
+/**
  * National Enterprise & Nodal Officer Directory
  * Stores pre-configured official grievance nodal emails, ombudsman categories, and resolution SLAs.
  */
@@ -107,7 +107,7 @@ const COMPANY_DIRECTORY = [
     supportEmail: "customercare@sbi.co.in",
     ombudsman: "RBI Integrated Ombudsman Scheme (cms.rbi.org.in)",
     slaHours: 48,
-    slaDays: 14,
+    slaDays: 7,
   },
   {
     id: "hdfc",
@@ -117,7 +117,7 @@ const COMPANY_DIRECTORY = [
     supportEmail: "support@hdfcbank.com",
     ombudsman: "RBI Integrated Ombudsman Scheme (cms.rbi.org.in)",
     slaHours: 48,
-    slaDays: 14,
+    slaDays: 7,
   },
   {
     id: "icici",
@@ -127,7 +127,7 @@ const COMPANY_DIRECTORY = [
     supportEmail: "customer.care@icicibank.com",
     ombudsman: "RBI Integrated Ombudsman Scheme (cms.rbi.org.in)",
     slaHours: 48,
-    slaDays: 14,
+    slaDays: 7,
   },
   {
     id: "axis",
@@ -137,7 +137,7 @@ const COMPANY_DIRECTORY = [
     supportEmail: "customer.services@axisbank.com",
     ombudsman: "RBI Integrated Ombudsman Scheme (cms.rbi.org.in)",
     slaHours: 48,
-    slaDays: 14,
+    slaDays: 7,
   },
   {
     id: "phonepe",
@@ -263,7 +263,7 @@ const COMPANY_DIRECTORY = [
     supportEmail: "support.india@samsung.com",
     ombudsman: "National Consumer Helpline (1915)",
     slaHours: 48,
-    slaDays: 10,
+    slaDays: 7,
   },
   {
     id: "apple",
@@ -273,7 +273,7 @@ const COMPANY_DIRECTORY = [
     supportEmail: "contactus.in@apple.com",
     ombudsman: "National Consumer Helpline (1915)",
     slaHours: 48,
-    slaDays: 10,
+    slaDays: 7,
   },
 ];
 

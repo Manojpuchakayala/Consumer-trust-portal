@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import {
   FaShieldAlt,
@@ -141,6 +141,18 @@ function CompanyResolution() {
           <p>
             Official Enterprise Dispute Resolution Interface under Consumer Protection Regulations & RBI/TRAI Directives.
           </p>
+
+          <div className="sla-deadline-card">
+            <div className="sla-deadline-icon">
+              <FaClock />
+            </div>
+            <div className="sla-deadline-text">
+              <strong>Mandatory 7-Day Resolution Mandate</strong>
+              <p>
+                Under the Central Consumer Redressal SLA, this dispute must be formally redressed and updated with resolution/refund proof within <strong>7 days (168 hours)</strong> from registration. Past 7 days, this case docket is automatically flagged for Ombudsman escalation.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Success Banner */}

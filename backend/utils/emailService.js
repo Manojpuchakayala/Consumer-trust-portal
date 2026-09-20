@@ -457,9 +457,9 @@ const sendCompanyGrievanceNoticeEmail = async ({ complaint, company, resolutionU
             </div>
 
             <!-- Statutory Notice & SLA -->
-            <div style="background: #fffbeb; border: 1px solid #fef3c7; border-radius: 8px; padding: 12px 16px; margin: 20px 0;">
-              <p style="color: #92400e; font-size: 12px; margin: 0; line-height: 1.5;">
-                ⏱️ <strong>Statutory Redressal SLA:</strong> Please acknowledge this case within <strong>48 hours</strong>. Unresolved cases beyond 7 days will be flagged for automatic escalation to the competent Ombudsman (RBI CMS / NCDRC / TRAI TDSAT).
+            <div style="background: #fffbeb; border: 1.5px solid #f59e0b; border-radius: 8px; padding: 14px 18px; margin: 20px 0;">
+              <p style="color: #92400e; font-size: 13px; margin: 0; line-height: 1.6;">
+                ⏱️ <strong>Strict 7-Day Resolution Mandate:</strong> Please acknowledge this case within <strong>48 hours</strong>. The statutory grievance redressal period is strictly capped at <strong>7 Days (168 Hours)</strong>. Unresolved cases past the 7-day deadline will be automatically escalated to the competent Statutory Ombudsman (RBI CMS / NCDRC e-Daakhil / TRAI TDSAT) with full timestamped audit logs.
               </p>
             </div>
 

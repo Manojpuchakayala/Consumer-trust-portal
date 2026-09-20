@@ -1,4 +1,4 @@
-﻿.company-resolution-page {
+.company-resolution-page {
   min-height: calc(100vh - 80px);
   background: #f1f5f9;
   padding: 40px 20px;
@@ -57,6 +57,46 @@
   max-width: 650px;
   margin: 0 auto;
   line-height: 1.5;
+}
+
+.sla-deadline-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #fffbeb;
+  border: 1.5px solid #fde68a;
+  border-radius: 12px;
+  padding: 14px 18px;
+  max-width: 650px;
+  margin: 18px auto 0;
+  text-align: left;
+}
+
+.sla-deadline-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: #d97706;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.sla-deadline-text strong {
+  display: block;
+  color: #92400e;
+  font-size: 13.5px;
+  margin-bottom: 2px;
+}
+
+.sla-deadline-text p {
+  margin: 0;
+  color: #78350f;
+  font-size: 12.5px;
+  line-height: 1.4;
 }
 
 .alert-success {
