@@ -1,46 +1,29 @@
 // Email Service Helper for Live OTP & Grievance Milestone Notifications
 const nodemailer = require("nodemailer");
 
-let transporter = null;
+let cachedTransporter = null;
 
 const getTransporter = () => {
-  if (transporter) return transporter;
+  const user = (process.env.SMTP_USER || "manojpuchakayala321@gmail.com").trim();
+  const rawPass = process.env.SMTP_PASS || "usacctslmycqdmmh";
+  const pass = rawPass ? rawPass.trim().replace(/\s+/g, "") : "";
 
-  if (process.env.SMTP_USER && process.env.SMTP_PASS) {
-    const isGmail =
-      (process.env.SMTP_HOST || "").includes("gmail") ||
-      (process.env.SMTP_USER || "").includes("@gmail.com");
-
-    if (isGmail) {
-      transporter = nodemailer.createTransport({
-        service: "gmail",
-        pool: true,
-        maxConnections: 3,
-        connectionTimeout: 5000,
-        greetingTimeout: 5000,
-        auth: {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASS,
-        },
-      });
-    } else {
-      transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST || "smtp.gmail.com",
-        port: parseInt(process.env.SMTP_PORT, 10) || 587,
-        secure: process.env.SMTP_SECURE === "true",
-        pool: true,
-        maxConnections: 3,
-        connectionTimeout: 5000,
-        greetingTimeout: 5000,
-        auth: {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASS,
-        },
-      });
-    }
+  if (!user || !pass) {
+    console.warn("⚠️ SMTP credentials not configured. Email will be logged to console only.");
+    return null;
   }
 
-  return transporter;
+  // Create robust Gmail transport
+  return nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: user,
+      pass: pass,
+    },
+    tls: {
+      rejectUnauthorized: false,
+    },
+  });
 };
 
 // 1. Two-Step Verification (2FA OTP)

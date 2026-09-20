@@ -9,6 +9,10 @@ try {
 }
 
 const connectDB = async () => {
+  if (mongoose.connection.readyState >= 1) {
+    return;
+  }
+
   try {
     const mongoURI = process.env.MONGO_URI;
 
@@ -17,7 +21,9 @@ const connectDB = async () => {
       return;
     }
 
-    const conn = await mongoose.connect(mongoURI);
+    const conn = await mongoose.connect(mongoURI, {
+      serverSelectionTimeoutMS: 5000,
+    });
     console.log(`✅ MongoDB Connected: ${conn.connection.host} | Database: ${conn.connection.name}`);
   } catch (error) {
     console.error("❌ MongoDB Connection Error:", error.message);

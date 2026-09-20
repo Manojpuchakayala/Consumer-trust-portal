@@ -3,6 +3,7 @@ const path = require("path");
 const fs = require("fs");
 const mongoose = require("mongoose");
 const cors = require("cors");
+require("dotenv").config({ path: path.join(__dirname, ".env") });
 require("dotenv").config();
 
 const connectDB = require("./config/db");
@@ -140,6 +141,10 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`🚀 Consumer Trust Server running at http://localhost:${PORT}`);
-});
+if (process.env.NODE_ENV !== "test" && !process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Consumer Trust Server running at http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
