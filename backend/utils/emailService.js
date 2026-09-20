@@ -263,8 +263,108 @@ const sendComplaintStatusUpdateEmail = async (complaint) => {
   return true;
 };
 
+// 4. Successful Login / Security Notification Email
+const sendLoginNotificationEmail = async ({
+  email,
+  name = "Citizen",
+  role = "user",
+  authMethod = "Email & Password",
+  loginTime = new Date(),
+}) => {
+  const formattedTime = new Date(loginTime).toLocaleString("en-IN", {
+    timeZone: "Asia/Kolkata",
+    dateStyle: "full",
+    timeStyle: "medium",
+  });
+
+  console.log("=========================================");
+  console.log(`📧 [LOGIN SECURITY NOTIFICATION EMAIL]`);
+  console.log(`   To: ${email} (${name})`);
+  console.log(`   Time: ${formattedTime}`);
+  console.log(`   Method: ${authMethod}`);
+  console.log("=========================================");
+
+  const mailer = getTransporter();
+  const frontendUrl = process.env.FRONTEND_URL || "https://consumer-trust-portal.vercel.app";
+
+  if (mailer) {
+    try {
+      const isInternalDomain =
+        email.endsWith("@consumertrust.gov") ||
+        email.endsWith("@consumertrust.com");
+      const targetEmail =
+        isInternalDomain && process.env.SMTP_USER ? process.env.SMTP_USER : email;
+
+      await mailer.sendMail({
+        from: `"Consumer Trust Security" <${process.env.SMTP_USER}>`,
+        to: targetEmail,
+        subject: `🔐 Login Notification: Successful Sign-In (${email}) - Consumer Trust Portal`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 14px; background: #ffffff;">
+            <div style="text-align: center; border-bottom: 2px solid #2563eb; padding-bottom: 16px; margin-bottom: 20px;">
+              <h2 style="color: #1e3a8a; margin: 0; font-size: 22px;">🏛️ Consumer Trust Portal</h2>
+              <p style="color: #64748b; font-size: 13px; margin: 4px 0 0;">Official Citizen Grievance & Redressal Platform</p>
+            </div>
+
+            <p style="color: #334155; font-size: 15px;">Hello <strong>${name}</strong>,</p>
+            <p style="color: #475569; line-height: 1.6; font-size: 14px;">
+              Your account was recently accessed on the <strong>Consumer Trust Grievance Portal</strong>. Here are the security details for this session:
+            </p>
+
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 18px; margin: 20px 0;">
+              <div style="margin-bottom: 10px;">
+                <strong style="color: #475569; font-size: 13px;">Registered Email:</strong> 
+                <span style="color: #1e293b; font-size: 14px; font-weight: 700;">${email}</span>
+              </div>
+              <div style="margin-bottom: 10px;">
+                <strong style="color: #475569; font-size: 13px;">Account Type:</strong> 
+                <span style="color: #0369a1; background: #e0f2fe; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 700; text-transform: uppercase;">
+                  ${role === "admin" ? "Administrator" : "Consumer / Citizen"}
+                </span>
+              </div>
+              <div style="margin-bottom: 10px;">
+                <strong style="color: #475569; font-size: 13px;">Sign-In Method:</strong> 
+                <span style="color: #166534; background: #dcfce7; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 700;">
+                  ${authMethod}
+                </span>
+              </div>
+              <div>
+                <strong style="color: #475569; font-size: 13px;">Login Timestamp:</strong> 
+                <span style="color: #1e293b; font-size: 13px;">${formattedTime}</span>
+              </div>
+            </div>
+
+            <div style="text-align: center; margin: 26px 0;">
+              <a href="${frontendUrl}/my-complaints" style="background: #2563eb; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 14px; display: inline-block;">
+                Access Your Complaints Dashboard →
+              </a>
+            </div>
+
+            <div style="background: #fffbeb; border: 1px solid #fef3c7; border-radius: 8px; padding: 12px 16px; margin: 20px 0;">
+              <p style="color: #92400e; font-size: 12px; margin: 0; line-height: 1.5;">
+                🛡️ <strong>Security Notice:</strong> If this was you, you can safely disregard this email. If you did not sign in or suspect unauthorized access, please contact our support desk immediately.
+              </p>
+            </div>
+
+            <hr style="border: none; border-top: 1px solid #f1f5f9; margin: 20px 0;" />
+            <p style="color: #94a3b8; font-size: 11px; text-align: center;">
+              © ${new Date().getFullYear()} Consumer Trust Grievance Portal. All rights reserved.
+            </p>
+          </div>
+        `,
+      });
+      console.log(`✅ Login notification email delivered to ${targetEmail} (account: ${email})`);
+    } catch (err) {
+      console.warn("⚠️ Login notification email dispatch error:", err.message);
+    }
+  }
+
+  return true;
+};
+
 module.exports = {
   sendOtpEmail,
   sendComplaintConfirmationEmail,
   sendComplaintStatusUpdateEmail,
+  sendLoginNotificationEmail,
 };
