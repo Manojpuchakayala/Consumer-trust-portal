@@ -158,14 +158,25 @@ function Navbar() {
                 </button>
               </div>
             ) : (
-              <Link
-                to="/login"
-                className="login-btn"
-                onClick={() => setMenuOpen(false)}
-              >
-                <FaUserCircle />
-                <span>Login / Sign Up</span>
-              </Link>
+              <div className="auth-actions-loggedout">
+                <Link
+                  to="/login?portal=admin"
+                  className="officer-btn"
+                  onClick={() => setMenuOpen(false)}
+                  title="Grievance Redressal Officer / Admin Portal"
+                >
+                  <FaUserShield />
+                  <span>Officer Portal</span>
+                </Link>
+                <Link
+                  to="/login"
+                  className="login-btn"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <FaUserCircle />
+                  <span>Citizen Login</span>
+                </Link>
+              </div>
             )}
           </div>
         </div>

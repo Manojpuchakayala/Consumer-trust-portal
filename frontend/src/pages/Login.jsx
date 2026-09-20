@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import {
   FaEnvelope,
@@ -7,26 +7,34 @@ import {
   FaUser,
   FaPhone,
   FaShieldAlt,
+  FaUserShield,
   FaExclamationCircle,
   FaCheckCircle,
   FaEye,
   FaEyeSlash,
+  FaKey,
 } from "react-icons/fa";
 import api from "../services/api";
 import "./Login.css";
 
 function Login() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const isInitialAdmin =
+    searchParams.get("portal") === "admin" ||
+    searchParams.get("role") === "admin";
+
+  const [portal, setPortal] = useState(isInitialAdmin ? "admin" : "citizen");
   const [isRegisterMode, setIsRegisterMode] = useState(
-    searchParams.get("mode") === "signup"
+    searchParams.get("mode") === "signup" && !isInitialAdmin
   );
 
   // Form State
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
-    password: "",
+    email: isInitialAdmin ? "admin@consumertrust.gov" : "",
+    password: isInitialAdmin ? "admin@123" : "",
     phone: "",
   });
 
@@ -35,11 +43,39 @@ function Login() {
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
 
+  useEffect(() => {
+    if (searchParams.get("portal") === "admin" || searchParams.get("role") === "admin") {
+      setPortal("admin");
+      setIsRegisterMode(false);
+      if (!formData.email) {
+        setFormData((prev) => ({
+          ...prev,
+          email: "admin@consumertrust.gov",
+          password: "admin@123",
+        }));
+      }
+    }
+  }, [searchParams]);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
+  };
+
+  const handlePortalChange = (newPortal) => {
+    setPortal(newPortal);
+    setError("");
+    setSuccessMsg("");
+    if (newPortal === "admin") {
+      setIsRegisterMode(false);
+      setFormData((prev) => ({
+        ...prev,
+        email: prev.email || "admin@consumertrust.gov",
+        password: prev.password || "admin@123",
+      }));
+    }
   };
 
   // Submit Credentials (Sign In or Sign Up)
@@ -61,6 +97,7 @@ function Login() {
         : {
             email: formData.email,
             password: formData.password,
+            requestedRole: portal === "admin" ? "admin" : "user",
           };
 
       const response = await api.post(endpoint, payload);
@@ -150,43 +187,103 @@ function Login() {
   return (
     <div className="login-page">
       <div className="login-container">
-        {/* Shield Icon Header */}
-        <div className="login-badge-wrap">
-          <FaShieldAlt className="login-badge-icon" />
+        {/* Portal Switcher (Citizen vs Officer/Admin) */}
+        <div className="portal-switcher">
+          <button
+            type="button"
+            className={`portal-tab ${portal === "citizen" ? "active" : ""}`}
+            onClick={() => handlePortalChange("citizen")}
+          >
+            <FaUser style={{ marginRight: 6 }} />
+            Citizen Portal
+          </button>
+          <button
+            type="button"
+            className={`portal-tab ${portal === "admin" ? "active" : ""}`}
+            onClick={() => handlePortalChange("admin")}
+          >
+            <FaUserShield style={{ marginRight: 6 }} />
+            Officer / Admin
+          </button>
         </div>
 
-        <h1>{isRegisterMode ? "Create Account" : "Sign In"}</h1>
+        {/* Shield Icon Header */}
+        <div className={`login-badge-wrap ${portal === "admin" ? "admin-mode" : ""}`}>
+          {portal === "admin" ? (
+            <FaUserShield className="login-badge-icon admin" />
+          ) : (
+            <FaShieldAlt className="login-badge-icon" />
+          )}
+        </div>
+
+        <h1>
+          {portal === "admin"
+            ? "Officer / Admin Sign In"
+            : isRegisterMode
+            ? "Create Account"
+            : "Citizen Sign In"}
+        </h1>
         <p className="login-subtitle">
-          {isRegisterMode
+          {portal === "admin"
+            ? "Authorized grievance redressal officers sign in to access the National Control Center."
+            : isRegisterMode
             ? "Sign up to file and track consumer grievances."
             : "Sign in to access your complaints and redressal records."}
         </p>
 
-        {/* Simple Sign In / Sign Up Mode Switch Tabs */}
-        <div className="auth-tabs">
-          <button
-            type="button"
-            className={`tab-btn ${!isRegisterMode ? "active" : ""}`}
-            onClick={() => {
-              setIsRegisterMode(false);
-              setError("");
-              setSuccessMsg("");
-            }}
-          >
-            Sign In
-          </button>
-          <button
-            type="button"
-            className={`tab-btn ${isRegisterMode ? "active" : ""}`}
-            onClick={() => {
-              setIsRegisterMode(true);
-              setError("");
-              setSuccessMsg("");
-            }}
-          >
-            Sign Up
-          </button>
-        </div>
+        {/* Mode Switch Tabs (Only for Citizen Portal) */}
+        {portal === "citizen" && (
+          <div className="auth-tabs">
+            <button
+              type="button"
+              className={`tab-btn ${!isRegisterMode ? "active" : ""}`}
+              onClick={() => {
+                setIsRegisterMode(false);
+                setError("");
+                setSuccessMsg("");
+              }}
+            >
+              Sign In
+            </button>
+            <button
+              type="button"
+              className={`tab-btn ${isRegisterMode ? "active" : ""}`}
+              onClick={() => {
+                setIsRegisterMode(true);
+                setError("");
+                setSuccessMsg("");
+              }}
+            >
+              Sign Up
+            </button>
+          </div>
+        )}
+
+        {/* Admin Quick Auto-Fill Helper Card */}
+        {portal === "admin" && (
+          <div className="admin-quick-tip">
+            <div className="admin-tip-text">
+              <FaKey className="tip-icon" />
+              <div>
+                <strong>Official Admin Login</strong>
+                <p>admin@consumertrust.gov / admin@123</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              className="quick-fill-btn"
+              onClick={() => {
+                setFormData({
+                  ...formData,
+                  email: "admin@consumertrust.gov",
+                  password: "admin@123",
+                });
+              }}
+            >
+              Auto-Fill
+            </button>
+          </div>
+        )}
 
         {/* Prominent Google Sign-In Button */}
         <div className="google-auth-wrapper">
@@ -202,7 +299,7 @@ function Login() {
         </div>
 
         <div className="auth-divider">
-          <span>OR CONTINUE WITH EMAIL</span>
+          <span>OR CONTINUE WITH CREDENTIALS</span>
         </div>
 
         {/* Error Alert */}
@@ -221,9 +318,9 @@ function Login() {
           </div>
         )}
 
-        {/* Simple & Clean Form */}
+        {/* Form */}
         <form onSubmit={handleSubmit} className="login-form">
-          {isRegisterMode && (
+          {portal === "citizen" && isRegisterMode && (
             <>
               <div className="input-group">
                 <div className="input-wrapper">
@@ -261,7 +358,7 @@ function Login() {
               <input
                 type="email"
                 name="email"
-                placeholder="Email Address"
+                placeholder={portal === "admin" ? "Officer / Admin Email" : "Email Address"}
                 value={formData.email}
                 onChange={handleChange}
                 required
@@ -275,11 +372,7 @@ function Login() {
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
-                placeholder={
-                  isRegisterMode
-                    ? "Password (minimum 6 characters)"
-                    : "Password"
-                }
+                placeholder="Password"
                 value={formData.password}
                 onChange={handleChange}
                 required
@@ -296,33 +389,42 @@ function Login() {
             </div>
           </div>
 
-          <button type="submit" className="login-submit-btn" disabled={loading}>
+          <button type="submit" className={`login-submit-btn ${portal === "admin" ? "admin-btn" : ""}`} disabled={loading}>
             {loading
-              ? "Please wait..."
+              ? "Authenticating..."
+              : portal === "admin"
+              ? "Access Admin Control Center"
               : isRegisterMode
-              ? "Create Account"
+              ? "Create Citizen Account"
               : "Sign In"}
           </button>
         </form>
 
-        {/* Clean Footer Link */}
+        {/* Footer info link */}
         <div className="login-footer-info">
-          <p>
-            {isRegisterMode
-              ? "Already have an account?"
-              : "Don't have an account?"}{" "}
-            <button
-              type="button"
-              className="toggle-link"
-              onClick={() => {
-                setIsRegisterMode(!isRegisterMode);
-                setError("");
-                setSuccessMsg("");
-              }}
-            >
-              {isRegisterMode ? "Sign In here" : "Sign Up now"}
-            </button>
-          </p>
+          {portal === "citizen" ? (
+            <p>
+              {isRegisterMode
+                ? "Already have an account?"
+                : "Don't have an account?"}{" "}
+              <button
+                type="button"
+                className="toggle-link"
+                onClick={() => {
+                  setIsRegisterMode(!isRegisterMode);
+                  setError("");
+                  setSuccessMsg("");
+                }}
+              >
+                {isRegisterMode ? "Sign In here" : "Sign Up now"}
+              </button>
+            </p>
+          ) : (
+            <p>
+              Officer Support: Contact system administration at{" "}
+              <strong>admin@consumertrust.gov</strong>
+            </p>
+          )}
         </div>
       </div>
     </div>
@@ -330,3 +432,4 @@ function Login() {
 }
 
 export default Login;
+

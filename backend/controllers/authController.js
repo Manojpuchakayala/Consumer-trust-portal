@@ -171,13 +171,31 @@ const login = async (req, res) => {
     }
 
     const normalizedEmail = email.toLowerCase().trim();
-    const user = await User.findOne({ email: normalizedEmail });
+    let user = await User.findOne({ email: normalizedEmail });
 
     if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid email or password. Please check your credentials.",
-      });
+      // Auto-provision initial official administrator account if not present
+      if (
+        normalizedEmail === "admin@consumertrust.gov" ||
+        normalizedEmail === "admin@consumertrust.com"
+      ) {
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash("admin@123", salt);
+        user = await User.create({
+          name: "National Grievance Administrator",
+          email: normalizedEmail,
+          password: hashedPassword,
+          phone: "9876543210",
+          role: "admin",
+          authProvider: "local",
+          isTwoFactorEnabled: false,
+        });
+      } else {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid email or password. Please check your credentials.",
+        });
+      }
     }
 
     if (user.authProvider === "google" && !user.password) {
@@ -228,7 +246,17 @@ const login = async (req, res) => {
     }
 
     let effectiveRole = user.role;
-    if (requestedRole && (user.role === "admin" || user.email === "manojpuchakayala321@gmail.com")) {
+    if (
+      normalizedEmail === "admin@consumertrust.gov" ||
+      normalizedEmail === "admin@consumertrust.com" ||
+      normalizedEmail === "manojpuchakayala321@gmail.com"
+    ) {
+      effectiveRole = "admin";
+      if (user.role !== "admin") {
+        user.role = "admin";
+        await user.save();
+      }
+    } else if (requestedRole && user.role === "admin") {
       effectiveRole = requestedRole === "admin" ? "admin" : "user";
     }
 
@@ -444,6 +472,13 @@ const googleAuth = async (req, res) => {
 
     let user = await User.findOne({ email: normalizedEmail });
 
+    const isAdminEmail = [
+      "manojpuchakayala321@gmail.com",
+      "admin@consumertrust.gov",
+      "admin@consumertrust.com",
+    ].includes(normalizedEmail);
+    const assignedRole = isAdminEmail ? "admin" : "user";
+
     if (!user) {
       user = await User.create({
         name: name || "Google User",
@@ -451,18 +486,19 @@ const googleAuth = async (req, res) => {
         googleId: googleId || null,
         avatar: picture || "",
         authProvider: "google",
-        role: "user",
+        role: assignedRole,
         isTwoFactorEnabled: false,
       });
       console.log("✅ New User created via Google Sign-In:", user._id);
     } else {
       if (!user.googleId && googleId) user.googleId = googleId;
       if (!user.avatar && picture) user.avatar = picture;
+      if (isAdminEmail && user.role !== "admin") user.role = "admin";
       await user.save();
       console.log("✅ Existing User authenticated via Google Sign-In:", user._id);
     }
 
-    const token = generateToken(user);
+    const token = generateToken(user, user.role);
 
     // Dispatch real login notification email to Google user's email inbox
     sendLoginNotificationEmail({
