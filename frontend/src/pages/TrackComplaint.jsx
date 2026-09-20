@@ -26,8 +26,15 @@ import {
   FaBuilding,
   FaReceipt,
   FaShieldAlt,
+  FaHourglassHalf,
+  FaExclamationTriangle,
+  FaAward,
 } from "react-icons/fa";
 import api from "../services/api";
+import {
+  generateGrievanceNoticePdf,
+  generateResolutionCertificatePdf,
+} from "../utils/pdfGenerator";
 import "./TrackComplaint.css";
 
 function TrackComplaint() {
@@ -47,6 +54,46 @@ function TrackComplaint() {
   const [submittingFeedback, setSubmittingFeedback] = useState(false);
   const [feedbackSuccess, setFeedbackSuccess] = useState("");
   const [feedbackError, setFeedbackError] = useState("");
+
+  // SLA Countdown & Escalation Modal State
+  const [showEscalateModal, setShowEscalateModal] = useState(false);
+  const [slaTime, setSlaTime] = useState({
+    days: 7,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+    isExpired: false,
+    percentElapsed: 0,
+  });
+
+  // Calculate live SLA countdown
+  useEffect(() => {
+    if (!complaint || !complaint.createdAt) return;
+
+    const updateSla = () => {
+      const createdTime = new Date(complaint.createdAt).getTime();
+      const slaDuration = 7 * 24 * 60 * 60 * 1000;
+      const deadline = createdTime + slaDuration;
+      const now = Date.now();
+      const remaining = deadline - now;
+      const elapsed = now - createdTime;
+      const percentElapsed = Math.min(100, Math.max(0, (elapsed / slaDuration) * 100));
+
+      if (remaining <= 0) {
+        setSlaTime({ days: 0, hours: 0, minutes: 0, seconds: 0, isExpired: true, percentElapsed: 100 });
+      } else {
+        const days = Math.floor(remaining / (24 * 60 * 60 * 1000));
+        const hours = Math.floor((remaining % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+        const minutes = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
+        const seconds = Math.floor((remaining % (60 * 1000)) / 1000);
+        setSlaTime({ days, hours, minutes, seconds, isExpired: false, percentElapsed });
+      }
+    };
+
+    updateSla();
+    const interval = setInterval(updateSla, 1000);
+    return () => clearInterval(interval);
+  }, [complaint]);
 
   const fetchComplaint = async (idToSearch) => {
     if (!idToSearch || !idToSearch.trim()) {
@@ -234,6 +281,92 @@ function TrackComplaint() {
                 {complaint.status}
               </div>
             </div>
+
+            {/* 7-Day Statutory SLA Live Countdown Banner */}
+            {complaint.status !== "Resolved" && complaint.status !== "Rejected" && (
+              <div className={`sla-countdown-card ${slaTime.isExpired ? "expired" : ""}`}>
+                <div className="sla-countdown-top">
+                  <div className="sla-left">
+                    <FaHourglassHalf className={`sla-hourglass-icon ${slaTime.isExpired ? "text-red" : "text-amber"}`} />
+                    <div>
+                      <h4>7-Day Statutory Redressal SLA Countdown</h4>
+                      <p>
+                        {slaTime.isExpired
+                          ? "⚠️ Statutory 7-day period has elapsed. Case eligible for immediate Statutory Ombudsman Escalation."
+                          : `Strict statutory deadline for ${complaint.companyName || "the enterprise"} Grievance Desk to redress.`}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="sla-timer-digits">
+                    <div className="digit-box">
+                      <strong>{slaTime.days}</strong>
+                      <span>Days</span>
+                    </div>
+                    <div className="digit-sep">:</div>
+                    <div className="digit-box">
+                      <strong>{String(slaTime.hours).padStart(2, "0")}</strong>
+                      <span>Hours</span>
+                    </div>
+                    <div className="digit-sep">:</div>
+                    <div className="digit-box">
+                      <strong>{String(slaTime.minutes).padStart(2, "0")}</strong>
+                      <span>Mins</span>
+                    </div>
+                    <div className="digit-sep">:</div>
+                    <div className="digit-box">
+                      <strong>{String(slaTime.seconds).padStart(2, "0")}</strong>
+                      <span>Secs</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* SLA Progress Bar */}
+                <div className="sla-progress-track">
+                  <div
+                    className={`sla-progress-fill ${slaTime.isExpired ? "expired" : ""}`}
+                    style={{ width: `${slaTime.percentElapsed}%` }}
+                  />
+                </div>
+
+                <div className="sla-footer-actions">
+                  <button
+                    type="button"
+                    className="escalate-modal-trigger-btn"
+                    onClick={() => setShowEscalateModal(true)}
+                  >
+                    <FaExclamationTriangle /> 1-Click Ombudsman Escalation Gateway
+                  </button>
+
+                  <button
+                    type="button"
+                    className="download-pdf-notice-btn"
+                    onClick={() => generateGrievanceNoticePdf(complaint)}
+                  >
+                    <FaFilePdf /> Download Official Notice (PDF)
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Certified Redressal Banner when Resolved */}
+            {complaint.status === "Resolved" && (
+              <div className="resolution-cert-banner">
+                <div className="res-cert-left">
+                  <FaAward className="res-award-icon" />
+                  <div>
+                    <h4>Official Redressal Certified & Settled</h4>
+                    <p>This dispute has been legally resolved. You can download your official stamped resolution certificate.</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="download-cert-btn"
+                  onClick={() => generateResolutionCertificatePdf(complaint)}
+                >
+                  <FaFilePdf /> Download Settlement Certificate (PDF)
+                </button>
+              </div>
+            )}
 
             {/* Step Progress Bar */}
             {complaint.status === "Rejected" ? (
@@ -699,6 +832,113 @@ function TrackComplaint() {
               >
                 <FaPrint /> Print Official Case Status
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* Ombudsman Escalation Modal */}
+        {showEscalateModal && complaint && (
+          <div className="escalate-modal-overlay" onClick={() => setShowEscalateModal(false)}>
+            <div className="escalate-modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="escalate-modal-header">
+                <div className="escalate-header-title">
+                  <FaShieldAlt className="modal-shield-icon" />
+                  <div>
+                    <h3>Official Statutory Ombudsman Escalation</h3>
+                    <p>Case Reference: <strong>{complaint.complaintId}</strong> against <strong>{complaint.companyName}</strong></p>
+                  </div>
+                </div>
+                <button type="button" className="close-modal-btn" onClick={() => setShowEscalateModal(false)}>✕</button>
+              </div>
+
+              <div className="escalate-modal-body">
+                <p className="modal-lead">
+                  Under statutory consumer protection directives, if <strong>{complaint.companyName}</strong> fails to provide resolution within the 7-day SLA, you are entitled to escalate directly to the competent National Ombudsman:
+                </p>
+
+                <div className="ombudsman-options-list">
+                  <a
+                    href="https://consumerhelpline.gov.in/user/login.php"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ombudsman-card"
+                  >
+                    <div className="omb-icon">🏛️</div>
+                    <div className="omb-info">
+                      <strong>National Consumer Helpline (NCH / Toll-Free 1915)</strong>
+                      <span>Central Consumer Protection Authority (CCPA) — 1-Tap Portal Filing</span>
+                    </div>
+                    <FaExternalLinkAlt className="omb-link-icon" />
+                  </a>
+
+                  <a
+                    href="https://cms.rbi.org.in"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ombudsman-card"
+                  >
+                    <div className="omb-icon">🏦</div>
+                    <div className="omb-info">
+                      <strong>RBI Integrated Banking Ombudsman (CMS)</strong>
+                      <span>For Banks, UPI, Credit Cards, Wallets, and Digital Payment Failures</span>
+                    </div>
+                    <FaExternalLinkAlt className="omb-link-icon" />
+                  </a>
+
+                  <a
+                    href="https://edaakhil.nic.in"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ombudsman-card"
+                  >
+                    <div className="omb-icon">⚖️</div>
+                    <div className="omb-info">
+                      <strong>e-Daakhil (National Consumer Disputes Commission)</strong>
+                      <span>Direct Digital Filing in Consumer Court for Full Compensation & Refunds</span>
+                    </div>
+                    <FaExternalLinkAlt className="omb-link-icon" />
+                  </a>
+
+                  <a
+                    href="https://tdsat.gov.in"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ombudsman-card"
+                  >
+                    <div className="omb-icon">📱</div>
+                    <div className="omb-info">
+                      <strong>TRAI TDSAT (Telecom Dispute Settlement Tribunal)</strong>
+                      <span>For Telecom, ISP, SIM & Broadcasting Grievances</span>
+                    </div>
+                    <FaExternalLinkAlt className="omb-link-icon" />
+                  </a>
+                </div>
+
+                <div className="modal-copy-dossier">
+                  <label>📋 Pre-Formatted Claim Summary for Ombudsman:</label>
+                  <textarea
+                    readOnly
+                    rows="3"
+                    value={`Statutory Grievance Docket: ${complaint.complaintId}\nDisputed Party: ${complaint.companyName}\nOrder/Ref: ${complaint.orderOrTransactionId || "N/A"}\nClaim: ${complaint.subject}\nFiling Date: ${new Date(complaint.createdAt).toLocaleDateString()}\nStatus: ${complaint.status} (7-Day SLA Exceeded)\nDocket URL: ${window.location.origin}/track?id=${complaint.complaintId}`}
+                  />
+                </div>
+              </div>
+
+              <div className="escalate-modal-footer">
+                <button
+                  type="button"
+                  className="download-docket-modal-btn"
+                  onClick={() => {
+                    generateGrievanceNoticePdf(complaint);
+                    setShowEscalateModal(false);
+                  }}
+                >
+                  <FaFilePdf /> Download Official Notice (PDF)
+                </button>
+                <button type="button" className="close-btn" onClick={() => setShowEscalateModal(false)}>
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         )}

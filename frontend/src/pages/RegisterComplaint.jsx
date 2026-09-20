@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   FaUser,
   FaEnvelope,
@@ -20,8 +20,11 @@ import {
   FaBuilding,
   FaReceipt,
   FaShieldAlt,
+  FaMagic,
 } from "react-icons/fa";
 import api from "../services/api";
+import { enhanceGrievanceDescription, COMMON_RELIEFS } from "../utils/aiLegalAssistant";
+import { generateGrievanceNoticePdf } from "../utils/pdfGenerator";
 import "./RegisterComplaint.css";
 
 const ENTERPRISE_OPTIONS = [
@@ -55,12 +58,15 @@ const ENTERPRISE_OPTIONS = [
 ];
 
 function RegisterComplaint() {
+  const [searchParams] = useSearchParams();
+  const initialCompany = searchParams.get("company") || "Amazon India";
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
     category: "Product",
-    companyName: "Amazon India",
+    companyName: initialCompany,
     customCompanyName: "",
     orderOrTransactionId: "",
     subject: "",
@@ -79,6 +85,31 @@ function RegisterComplaint() {
   const [copiedWa, setCopiedWa] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
 
+  // AI Legal Assistant States
+  const [selectedReliefs, setSelectedReliefs] = useState([]);
+  const [isAiEnhancing, setIsAiEnhancing] = useState(false);
+
+  useEffect(() => {
+    // If company is in query params, pre-select it and its category
+    const paramCompany = searchParams.get("company");
+    if (paramCompany) {
+      const match = ENTERPRISE_OPTIONS.find((opt) => opt.name.toLowerCase() === paramCompany.toLowerCase());
+      if (match) {
+        setFormData((prev) => ({
+          ...prev,
+          companyName: match.name,
+          category: match.category || prev.category,
+        }));
+      } else {
+        setFormData((prev) => ({
+          ...prev,
+          companyName: "Other / Custom Enterprise",
+          customCompanyName: paramCompany,
+        }));
+      }
+    }
+  }, [searchParams]);
+
   useEffect(() => {
     // Pre-fill user data if logged in
     const storedUser = localStorage.getItem("consumerTrustUser");
@@ -94,6 +125,31 @@ function RegisterComplaint() {
       } catch (e) {}
     }
   }, []);
+
+  const toggleRelief = (relief) => {
+    if (selectedReliefs.includes(relief)) {
+      setSelectedReliefs(selectedReliefs.filter((r) => r !== relief));
+    } else {
+      setSelectedReliefs([...selectedReliefs, relief]);
+    }
+  };
+
+  const handleAiEnhance = () => {
+    setIsAiEnhancing(true);
+    const enhanced = enhanceGrievanceDescription({
+      companyName:
+        formData.companyName === "Other / Custom Enterprise"
+          ? formData.customCompanyName.trim() || "the Enterprise"
+          : formData.companyName,
+      category: formData.category,
+      orderOrTransactionId: formData.orderOrTransactionId,
+      rawSubject: formData.subject,
+      rawDescription: formData.description,
+      selectedReliefs,
+    });
+    setFormData((prev) => ({ ...prev, description: enhanced }));
+    setTimeout(() => setIsAiEnhancing(false), 400);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -405,23 +461,31 @@ function RegisterComplaint() {
             <div className="success-actions no-print">
               <button
                 type="button"
+                className="pdf-notice-btn"
+                onClick={() => generateGrievanceNoticePdf(submittedData)}
+                title="Download stamped, verifiable statutory legal notice PDF"
+              >
+                <FaFilePdf /> Download Official Notice (PDF)
+              </button>
+              <button
+                type="button"
                 className="print-slip-btn"
                 onClick={handlePrintSlip}
               >
-                <FaPrint /> Print / Save Acknowledgment Slip
+                <FaPrint /> Print Slip
               </button>
               <Link
                 to={`/track?id=${submittedData.complaintId}`}
                 className="track-now-btn"
               >
-                Track This Complaint Now <FaArrowRight />
+                Track Live <FaArrowRight />
               </Link>
               <button
                 type="button"
                 className="register-another-btn"
                 onClick={handleReset}
               >
-                File Another Complaint
+                File Another
               </button>
             </div>
 
@@ -694,12 +758,44 @@ function RegisterComplaint() {
                 </div>
               </div>
 
-              <div className="input-group full-width">
-                <label>Comprehensive Description *</label>
+              <div className="input-group full-width description-group">
+                <div className="desc-header-row">
+                  <label>Comprehensive Grievance Statement & Claim *</label>
+                  <button
+                    type="button"
+                    className={`ai-enhance-btn ${isAiEnhancing ? "enhancing" : ""}`}
+                    onClick={handleAiEnhance}
+                    title="Structure this grievance with Consumer Protection Act citations and formal legal wording"
+                  >
+                    <FaMagic /> {isAiEnhancing ? "Structuring Claim..." : "✨ AI Legal Assistant (Enhance Statement)"}
+                  </button>
+                </div>
+
+                {/* Quick Relief Chips */}
+                <div className="relief-chips-wrap">
+                  <span className="relief-chips-label">Select Desired Reliefs (AI will include in claim):</span>
+                  <div className="relief-chips-list">
+                    {COMMON_RELIEFS.map((relief) => {
+                      const isSelected = selectedReliefs.includes(relief);
+                      return (
+                        <button
+                          key={relief}
+                          type="button"
+                          className={`relief-chip ${isSelected ? "selected" : ""}`}
+                          onClick={() => toggleRelief(relief)}
+                        >
+                          {isSelected ? "✓ " : "+ "}
+                          {relief}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
                 <textarea
                   name="description"
-                  rows="5"
-                  placeholder="Provide complete details including invoice numbers, seller name, dates of purchase/contact, and desired resolution..."
+                  rows="6"
+                  placeholder="Provide details of your transaction/dispute. Click '✨ AI Legal Assistant' above to automatically format into a statutory claim with legal clauses..."
                   value={formData.description}
                   onChange={handleChange}
                   required

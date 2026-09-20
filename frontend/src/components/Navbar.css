@@ -222,9 +222,145 @@
   color: white;
 }
 
+.nav-extra-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.theme-toggle-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffeb3b;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 15px;
+  transition: all 0.2s ease;
+}
+
+.theme-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: rotate(15deg) scale(1.05);
+}
+
+.theme-toggle-btn .sun-icon {
+  color: #fbc02d;
+}
+
+.theme-toggle-btn .moon-icon {
+  color: #e0e7ff;
+}
+
+.mobile-controls-wrap {
+  display: none;
+  align-items: center;
+  gap: 10px;
+}
+
+.desktop-only {
+  display: flex;
+}
+
+.mobile-only {
+  display: none;
+}
+
+.lang-selector-wrap {
+  position: relative;
+}
+
+.lang-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.lang-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.globe-icon {
+  font-size: 13px;
+  color: #93c5fd;
+}
+
+.lang-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  min-width: 170px;
+  padding: 6px;
+  z-index: 1050;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.lang-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text-primary, #1e293b);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.lang-option:hover,
+.lang-option.selected {
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-weight: 700;
+}
+
+.lang-option .flag {
+  font-size: 14px;
+}
+
+.brands-nav-link {
+  background: rgba(37, 99, 235, 0.25) !important;
+  border: 1px solid rgba(147, 197, 253, 0.3) !important;
+}
+
 @media (max-width: 900px) {
   .menu-toggle {
     display: block;
+  }
+
+  .mobile-controls-wrap {
+    display: flex;
+  }
+
+  .desktop-only {
+    display: none;
+  }
+
+  .mobile-only {
+    display: flex;
   }
 
   .nav-menu {
@@ -254,6 +390,11 @@
   .nav-links a {
     width: 100%;
     padding: 10px 14px;
+  }
+
+  .nav-extra-controls {
+    width: 100%;
+    justify-content: space-between;
   }
 
   .auth-section {

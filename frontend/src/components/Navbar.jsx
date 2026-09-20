@@ -8,7 +8,12 @@ import {
   FaSignOutAlt,
   FaClipboardList,
   FaUserShield,
+  FaMoon,
+  FaSun,
+  FaGlobe,
+  FaBuilding,
 } from "react-icons/fa";
+import { LANGUAGES, t } from "../utils/translations";
 import "./Navbar.css";
 
 function Navbar() {
@@ -16,6 +21,30 @@ function Navbar() {
   const location = useLocation();
   const [user, setUser] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    return localStorage.getItem("consumerTrustTheme") === "dark";
+  });
+  const [currentLang, setCurrentLang] = useState(() => {
+    return localStorage.getItem("consumerTrustLang") || "en";
+  });
+  const [langMenuOpen, setLangMenuOpen] = useState(false);
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.setAttribute("data-theme", "dark");
+      localStorage.setItem("consumerTrustTheme", "dark");
+    } else {
+      document.documentElement.removeAttribute("data-theme");
+      localStorage.setItem("consumerTrustTheme", "light");
+    }
+  }, [darkMode]);
+
+  const handleLangChange = (code) => {
+    setCurrentLang(code);
+    localStorage.setItem("consumerTrustLang", code);
+    setLangMenuOpen(false);
+    window.dispatchEvent(new Event("langChange"));
+  };
 
   useEffect(() => {
     const checkUser = () => {
@@ -73,14 +102,25 @@ function Navbar() {
           </div>
         </Link>
 
-        {/* Mobile Hamburger Toggle */}
-        <button
-          className={`menu-toggle ${menuOpen ? "open" : ""}`}
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Toggle navigation menu"
-        >
-          {menuOpen ? <FaTimes /> : <FaBars />}
-        </button>
+        {/* Mobile Controls Wrap */}
+        <div className="mobile-controls-wrap">
+          <button
+            type="button"
+            className="theme-toggle-btn mobile-only"
+            onClick={() => setDarkMode(!darkMode)}
+            title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          >
+            {darkMode ? <FaSun className="sun-icon" /> : <FaMoon className="moon-icon" />}
+          </button>
+
+          <button
+            className={`menu-toggle ${menuOpen ? "open" : ""}`}
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Toggle navigation menu"
+          >
+            {menuOpen ? <FaTimes /> : <FaBars />}
+          </button>
+        </div>
 
         {/* Navigation & Actions */}
         <div className={`nav-menu ${menuOpen ? "open" : ""}`}>
@@ -91,7 +131,7 @@ function Navbar() {
                 className={isActive("/") ? "active" : ""}
                 onClick={() => setMenuOpen(false)}
               >
-                Home
+                {t("nav_home", currentLang)}
               </Link>
             </li>
             <li>
@@ -100,7 +140,7 @@ function Navbar() {
                 className={isActive("/register") ? "active" : ""}
                 onClick={() => setMenuOpen(false)}
               >
-                Register Complaint
+                {t("nav_register", currentLang)}
               </Link>
             </li>
             <li>
@@ -109,7 +149,17 @@ function Navbar() {
                 className={isActive("/track") ? "active" : ""}
                 onClick={() => setMenuOpen(false)}
               >
-                Track Status
+                {t("nav_track", currentLang)}
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/brands"
+                className={`brands-nav-link ${isActive("/brands") ? "active" : ""}`}
+                onClick={() => setMenuOpen(false)}
+              >
+                <FaBuilding style={{ marginRight: 6 }} />
+                {t("nav_brands", currentLang)}
               </Link>
             </li>
             {user && (
@@ -120,7 +170,7 @@ function Navbar() {
                   onClick={() => setMenuOpen(false)}
                 >
                   <FaClipboardList style={{ marginRight: 6 }} />
-                  My Complaints
+                  {t("nav_my_complaints", currentLang)}
                 </Link>
               </li>
             )}
@@ -132,11 +182,52 @@ function Navbar() {
                   onClick={() => setMenuOpen(false)}
                 >
                   <FaUserShield style={{ marginRight: 6 }} />
-                  Admin Dashboard
+                  {t("nav_admin", currentLang)}
                 </Link>
               </li>
             )}
           </ul>
+
+          <div className="nav-extra-controls">
+            {/* Language Selector */}
+            <div className="lang-selector-wrap">
+              <button
+                type="button"
+                className="lang-btn"
+                onClick={() => setLangMenuOpen(!langMenuOpen)}
+                title="Select Language"
+              >
+                <FaGlobe className="globe-icon" />
+                <span>{LANGUAGES.find((l) => l.code === currentLang)?.label.split(" ")[0]}</span>
+              </button>
+
+              {langMenuOpen && (
+                <div className="lang-dropdown">
+                  {LANGUAGES.map((lang) => (
+                    <button
+                      key={lang.code}
+                      type="button"
+                      className={`lang-option ${currentLang === lang.code ? "selected" : ""}`}
+                      onClick={() => handleLangChange(lang.code)}
+                    >
+                      <span className="flag">{lang.flag}</span>
+                      <span>{lang.label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Dark Mode Toggle */}
+            <button
+              type="button"
+              className="theme-toggle-btn desktop-only"
+              onClick={() => setDarkMode(!darkMode)}
+              title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            >
+              {darkMode ? <FaSun className="sun-icon" /> : <FaMoon className="moon-icon" />}
+            </button>
+          </div>
 
           <div className="auth-section">
             {user ? (
@@ -165,7 +256,7 @@ function Navbar() {
                   title="Logout"
                 >
                   <FaSignOutAlt />
-                  <span>Logout</span>
+                  <span>{t("nav_logout", currentLang)}</span>
                 </button>
               </div>
             ) : (
@@ -175,7 +266,7 @@ function Navbar() {
                 onClick={() => setMenuOpen(false)}
               >
                 <FaUserCircle />
-                <span>Login / Sign Up</span>
+                <span>{t("nav_login", currentLang)}</span>
               </Link>
             )}
           </div>

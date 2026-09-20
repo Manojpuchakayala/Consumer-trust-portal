@@ -10,6 +10,7 @@ import MyComplaints from "./pages/MyComplaints";
 import Login from "./pages/Login";
 import AdminDashboard from "./pages/AdminDashboard";
 import CompanyResolution from "./pages/CompanyResolution";
+import BrandLeaderboard from "./pages/BrandLeaderboard";
 
 // Route guard for authenticated users (Consumers)
 function ProtectedRoute({ children }) {
@@ -52,6 +53,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/register" element={<RegisterComplaint />} />
             <Route path="/track" element={<TrackComplaint />} />
+            <Route path="/brands" element={<BrandLeaderboard />} />
             <Route
               path="/my-complaints"
               element={
