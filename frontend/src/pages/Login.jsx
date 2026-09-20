@@ -46,11 +46,18 @@ function Login() {
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
 
-  // Google Modal State
+  // Per-Device Dynamic Google Sign-In State
   const [showGoogleModal, setShowGoogleModal] = useState(false);
   const [showSetupGuide, setShowSetupGuide] = useState(false);
-  const [customGoogleEmail, setCustomGoogleEmail] = useState("manojpuchakayala321@gmail.com");
-  const [customGoogleName, setCustomGoogleName] = useState("Manoj Kumar");
+  const [googleEmailInput, setGoogleEmailInput] = useState("");
+  const [googleNameInput, setGoogleNameInput] = useState("");
+  const [savedDeviceGoogleUser, setSavedDeviceGoogleUser] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("consumerTrustLastGoogleUser") || "null");
+    } catch {
+      return null;
+    }
+  });
 
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
   const isRealGoogleConfigured = Boolean(
@@ -192,8 +199,13 @@ function Login() {
     setError("");
     setShowGoogleModal(false);
     try {
-      const email = (emailToUse || customGoogleEmail).trim().toLowerCase();
-      const name = (nameToUse || customGoogleName).trim() || "Google User";
+      const email = (emailToUse || googleEmailInput).trim().toLowerCase();
+      const rawName = (nameToUse || googleNameInput).trim();
+      const name = rawName || (email.includes("@") ? email.split("@")[0] : "Google User");
+
+      if (!email || !email.includes("@")) {
+        throw new Error("Please enter a valid Google email address.");
+      }
 
       const response = await api.post("/auth/google", {
         userInfo: {
@@ -204,11 +216,18 @@ function Login() {
       });
 
       if (response.data?.token) {
+        // Save this device's Google profile for 1-tap re-login next time
+        try {
+          const profile = { name: response.data.user.name, email: response.data.user.email };
+          localStorage.setItem("consumerTrustLastGoogleUser", JSON.stringify(profile));
+          setSavedDeviceGoogleUser(profile);
+        } catch {}
+
         handleAuthSuccess(response.data);
       }
     } catch (err) {
       setError(
-        err.response?.data?.message || "Google Sign-In failed. Please try again."
+        err.response?.data?.message || err.message || "Google Sign-In failed. Please try again."
       );
     } finally {
       setLoading(false);
@@ -524,39 +543,88 @@ function Login() {
               </div>
 
               <div className="google-accounts-list">
-                {/* Primary Quick Account */}
-                <button
-                  type="button"
-                  className="google-account-item"
-                  onClick={() => handleDirectGoogleSignIn("manojpuchakayala321@gmail.com", "Manoj Kumar")}
-                >
-                  <div className="account-avatar">M</div>
-                  <div className="account-meta">
-                    <strong>Manoj Kumar</strong>
-                    <span>manojpuchakayala321@gmail.com</span>
-                  </div>
-                  <span className="one-tap-badge">1-Tap Sign In</span>
-                </button>
-
-                {/* Custom Google Account Input */}
-                <div className="custom-google-account-form">
-                  <span className="form-sub-label">Or sign in with any Google Email:</span>
-                  <div className="custom-google-row">
-                    <input
-                      type="email"
-                      placeholder="e.g. yourname@gmail.com"
-                      value={customGoogleEmail}
-                      onChange={(e) => setCustomGoogleEmail(e.target.value)}
-                    />
+                {/* If the visitor has a previously remembered Google account on this browser, show 1-Tap */}
+                {savedDeviceGoogleUser && (
+                  <div className="saved-account-wrapper">
+                    <span className="form-sub-label">Saved on this device:</span>
                     <button
                       type="button"
-                      className="submit-custom-google-btn"
-                      onClick={() => handleDirectGoogleSignIn(customGoogleEmail, customGoogleName)}
+                      className="google-account-item"
+                      onClick={() =>
+                        handleDirectGoogleSignIn(
+                          savedDeviceGoogleUser.email,
+                          savedDeviceGoogleUser.name
+                        )
+                      }
                     >
-                      Continue
+                      <div className="account-avatar">
+                        {savedDeviceGoogleUser.name ? savedDeviceGoogleUser.name.charAt(0).toUpperCase() : "G"}
+                      </div>
+                      <div className="account-meta">
+                        <strong>{savedDeviceGoogleUser.name || "Google User"}</strong>
+                        <span>{savedDeviceGoogleUser.email}</span>
+                      </div>
+                      <span className="one-tap-badge">1-Tap Sign In</span>
+                    </button>
+
+                    <div className="switch-account-header">
+                      <span className="form-sub-label">Or use another account:</span>
+                      <button
+                        type="button"
+                        className="clear-saved-btn"
+                        onClick={() => {
+                          try {
+                            localStorage.removeItem("consumerTrustLastGoogleUser");
+                          } catch {}
+                          setSavedDeviceGoogleUser(null);
+                        }}
+                      >
+                        Forget
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Universal Google Account Input for Any User Worldwide */}
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleDirectGoogleSignIn(googleEmailInput, googleNameInput);
+                  }}
+                  className="custom-google-account-form"
+                >
+                  <div className="google-form-inputs">
+                    <div className="google-input-field">
+                      <label>Google / Gmail Email Address *</label>
+                      <input
+                        type="email"
+                        placeholder="e.g. yourname@gmail.com"
+                        value={googleEmailInput}
+                        onChange={(e) => setGoogleEmailInput(e.target.value)}
+                        required
+                        autoFocus={!savedDeviceGoogleUser}
+                      />
+                    </div>
+
+                    <div className="google-input-field">
+                      <label>Full Name (Optional)</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Your Name"
+                        value={googleNameInput}
+                        onChange={(e) => setGoogleNameInput(e.target.value)}
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="submit-custom-google-btn"
+                      disabled={loading || !googleEmailInput.trim()}
+                    >
+                      {loading ? "Signing in..." : "Continue with Google →"}
                     </button>
                   </div>
-                </div>
+                </form>
               </div>
 
               <div className="google-modal-footer">
