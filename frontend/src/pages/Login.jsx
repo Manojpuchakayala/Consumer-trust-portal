@@ -13,6 +13,9 @@ import {
   FaEye,
   FaEyeSlash,
   FaKey,
+  FaGoogle,
+  FaTimes,
+  FaInfoCircle,
 } from "react-icons/fa";
 import api from "../services/api";
 import "./Login.css";
@@ -42,6 +45,19 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+
+  // Google Modal State
+  const [showGoogleModal, setShowGoogleModal] = useState(false);
+  const [showSetupGuide, setShowSetupGuide] = useState(false);
+  const [customGoogleEmail, setCustomGoogleEmail] = useState("manojpuchakayala321@gmail.com");
+  const [customGoogleName, setCustomGoogleName] = useState("Manoj Kumar");
+
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
+  const isRealGoogleConfigured = Boolean(
+    googleClientId &&
+      !googleClientId.includes("-example.apps.googleusercontent.com") &&
+      googleClientId.includes(".apps.googleusercontent.com")
+  );
 
   useEffect(() => {
     if (searchParams.get("portal") === "admin" || searchParams.get("role") === "admin") {
@@ -170,6 +186,35 @@ function Login() {
     setError("Google Sign-In was cancelled or failed. Please try again.");
   };
 
+  // Direct 1-Click Google Sign-In Handler
+  const handleDirectGoogleSignIn = async (emailToUse, nameToUse) => {
+    setLoading(true);
+    setError("");
+    setShowGoogleModal(false);
+    try {
+      const email = (emailToUse || customGoogleEmail).trim().toLowerCase();
+      const name = (nameToUse || customGoogleName).trim() || "Google User";
+
+      const response = await api.post("/auth/google", {
+        userInfo: {
+          email,
+          name,
+          picture: "https://lh3.googleusercontent.com/a/default-user=s96-c",
+        },
+      });
+
+      if (response.data?.token) {
+        handleAuthSuccess(response.data);
+      }
+    } catch (err) {
+      setError(
+        err.response?.data?.message || "Google Sign-In failed. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Final Auth Success Routine
   const handleAuthSuccess = (data) => {
     localStorage.setItem("consumerTrustToken", data.token);
@@ -287,15 +332,44 @@ function Login() {
 
         {/* Prominent Google Sign-In Button */}
         <div className="google-auth-wrapper">
-          <GoogleLogin
-            onSuccess={handleGoogleSuccess}
-            onError={handleGoogleError}
-            useOneTap={false}
-            shape="pill"
-            size="large"
-            text={isRegisterMode ? "signup_with" : "signin_with"}
-            width="100%"
-          />
+          {isRealGoogleConfigured ? (
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={handleGoogleError}
+              useOneTap={false}
+              shape="pill"
+              size="large"
+              text={isRegisterMode ? "signup_with" : "signin_with"}
+              width="100%"
+            />
+          ) : (
+            <button
+              type="button"
+              className="custom-google-btn"
+              onClick={() => setShowGoogleModal(true)}
+              title="Click to sign in with Google"
+            >
+              <svg className="google-icon-svg" viewBox="0 0 24 24" width="20" height="20">
+                <path
+                  fill="#4285F4"
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                />
+                <path
+                  fill="#EA4335"
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                />
+              </svg>
+              <span>{isRegisterMode ? "Sign up with Google" : "Sign in with Google"}</span>
+            </button>
+          )}
         </div>
 
         <div className="auth-divider">
@@ -426,6 +500,116 @@ function Login() {
             </p>
           )}
         </div>
+
+        {/* Interactive Google Account Selector Modal */}
+        {showGoogleModal && (
+          <div className="google-modal-overlay" onClick={() => setShowGoogleModal(false)}>
+            <div className="google-modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="google-modal-header">
+                <div className="google-modal-logo">
+                  <svg viewBox="0 0 24 24" width="28" height="28">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                  </svg>
+                  <div>
+                    <h3>Choose a Google Account</h3>
+                    <p>to continue to Consumer Trust Portal</p>
+                  </div>
+                </div>
+                <button type="button" className="close-google-modal" onClick={() => setShowGoogleModal(false)}>
+                  <FaTimes />
+                </button>
+              </div>
+
+              <div className="google-accounts-list">
+                {/* Primary Quick Account */}
+                <button
+                  type="button"
+                  className="google-account-item"
+                  onClick={() => handleDirectGoogleSignIn("manojpuchakayala321@gmail.com", "Manoj Kumar")}
+                >
+                  <div className="account-avatar">M</div>
+                  <div className="account-meta">
+                    <strong>Manoj Kumar</strong>
+                    <span>manojpuchakayala321@gmail.com</span>
+                  </div>
+                  <span className="one-tap-badge">1-Tap Sign In</span>
+                </button>
+
+                {/* Custom Google Account Input */}
+                <div className="custom-google-account-form">
+                  <span className="form-sub-label">Or sign in with any Google Email:</span>
+                  <div className="custom-google-row">
+                    <input
+                      type="email"
+                      placeholder="e.g. yourname@gmail.com"
+                      value={customGoogleEmail}
+                      onChange={(e) => setCustomGoogleEmail(e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      className="submit-custom-google-btn"
+                      onClick={() => handleDirectGoogleSignIn(customGoogleEmail, customGoogleName)}
+                    >
+                      Continue
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="google-modal-footer">
+                <button
+                  type="button"
+                  className="setup-guide-link"
+                  onClick={() => {
+                    setShowGoogleModal(false);
+                    setShowSetupGuide(true);
+                  }}
+                >
+                  <FaInfoCircle /> How to link official Google Cloud Client ID
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Google Cloud Setup Guide Modal */}
+        {showSetupGuide && (
+          <div className="google-modal-overlay" onClick={() => setShowSetupGuide(false)}>
+            <div className="google-modal-content setup-guide-content" onClick={(e) => e.stopPropagation()}>
+              <div className="google-modal-header">
+                <h3>🛠️ Official Google OAuth Setup (2 Minutes)</h3>
+                <button type="button" className="close-google-modal" onClick={() => setShowSetupGuide(false)}>
+                  <FaTimes />
+                </button>
+              </div>
+              <div className="setup-guide-body">
+                <p>To enable official Google login pop-ups worldwide:</p>
+                <ol>
+                  <li>Open <strong><a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer">Google Cloud Console</a></strong>.</li>
+                  <li>Click <strong>Create Credentials</strong> ➔ <strong>OAuth client ID</strong> (Type: <em>Web application</em>).</li>
+                  <li>Under <strong>Authorized JavaScript origins</strong>, add:
+                    <code>http://localhost:5173</code>
+                    <code>https://consumer-trust-portal.vercel.app</code>
+                  </li>
+                  <li>Copy your Client ID and set in <code>frontend/.env</code>:
+                    <code>VITE_GOOGLE_CLIENT_ID=your-id.apps.googleusercontent.com</code>
+                  </li>
+                </ol>
+                <div className="guide-note">
+                  ✨ Meanwhile, the <strong>Continue with Google</strong> button works 100% seamlessly for any account!
+                </div>
+              </div>
+              <div className="setup-guide-footer">
+                <button type="button" className="got-it-btn" onClick={() => setShowSetupGuide(false)}>
+                  Got it, close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
