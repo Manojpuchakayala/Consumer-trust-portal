@@ -107,8 +107,12 @@ const register = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create user
-    const userRole = role === "admin" ? "admin" : "user";
+    // Create user (strictly default to "user" unless authorized administrative email)
+    const isAdminEmail =
+      normalizedEmail.includes("admin@consumertrust") ||
+      normalizedEmail === "manojpuchakayala321@gmail.com";
+    const userRole = role === "admin" && isAdminEmail ? "admin" : "user";
+
     const user = await User.create({
       name: name.trim(),
       email: normalizedEmail,

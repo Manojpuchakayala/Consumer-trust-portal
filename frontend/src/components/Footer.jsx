@@ -35,7 +35,7 @@ function Footer() {
               <li><Link to="/register">Register Complaint</Link></li>
               <li><Link to="/track">Track Status</Link></li>
               <li><Link to="/my-complaints">My Grievances</Link></li>
-              <li><Link to="/admin">Admin Access</Link></li>
+              <li><Link to="/login">Account Access</Link></li>
             </ul>
           </div>
 

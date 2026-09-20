@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -10,6 +10,31 @@ import MyComplaints from "./pages/MyComplaints";
 import Login from "./pages/Login";
 import AdminDashboard from "./pages/AdminDashboard";
 
+// Route guard for authenticated users (Consumers)
+function ProtectedRoute({ children }) {
+  const token = localStorage.getItem("consumerTrustToken");
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+}
+
+// Strict Route guard for Administrator role only
+function AdminRoute({ children }) {
+  const token = localStorage.getItem("consumerTrustToken");
+  const user = JSON.parse(localStorage.getItem("consumerTrustUser") || "null");
+
+  if (!token || !user) {
+    return <Navigate to="/login?role=admin" replace />;
+  }
+
+  if (user.role !== "admin") {
+    return <Navigate to="/my-complaints" replace />;
+  }
+
+  return children;
+}
+
 function App() {
   return (
     <BrowserRouter>
@@ -20,9 +45,25 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/register" element={<RegisterComplaint />} />
             <Route path="/track" element={<TrackComplaint />} />
-            <Route path="/my-complaints" element={<MyComplaints />} />
+            <Route
+              path="/my-complaints"
+              element={
+                <ProtectedRoute>
+                  <MyComplaints />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/login" element={<Login />} />
-            <Route path="/admin" element={<AdminDashboard />} />
+            <Route
+              path="/admin"
+              element={
+                <AdminRoute>
+                  <AdminDashboard />
+                </AdminRoute>
+              }
+            />
+            {/* Fallback */}
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
         <Footer />
@@ -32,3 +73,4 @@ function App() {
 }
 
 export default App;
+

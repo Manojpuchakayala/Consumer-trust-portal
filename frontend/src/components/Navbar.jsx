@@ -113,16 +113,18 @@ function Navbar() {
                 </Link>
               </li>
             )}
-            <li>
-              <Link
-                to="/admin"
-                className={`admin-link ${isActive("/admin") ? "active" : ""}`}
-                onClick={() => setMenuOpen(false)}
-              >
-                <FaUserShield style={{ marginRight: 6 }} />
-                Admin Dashboard
-              </Link>
-            </li>
+            {user && user.role === "admin" && (
+              <li>
+                <Link
+                  to="/admin"
+                  className={`admin-link ${isActive("/admin") ? "active" : ""}`}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <FaUserShield style={{ marginRight: 6 }} />
+                  Admin Dashboard
+                </Link>
+              </li>
+            )}
           </ul>
 
           <div className="auth-section">

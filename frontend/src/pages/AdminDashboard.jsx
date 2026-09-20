@@ -57,6 +57,9 @@ function AdminDashboard() {
   const user = JSON.parse(localStorage.getItem("consumerTrustUser") || "null");
 
   const fetchData = async () => {
+    if (!user || user.role !== "admin") {
+      return;
+    }
     setLoading(true);
     setError("");
     try {
@@ -82,6 +85,14 @@ function AdminDashboard() {
   };
 
   useEffect(() => {
+    if (!user) {
+      navigate("/login?role=admin", { replace: true });
+      return;
+    }
+    if (user.role !== "admin") {
+      navigate("/my-complaints", { replace: true });
+      return;
+    }
     fetchData();
   }, [statusFilter, categoryFilter]);
 
@@ -229,6 +240,23 @@ function AdminDashboard() {
     document.body.removeChild(link);
   };
 
+  if (!user || user.role !== "admin") {
+    return (
+      <div className="admin-dashboard-page" style={{ minHeight: "70vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ textAlign: "center", padding: "40px", background: "#fff", borderRadius: "12px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)", maxWidth: "480px" }}>
+          <FaShieldAlt style={{ fontSize: "48px", color: "#dc2626", marginBottom: "16px" }} />
+          <h2 style={{ fontSize: "22px", fontWeight: "700", color: "#1e293b", marginBottom: "8px" }}>Access Restricted</h2>
+          <p style={{ color: "#64748b", fontSize: "14px", lineHeight: "1.6", marginBottom: "20px" }}>
+            This portal is strictly restricted to authorized grievance administrators. Your current account ({user?.email || "Guest"}) does not have administrative clearance.
+          </p>
+          <Link to="/my-complaints" style={{ display: "inline-block", background: "#0b2545", color: "#fff", padding: "10px 20px", borderRadius: "8px", fontWeight: "600", textDecoration: "none" }}>
+            Return to My Grievances
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="admin-dashboard-page">
       <div className="admin-container">
@@ -241,15 +269,6 @@ function AdminDashboard() {
             <h1>Admin Control Center</h1>
             <p>Review filed complaints, inspect evidence files, dispatch WhatsApp resolutions, and monitor satisfaction.</p>
           </div>
-          {user?.role !== "admin" && (
-            <div className="admin-notice">
-              <FaExclamationTriangle />
-              <span>
-                Tip: If not logged in as Admin, please{" "}
-                <Link to="/login?role=admin">sign in with an Admin account</Link>.
-              </span>
-            </div>
-          )}
         </div>
 
         {/* Stats Grid */}
