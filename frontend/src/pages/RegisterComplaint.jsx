@@ -17,9 +17,42 @@ import {
   FaFileImage,
   FaWhatsapp,
   FaExternalLinkAlt,
+  FaBuilding,
+  FaReceipt,
+  FaShieldAlt,
 } from "react-icons/fa";
 import api from "../services/api";
 import "./RegisterComplaint.css";
+
+const ENTERPRISE_OPTIONS = [
+  { id: "amazon", name: "Amazon India", category: "Product", nodal: "grievance-officer@amazon.in", sla: "48h / 7 Days" },
+  { id: "flipkart", name: "Flipkart", category: "Product", nodal: "grievance.officer@flipkart.com", sla: "48h / 7 Days" },
+  { id: "myntra", name: "Myntra", category: "Product", nodal: "grievanceofficer@myntra.com", sla: "48h / 7 Days" },
+  { id: "meesho", name: "Meesho", category: "Product", nodal: "grievance-officer@meesho.com", sla: "48h / 7 Days" },
+  { id: "ajio", name: "Ajio (Reliance Retail)", category: "Product", nodal: "grievance.officer@ajio.com", sla: "48h / 7 Days" },
+  { id: "zomato", name: "Zomato", category: "Food", nodal: "grievance@zomato.com", sla: "24h / 3 Days" },
+  { id: "swiggy", name: "Swiggy", category: "Food", nodal: "grievances@swiggy.in", sla: "24h / 3 Days" },
+  { id: "blinkit", name: "Blinkit", category: "Food", nodal: "grievance@blinkit.com", sla: "24h / 3 Days" },
+  { id: "zepto", name: "Zepto", category: "Food", nodal: "grievance@zeptonow.com", sla: "24h / 3 Days" },
+  { id: "sbi", name: "State Bank of India (SBI)", category: "Banking", nodal: "nodalofficer@sbi.co.in", sla: "48h / 14 Days (RBI)" },
+  { id: "hdfc", name: "HDFC Bank", category: "Banking", nodal: "grievance.redressal@hdfcbank.com", sla: "48h / 14 Days (RBI)" },
+  { id: "icici", name: "ICICI Bank", category: "Banking", nodal: "headservicequality@icicibank.com", sla: "48h / 14 Days (RBI)" },
+  { id: "axis", name: "Axis Bank", category: "Banking", nodal: "nodal.officer@axisbank.com", sla: "48h / 14 Days (RBI)" },
+  { id: "phonepe", name: "PhonePe (UPI & Payments)", category: "Banking", nodal: "grievance-officer@phonepe.com", sla: "24h / 5 Days (NPCI)" },
+  { id: "paytm", name: "Paytm Payments", category: "Banking", nodal: "grievanceofficer@paytm.com", sla: "24h / 5 Days (NPCI)" },
+  { id: "googlepay", name: "Google Pay India", category: "Banking", nodal: "gpay-grievance-india@google.com", sla: "24h / 5 Days (NPCI)" },
+  { id: "jio", name: "Reliance Jio Infocomm", category: "Telecom", nodal: "appellate.authority@jio.com", sla: "48h / 7 Days (TRAI)" },
+  { id: "airtel", name: "Bharti Airtel", category: "Telecom", nodal: "nodalofficer.india@airtel.com", sla: "48h / 7 Days (TRAI)" },
+  { id: "vi", name: "Vodafone Idea (Vi)", category: "Telecom", nodal: "nodalofficer@vodafoneidea.com", sla: "48h / 7 Days (TRAI)" },
+  { id: "makemytrip", name: "MakeMyTrip", category: "Travel", nodal: "grievance.officer@makemytrip.com", sla: "24h / 7 Days" },
+  { id: "irctc", name: "IRCTC (Indian Railways)", category: "Travel", nodal: "customercare@irctc.co.in", sla: "24h / 5 Days" },
+  { id: "indigo", name: "IndiGo Airlines", category: "Travel", nodal: "nodalofficer@goindigo.in", sla: "24h / 7 Days" },
+  { id: "uber", name: "Uber India", category: "Travel", nodal: "grievance-officer-india@uber.com", sla: "24h / 5 Days" },
+  { id: "ola", name: "Ola Cabs", category: "Travel", nodal: "grievanceofficer@olacabs.com", sla: "24h / 5 Days" },
+  { id: "samsung", name: "Samsung Electronics India", category: "Product", nodal: "grievance.india@samsung.com", sla: "48h / 10 Days" },
+  { id: "apple", name: "Apple India", category: "Product", nodal: "india_grievance_officer@apple.com", sla: "48h / 10 Days" },
+  { id: "other", name: "Other / Custom Enterprise", category: "Other", nodal: "Custom Enterprise Desk", sla: "Standard 7 Days" },
+];
 
 function RegisterComplaint() {
   const [formData, setFormData] = useState({
@@ -27,6 +60,9 @@ function RegisterComplaint() {
     email: "",
     phone: "",
     category: "Product",
+    companyName: "Amazon India",
+    customCompanyName: "",
+    orderOrTransactionId: "",
     subject: "",
     description: "",
   });
@@ -60,10 +96,22 @@ function RegisterComplaint() {
   }, []);
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    if (name === "companyName") {
+      const match = ENTERPRISE_OPTIONS.find((opt) => opt.name === value);
+      if (match && match.category && match.id !== "other") {
+        setFormData((prev) => ({
+          ...prev,
+          companyName: value,
+          category: match.category,
+        }));
+        return;
+      }
+    }
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleFileChange = (e) => {
@@ -120,11 +168,18 @@ function RegisterComplaint() {
     setError("");
 
     try {
+      const effectiveCompanyName =
+        formData.companyName === "Other / Custom Enterprise"
+          ? formData.customCompanyName.trim() || "Custom Enterprise"
+          : formData.companyName;
+
       const data = new FormData();
       data.append("name", formData.name.trim());
       data.append("email", formData.email.trim());
       data.append("phone", formData.phone.trim());
       data.append("category", formData.category);
+      data.append("companyName", effectiveCompanyName);
+      data.append("orderOrTransactionId", formData.orderOrTransactionId.trim());
       data.append("subject", formData.subject.trim());
       data.append("description", formData.description.trim());
       data.append("whatsappAlertsEnabled", whatsappAlertsEnabled);
@@ -145,6 +200,8 @@ function RegisterComplaint() {
 
       setSubmittedData({
         complaintId: response.data.complaintId,
+        companyName: effectiveCompanyName,
+        orderOrTransactionId: formData.orderOrTransactionId,
         subject: formData.subject,
         category: formData.category,
         name: formData.name,
@@ -179,7 +236,7 @@ function RegisterComplaint() {
     const defaultTrack = `${window.location.origin}/track?id=${submittedData?.complaintId}`;
     const textToCopy =
       submittedData?.whatsAppMessage ||
-      `🏛️ *CONSUMER TRUST GRIEVANCE CELL*\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n📋 *Tracking ID:* ${submittedData?.complaintId}\n👤 *Citizen:* ${submittedData?.name}\n📁 *Category:* ${submittedData?.category}\n📌 *Subject:* ${submittedData?.subject}\n⏳ *Status:* Pending Investigation\n\n🔗 *Track Live Investigation:*\n${defaultTrack}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
+      `🏛️ *CONSUMER TRUST GRIEVANCE CELL*\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n📋 *Tracking ID:* ${submittedData?.complaintId}\n🏢 *Enterprise:* ${submittedData?.companyName}\n👤 *Citizen:* ${submittedData?.name}\n📁 *Category:* ${submittedData?.category}\n📌 *Subject:* ${submittedData?.subject}\n⏳ *Status:* Pending Investigation\n\n🔗 *Track Live Investigation:*\n${defaultTrack}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
     navigator.clipboard.writeText(textToCopy);
     setCopiedWa(true);
     setTimeout(() => setCopiedWa(false), 3000);
@@ -206,10 +263,17 @@ function RegisterComplaint() {
       email: "",
       phone: "",
       category: "Product",
+      companyName: "Amazon India",
+      customCompanyName: "",
+      orderOrTransactionId: "",
       subject: "",
       description: "",
     });
   };
+
+  const selectedEnterprise =
+    ENTERPRISE_OPTIONS.find((opt) => opt.name === formData.companyName) ||
+    ENTERPRISE_OPTIONS.find((opt) => opt.id === "other");
 
   return (
     <div className="register-page">
@@ -222,7 +286,7 @@ function RegisterComplaint() {
 
             <h2>Complaint Registered Successfully!</h2>
             <p className="success-desc">
-              Your grievance has been safely logged in the official repository.
+              Your grievance against <strong>{submittedData.companyName}</strong> has been safely logged in the official repository.
               A confirmation email has been dispatched to <strong>{submittedData.email}</strong>.
             </p>
 
@@ -292,6 +356,14 @@ function RegisterComplaint() {
 
             <div className="success-summary">
               <div>
+                <strong>Target Enterprise:</strong> {submittedData.companyName}
+              </div>
+              {submittedData.orderOrTransactionId && (
+                <div>
+                  <strong>Order / Ref ID:</strong> {submittedData.orderOrTransactionId}
+                </div>
+              )}
+              <div>
                 <strong>Complainant:</strong> {submittedData.name}
               </div>
               <div>
@@ -322,6 +394,11 @@ function RegisterComplaint() {
                 ) : (
                   "Disabled"
                 )}
+              </div>
+              <div className="statutory-notice-badge-row">
+                <span className="statutory-notice-badge">
+                  <FaShieldAlt /> Statutory Grievance Notice & 1-Click Resolution Token Dispatched to {submittedData.companyName} Nodal Desk
+                </span>
               </div>
             </div>
 
@@ -360,6 +437,16 @@ function RegisterComplaint() {
                   <strong>{submittedData.complaintId}</strong>
                 </div>
                 <div className="slip-row">
+                  <span>Disputed Enterprise:</span>
+                  <strong>{submittedData.companyName}</strong>
+                </div>
+                {submittedData.orderOrTransactionId && (
+                  <div className="slip-row">
+                    <span>Order / Ref ID:</span>
+                    <span>{submittedData.orderOrTransactionId}</span>
+                  </div>
+                )}
+                <div className="slip-row">
                   <span>Filing Timestamp:</span>
                   <span>{submittedData.date}</span>
                 </div>
@@ -394,7 +481,7 @@ function RegisterComplaint() {
               </div>
               <div className="slip-footer">
                 <p>Please preserve this receipt for ombudsman appeals and verification.</p>
-                <p>Verify live progress at: http://localhost:5173/track?id={submittedData.complaintId}</p>
+                <p>Verify live progress at: {window.location.origin}/track?id={submittedData.complaintId}</p>
               </div>
             </div>
           </div>
@@ -475,11 +562,122 @@ function RegisterComplaint() {
                       <option value="Service">Services / E-Commerce</option>
                       <option value="Food">Food / Restaurants / FMCG</option>
                       <option value="Banking">Banking / Payments / FinTech</option>
+                      <option value="Telecom">Telecom / Internet Providers</option>
+                      <option value="Travel">Travel / Airlines / Railways</option>
                       <option value="Other">Other Grievance</option>
                     </select>
                   </div>
                 </div>
               </div>
+
+              {/* Disputed Enterprise & Order/Transaction Ref */}
+              <div className="form-row">
+                <div className="input-group">
+                  <label>Disputed Enterprise / Platform / Bank *</label>
+                  <div className="input-wrapper">
+                    <FaBuilding className="input-icon" />
+                    <select
+                      name="companyName"
+                      value={formData.companyName}
+                      onChange={handleChange}
+                      required
+                    >
+                      <optgroup label="🛍️ E-Commerce & Retail">
+                        <option value="Amazon India">Amazon India</option>
+                        <option value="Flipkart">Flipkart</option>
+                        <option value="Myntra">Myntra</option>
+                        <option value="Meesho">Meesho</option>
+                        <option value="Ajio (Reliance Retail)">Ajio (Reliance Retail)</option>
+                      </optgroup>
+                      <optgroup label="🍔 Quick Commerce & Food Delivery">
+                        <option value="Zomato">Zomato</option>
+                        <option value="Swiggy">Swiggy</option>
+                        <option value="Blinkit">Blinkit</option>
+                        <option value="Zepto">Zepto</option>
+                      </optgroup>
+                      <optgroup label="🏦 Banks, FinTech & UPI Payments">
+                        <option value="State Bank of India (SBI)">State Bank of India (SBI)</option>
+                        <option value="HDFC Bank">HDFC Bank</option>
+                        <option value="ICICI Bank">ICICI Bank</option>
+                        <option value="Axis Bank">Axis Bank</option>
+                        <option value="PhonePe (UPI & Payments)">PhonePe (UPI & Payments)</option>
+                        <option value="Paytm Payments">Paytm Payments</option>
+                        <option value="Google Pay India">Google Pay India</option>
+                      </optgroup>
+                      <optgroup label="📱 Telecom & Internet Service Providers">
+                        <option value="Reliance Jio Infocomm">Reliance Jio Infocomm</option>
+                        <option value="Bharti Airtel">Bharti Airtel</option>
+                        <option value="Vodafone Idea (Vi)">Vodafone Idea (Vi)</option>
+                      </optgroup>
+                      <optgroup label="✈️ Travel, Railways, Flights & Cabs">
+                        <option value="MakeMyTrip">MakeMyTrip</option>
+                        <option value="IRCTC (Indian Railways)">IRCTC (Indian Railways)</option>
+                        <option value="IndiGo Airlines">IndiGo Airlines</option>
+                        <option value="Uber India">Uber India</option>
+                        <option value="Ola Cabs">Ola Cabs</option>
+                      </optgroup>
+                      <optgroup label="📱 Electronics & Manufacturers">
+                        <option value="Samsung Electronics India">Samsung Electronics India</option>
+                        <option value="Apple India">Apple India</option>
+                      </optgroup>
+                      <optgroup label="🏢 Other Organizations">
+                        <option value="Other / Custom Enterprise">Other / Custom Enterprise</option>
+                      </optgroup>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="input-group">
+                  <label>Order # / UTR / Account / PNR (Optional)</label>
+                  <div className="input-wrapper">
+                    <FaReceipt className="input-icon" />
+                    <input
+                      type="text"
+                      name="orderOrTransactionId"
+                      placeholder="e.g. 408-1234567-8901234 or UTR 4291829102"
+                      value={formData.orderOrTransactionId}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {formData.companyName === "Other / Custom Enterprise" && (
+                <div className="input-group full-width custom-company-row">
+                  <label>Custom Enterprise / Company Name *</label>
+                  <div className="input-wrapper">
+                    <FaBuilding className="input-icon" />
+                    <input
+                      type="text"
+                      name="customCompanyName"
+                      placeholder="Enter the official name of the company / merchant"
+                      value={formData.customCompanyName}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Nodal Redressal SLA Shield Banner */}
+              {selectedEnterprise && (
+                <div className="nodal-sla-banner">
+                  <div className="nodal-sla-icon">
+                    <FaShieldAlt />
+                  </div>
+                  <div className="nodal-sla-info">
+                    <div className="nodal-sla-title">
+                      <strong>Statutory Redressal Desk: </strong>
+                      <span>{selectedEnterprise.nodal}</span>
+                    </div>
+                    <div className="nodal-sla-meta">
+                      <span>⚡ Regulatory SLA: <strong>{selectedEnterprise.sla}</strong></span>
+                      <span className="sla-dot">•</span>
+                      <span>⚖️ Statutory Notice will be automatically dispatched upon submission</span>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div className="input-group full-width">
                 <label>Complaint Subject / Title *</label>

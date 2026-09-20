@@ -9,6 +9,7 @@ import TrackComplaint from "./pages/TrackComplaint";
 import MyComplaints from "./pages/MyComplaints";
 import Login from "./pages/Login";
 import AdminDashboard from "./pages/AdminDashboard";
+import CompanyResolution from "./pages/CompanyResolution";
 
 // Route guard for authenticated users (Consumers)
 function ProtectedRoute({ children }) {
@@ -68,6 +69,8 @@ function App() {
                 </AdminRoute>
               }
             />
+            {/* Enterprise Partner 1-Click Resolution Desk */}
+            <Route path="/partner/resolve" element={<CompanyResolution />} />
             {/* Fallback */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

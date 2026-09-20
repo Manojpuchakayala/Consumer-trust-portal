@@ -23,6 +23,9 @@ import {
   FaWhatsapp,
   FaShareAlt,
   FaCopy,
+  FaBuilding,
+  FaReceipt,
+  FaShieldAlt,
 } from "react-icons/fa";
 import api from "../services/api";
 import "./TrackComplaint.css";
@@ -285,6 +288,24 @@ function TrackComplaint() {
             {/* Details Grid */}
             <div className="details-grid">
               <div className="detail-item">
+                <FaBuilding className="detail-icon" />
+                <div>
+                  <label>Disputed Enterprise / Bank</label>
+                  <strong style={{ color: "#0d3b66" }}>{complaint.companyName || "General / Other"}</strong>
+                </div>
+              </div>
+
+              {complaint.orderOrTransactionId && (
+                <div className="detail-item">
+                  <FaReceipt className="detail-icon" />
+                  <div>
+                    <label>Order # / Ref ID</label>
+                    <span style={{ fontFamily: "monospace", fontWeight: 600 }}>{complaint.orderOrTransactionId}</span>
+                  </div>
+                </div>
+              )}
+
+              <div className="detail-item">
                 <FaUser className="detail-icon" />
                 <div>
                   <label>Complainant Name</label>
@@ -475,6 +496,51 @@ function TrackComplaint() {
                     );
                   })}
                 </div>
+              </div>
+            )}
+
+            {/* Enterprise Nodal Resolution & Settlement Record */}
+            {complaint.companyResolution && complaint.companyResolution.resolvedByCompany && (
+              <div className="company-resolution-box">
+                <div className="company-res-header">
+                  <div className="company-res-icon">
+                    <FaShieldAlt />
+                  </div>
+                  <div>
+                    <h4>Official Enterprise Settlement Notice</h4>
+                    <p>
+                      Direct corporate redressal submitted by <strong>{complaint.companyName || "Enterprise"} Grievance Desk</strong>
+                    </p>
+                  </div>
+                </div>
+
+                <div className="company-res-grid">
+                  <div className="company-res-item">
+                    <span className="res-item-label">Redressal Action</span>
+                    <strong className="res-action-badge">{complaint.companyResolution.resolutionType || "Settled"}</strong>
+                  </div>
+
+                  {complaint.companyResolution.settlementReference && (
+                    <div className="company-res-item">
+                      <span className="res-item-label">Refund UTR / Settlement Ref / Waybill #</span>
+                      <strong className="res-ref-code">{complaint.companyResolution.settlementReference}</strong>
+                    </div>
+                  )}
+
+                  {complaint.companyResolution.resolvedAt && (
+                    <div className="company-res-item">
+                      <span className="res-item-label">Settlement Timestamp</span>
+                      <span>{new Date(complaint.companyResolution.resolvedAt).toLocaleString()}</span>
+                    </div>
+                  )}
+                </div>
+
+                {complaint.companyResolution.resolutionRemarks && (
+                  <div className="company-res-remarks">
+                    <strong>Enterprise Desk Findings & Remarks:</strong>
+                    <p>"{complaint.companyResolution.resolutionRemarks}"</p>
+                  </div>
+                )}
               </div>
             )}
 

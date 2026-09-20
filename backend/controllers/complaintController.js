@@ -1,8 +1,11 @@
+const crypto = require("crypto");
 const Complaint = require("../models/Complaint");
 const User = require("../models/User");
+const { findCompany } = require("../utils/companyDirectory");
 const {
   sendComplaintConfirmationEmail,
   sendComplaintStatusUpdateEmail,
+  sendCompanyGrievanceNoticeEmail,
 } = require("../utils/emailService");
 const {
   sendComplaintRegistrationSMS,
@@ -27,7 +30,19 @@ const generateComplaintId = () => {
 // Register / Create Complaint
 const createComplaint = async (req, res) => {
   try {
-    const { name, email, phone, category, subject, description, smsAlertsEnabled, whatsappAlertsEnabled } = req.body;
+    const {
+      name,
+      email,
+      phone,
+      category,
+      companyName,
+      companyEmail,
+      orderOrTransactionId,
+      subject,
+      description,
+      smsAlertsEnabled,
+      whatsappAlertsEnabled,
+    } = req.body;
 
     if (!name || !email || !phone || !subject || !description) {
       return res.status(400).json({
@@ -78,6 +93,22 @@ const createComplaint = async (req, res) => {
     const smsEnabled = smsAlertsEnabled !== false && smsAlertsEnabled !== "false";
     const waEnabled = whatsappAlertsEnabled !== false && whatsappAlertsEnabled !== "false";
 
+    // Enterprise / Company Identification & Nodal Lookup
+    const matchedCompany = findCompany(companyName);
+    const resolvedCompanyName = companyName
+      ? companyName.trim()
+      : matchedCompany
+      ? matchedCompany.name
+      : "General Enterprise";
+    const resolvedCompanyEmail = companyEmail
+      ? companyEmail.trim().toLowerCase()
+      : matchedCompany
+      ? matchedCompany.nodalEmail
+      : "";
+
+    // Generate secure 1-click resolution token for company
+    const resolutionToken = crypto.randomBytes(24).toString("hex");
+
     // Build official rich WhatsApp message & direct wa.me link
     const waMessage = formatRegistrationWhatsAppMessage({
       complaintId,
@@ -95,6 +126,12 @@ const createComplaint = async (req, res) => {
       email: email.toLowerCase().trim(),
       phone: phone.trim(),
       category: category || "Product",
+      companyName: resolvedCompanyName,
+      companyEmail: resolvedCompanyEmail,
+      orderOrTransactionId: orderOrTransactionId ? orderOrTransactionId.trim() : "",
+      resolutionToken,
+      companyNoticeSent: !!resolvedCompanyEmail,
+      companyNoticeSentAt: resolvedCompanyEmail ? new Date() : null,
       subject: subject.trim(),
       description: description.trim(),
       status: "Pending",
@@ -105,10 +142,23 @@ const createComplaint = async (req, res) => {
       whatsappLogs: [waLog],
     });
 
-    // Asynchronously dispatch official confirmation receipt email
+    // Asynchronously dispatch official confirmation receipt email to Citizen
     sendComplaintConfirmationEmail(complaint).catch((err) => {
       console.warn("Async confirmation email error:", err.message);
     });
+
+    // Asynchronously dispatch formal statutory grievance notice to Enterprise / Bank Nodal Desk
+    if (resolvedCompanyEmail) {
+      const frontendUrl = process.env.FRONTEND_URL || "https://consumer-trust-portal.vercel.app";
+      const resolutionUrl = `${frontendUrl}/partner/resolve?token=${resolutionToken}`;
+      sendCompanyGrievanceNoticeEmail({
+        complaint,
+        company: matchedCompany,
+        resolutionUrl,
+      }).catch((err) => {
+        console.warn("Async company notice email error:", err.message);
+      });
+    }
 
     // Asynchronously dispatch confirmation SMS
     if (smsEnabled) {
@@ -126,8 +176,10 @@ const createComplaint = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: "Complaint registered successfully",
+      message: `Complaint registered successfully! Formal notice dispatched to ${resolvedCompanyName} Grievance Desk.`,
       complaintId: complaint.complaintId,
+      companyName: resolvedCompanyName,
+      companyEmail: resolvedCompanyEmail,
       whatsAppUrl,
       whatsAppMessage: waMessage,
       complaint,

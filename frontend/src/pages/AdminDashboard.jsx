@@ -22,6 +22,10 @@ import {
   FaFilePdf,
   FaFileImage,
   FaWhatsapp,
+  FaBuilding,
+  FaReceipt,
+  FaCopy,
+  FaLink as FaLinkIcon,
 } from "react-icons/fa";
 import api from "../services/api";
 import "./AdminDashboard.css";
@@ -53,6 +57,7 @@ function AdminDashboard() {
   const [modalPriority, setModalPriority] = useState("Medium");
   const [updating, setUpdating] = useState(false);
   const [modalError, setModalError] = useState("");
+  const [copiedTokenLink, setCopiedTokenLink] = useState(false);
 
   const AUTHORIZED_ADMIN_EMAILS = [
     "manojpuchakayala321@gmail.com",
@@ -115,6 +120,7 @@ function AdminDashboard() {
     setModalRemarks(complaint.adminRemarks || "");
     setModalPriority(complaint.priority || "Medium");
     setModalError("");
+    setCopiedTokenLink(false);
   };
 
   const handleSaveUpdate = async (e) => {
@@ -172,7 +178,7 @@ function AdminDashboard() {
       `🏛️ *CONSUMER TRUST GRIEVANCE REDRESSAL CELL*`,
       `━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
       `Dear ${complaint.name},`,
-      `Official resolution update regarding your case *${complaint.complaintId}*:`,
+      `Official resolution update regarding your case *${complaint.complaintId}* (vs ${complaint.companyName || 'Enterprise'}):`,
       ``,
       `📊 *Status:* *${status}*`,
       `📝 *Authority Remarks:* "${remarks}"`,
@@ -191,6 +197,8 @@ function AdminDashboard() {
     const headers = [
       "Complaint ID",
       "Filing Date",
+      "Disputed Enterprise",
+      "Order / Ref ID",
       "Citizen Name",
       "Email",
       "Phone",
@@ -202,6 +210,8 @@ function AdminDashboard() {
       "Evidence Files Count",
       "WhatsApp Alerts",
       "Officer Remarks",
+      "Company Resolution Action",
+      "Settlement Reference / UTR",
       "Resolved Date",
       "Citizen Rating (1-5)",
       "Citizen Feedback Comments",
@@ -216,6 +226,8 @@ function AdminDashboard() {
     const rows = complaints.map((c) => [
       escapeCsv(c.complaintId),
       escapeCsv(new Date(c.createdAt).toLocaleString()),
+      escapeCsv(c.companyName || "General"),
+      escapeCsv(c.orderOrTransactionId || "N/A"),
       escapeCsv(c.name),
       escapeCsv(c.email),
       escapeCsv(c.phone),
@@ -227,6 +239,8 @@ function AdminDashboard() {
       escapeCsv(c.attachments ? c.attachments.length : 0),
       escapeCsv(c.whatsappAlertsEnabled !== false ? "Active" : "Disabled"),
       escapeCsv(c.adminRemarks || "None"),
+      escapeCsv(c.companyResolution?.resolutionType || "None"),
+      escapeCsv(c.companyResolution?.settlementReference || "None"),
       escapeCsv(c.resolvedAt ? new Date(c.resolvedAt).toLocaleString() : "Pending"),
       escapeCsv(c.feedback?.rating ? `${c.feedback.rating}/5` : "Not Rated"),
       escapeCsv(c.feedback?.comments || "None"),
@@ -439,6 +453,16 @@ function AdminDashboard() {
                     <tr key={c._id}>
                       <td>
                         <span className="table-id">{c.complaintId}</span>
+                        {c.companyName && (
+                          <div className="table-enterprise-badge" title={c.companyName}>
+                            <FaBuilding /> {c.companyName}
+                          </div>
+                        )}
+                        {c.orderOrTransactionId && (
+                          <div className="table-order-id" title={c.orderOrTransactionId}>
+                            <FaReceipt /> {c.orderOrTransactionId}
+                          </div>
+                        )}
                       </td>
                       <td>
                         <div className="complainant-cell">
@@ -549,6 +573,17 @@ function AdminDashboard() {
               <form onSubmit={handleSaveUpdate} className="modal-form">
                 <div className="modal-info-box">
                   <div>
+                    <strong>Disputed Enterprise:</strong> {selectedComplaint.companyName || "General / Other"}
+                  </div>
+                  {selectedComplaint.orderOrTransactionId && (
+                    <div>
+                      <strong>Order # / Ref ID:</strong>{" "}
+                      <span style={{ fontFamily: "monospace", fontWeight: 700 }}>
+                        {selectedComplaint.orderOrTransactionId}
+                      </span>
+                    </div>
+                  )}
+                  <div>
                     <strong>Subject:</strong> {selectedComplaint.subject}
                   </div>
                   <div>
@@ -563,6 +598,57 @@ function AdminDashboard() {
                       <FaWhatsapp /> Active ({selectedComplaint.phone})
                     </span>
                   </div>
+
+                  {/* 1-Click Company Redressal Portal Token Link */}
+                  {selectedComplaint.resolutionToken && (
+                    <div className="modal-token-box">
+                      <div className="modal-token-header">
+                        <FaShieldAlt style={{ color: "#1976d2" }} />
+                        <strong>1-Click Enterprise Redressal Link (Nodal Officer Portal):</strong>
+                      </div>
+                      <div className="modal-token-row">
+                        <input
+                          type="text"
+                          readOnly
+                          value={`${window.location.origin}/partner/resolve?token=${selectedComplaint.resolutionToken}`}
+                          className="modal-token-input"
+                        />
+                        <button
+                          type="button"
+                          className="modal-copy-token-btn"
+                          onClick={() => {
+                            navigator.clipboard.writeText(
+                              `${window.location.origin}/partner/resolve?token=${selectedComplaint.resolutionToken}`
+                            );
+                            setCopiedTokenLink(true);
+                            setTimeout(() => setCopiedTokenLink(false), 3000);
+                          }}
+                        >
+                          <FaCopy /> {copiedTokenLink ? "Copied Link!" : "Copy Portal Link"}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Corporate Resolution Details if available */}
+                  {selectedComplaint.companyResolution && selectedComplaint.companyResolution.resolvedByCompany && (
+                    <div className="modal-company-res-box">
+                      <div className="modal-company-res-title">
+                        <FaCheckCircle style={{ color: "#16a34a" }} />
+                        <strong>Enterprise Settlement Submitted:</strong>
+                      </div>
+                      <p>
+                        <strong>Action:</strong> {selectedComplaint.companyResolution.resolutionType} •{" "}
+                        <strong>Reference:</strong> {selectedComplaint.companyResolution.settlementReference || "None"}
+                      </p>
+                      {selectedComplaint.companyResolution.resolutionRemarks && (
+                        <p className="modal-company-res-remarks">
+                          "{selectedComplaint.companyResolution.resolutionRemarks}"
+                        </p>
+                      )}
+                    </div>
+                  )}
+
                   <div>
                     <strong>Filed Description:</strong>
                     <p className="full-desc">{selectedComplaint.description}</p>

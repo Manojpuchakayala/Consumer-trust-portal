@@ -27,8 +27,54 @@ const complaintSchema = new mongoose.Schema(
     category: {
       type: String,
       required: [true, "Category is required"],
-      enum: ["Product", "Service", "Food", "Banking", "Other"],
+      enum: ["Product", "Service", "Food", "Banking", "Telecom", "Travel", "Other"],
       default: "Product",
+    },
+    companyName: {
+      type: String,
+      default: "General Enterprise",
+      trim: true,
+      index: true,
+    },
+    companyEmail: {
+      type: String,
+      default: "",
+      trim: true,
+      lowercase: true,
+    },
+    orderOrTransactionId: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    resolutionToken: {
+      type: String,
+      default: null,
+      index: true,
+    },
+    companyNoticeSent: {
+      type: Boolean,
+      default: false,
+    },
+    companyNoticeSentAt: {
+      type: Date,
+      default: null,
+    },
+    companyResolution: {
+      actionTaken: { type: String, default: "" },
+      refundAmount: { type: Number, default: 0 },
+      referenceNumber: { type: String, default: "" },
+      resolutionNotes: { type: String, default: "" },
+      resolvedBy: { type: String, default: "" },
+      resolvedAt: { type: Date, default: null },
+    },
+    escalatedToOmbudsman: {
+      type: Boolean,
+      default: false,
+    },
+    escalatedAt: {
+      type: Date,
+      default: null,
     },
     subject: {
       type: String,

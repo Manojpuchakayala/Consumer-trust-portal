@@ -9,6 +9,7 @@ const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const complaintRoutes = require("./routes/complaintRoutes");
 const userRoutes = require("./routes/userRoutes");
+const companyRoutes = require("./routes/companyRoutes");
 
 const app = express();
 
@@ -51,6 +52,7 @@ connectDB();
 app.use("/api/auth", authRoutes);
 app.use("/api/complaints", complaintRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/company", companyRoutes);
 
 // Root API Welcome & Status
 app.get("/", (req, res) => {
