@@ -117,35 +117,6 @@
   align-items: center;
 }
 
-.auth-actions-loggedout {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.officer-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(255, 255, 255, 0.12);
-  color: #ffecb3;
-  padding: 7px 14px;
-  border-radius: 20px;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 13px;
-  border: 1px solid rgba(255, 179, 0, 0.4);
-  transition: all 0.25s ease;
-  white-space: nowrap;
-}
-
-.officer-btn:hover {
-  background: rgba(255, 179, 0, 0.25);
-  color: #ffffff;
-  border-color: #ff9800;
-  transform: translateY(-1px);
-}
-
 .login-btn {
   display: flex;
   align-items: center;
