@@ -75,7 +75,7 @@ function Navbar() {
 
         {/* Mobile Hamburger Toggle */}
         <button
-          className={`hamburger ${menuOpen ? "open" : ""}`}
+          className={`menu-toggle ${menuOpen ? "open" : ""}`}
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label="Toggle navigation menu"
         >
@@ -83,7 +83,7 @@ function Navbar() {
         </button>
 
         {/* Navigation & Actions */}
-        <div className={`nav-wrapper ${menuOpen ? "open" : ""}`}>
+        <div className={`nav-menu ${menuOpen ? "open" : ""}`}>
           <ul className="nav-links">
             <li>
               <Link
