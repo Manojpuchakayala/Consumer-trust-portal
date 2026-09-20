@@ -4,6 +4,12 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { sendOtpEmail, sendLoginNotificationEmail } = require("../utils/emailService");
 
+// Single Authorized Administrator Email List
+const AUTHORIZED_ADMIN_EMAILS = [
+  "manojpuchakayala321@gmail.com",
+  "admin@consumertrust.gov",
+];
+
 // Helper to generate Full JWT Token
 const generateToken = (user, customRole) => {
   return jwt.sign(
@@ -107,11 +113,9 @@ const register = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create user (strictly default to "user" unless authorized administrative email)
-    const isAdminEmail =
-      normalizedEmail.includes("admin@consumertrust") ||
-      normalizedEmail === "manojpuchakayala321@gmail.com";
-    const userRole = role === "admin" && isAdminEmail ? "admin" : "user";
+    // Create user (strictly "user" unless authorized administrative email)
+    const isAdminEmail = AUTHORIZED_ADMIN_EMAILS.includes(normalizedEmail);
+    const userRole = isAdminEmail ? "admin" : "user";
 
     const user = await User.create({
       name: name.trim(),
@@ -245,19 +249,19 @@ const login = async (req, res) => {
       });
     }
 
-    let effectiveRole = user.role;
-    if (
-      normalizedEmail === "admin@consumertrust.gov" ||
-      normalizedEmail === "admin@consumertrust.com" ||
-      normalizedEmail === "manojpuchakayala321@gmail.com"
-    ) {
+    let effectiveRole = "user";
+    if (AUTHORIZED_ADMIN_EMAILS.includes(normalizedEmail)) {
       effectiveRole = "admin";
       if (user.role !== "admin") {
         user.role = "admin";
         await user.save();
       }
-    } else if (requestedRole && user.role === "admin") {
-      effectiveRole = requestedRole === "admin" ? "admin" : "user";
+    } else {
+      effectiveRole = "user";
+      if (user.role === "admin") {
+        user.role = "user";
+        await user.save();
+      }
     }
 
     // Generate session JWT
@@ -472,11 +476,7 @@ const googleAuth = async (req, res) => {
 
     let user = await User.findOne({ email: normalizedEmail });
 
-    const isAdminEmail = [
-      "manojpuchakayala321@gmail.com",
-      "admin@consumertrust.gov",
-      "admin@consumertrust.com",
-    ].includes(normalizedEmail);
+    const isAdminEmail = AUTHORIZED_ADMIN_EMAILS.includes(normalizedEmail);
     const assignedRole = isAdminEmail ? "admin" : "user";
 
     if (!user) {
@@ -493,7 +493,7 @@ const googleAuth = async (req, res) => {
     } else {
       if (!user.googleId && googleId) user.googleId = googleId;
       if (!user.avatar && picture) user.avatar = picture;
-      if (isAdminEmail && user.role !== "admin") user.role = "admin";
+      user.role = assignedRole;
       await user.save();
       console.log("✅ Existing User authenticated via Google Sign-In:", user._id);
     }

@@ -19,16 +19,22 @@ function ProtectedRoute({ children }) {
   return children;
 }
 
-// Strict Route guard for Administrator role only
+// Strict Route guard for Authorized Administrator only
+const AUTHORIZED_ADMIN_EMAILS = [
+  "manojpuchakayala321@gmail.com",
+  "admin@consumertrust.gov",
+];
+
 function AdminRoute({ children }) {
   const token = localStorage.getItem("consumerTrustToken");
   const user = JSON.parse(localStorage.getItem("consumerTrustUser") || "null");
 
   if (!token || !user) {
-    return <Navigate to="/login?role=admin" replace />;
+    return <Navigate to="/login?portal=admin" replace />;
   }
 
-  if (user.role !== "admin") {
+  const userEmail = (user.email || "").toLowerCase().trim();
+  if (user.role !== "admin" || !AUTHORIZED_ADMIN_EMAILS.includes(userEmail)) {
     return <Navigate to="/my-complaints" replace />;
   }
 

@@ -54,10 +54,18 @@ function AdminDashboard() {
   const [updating, setUpdating] = useState(false);
   const [modalError, setModalError] = useState("");
 
+  const AUTHORIZED_ADMIN_EMAILS = [
+    "manojpuchakayala321@gmail.com",
+    "admin@consumertrust.gov",
+  ];
+
   const user = JSON.parse(localStorage.getItem("consumerTrustUser") || "null");
+  const userEmail = (user?.email || "").toLowerCase().trim();
+  const isAuthorizedAdmin =
+    user && user.role === "admin" && AUTHORIZED_ADMIN_EMAILS.includes(userEmail);
 
   const fetchData = async () => {
-    if (!user || user.role !== "admin") {
+    if (!isAuthorizedAdmin) {
       return;
     }
     setLoading(true);
@@ -77,7 +85,7 @@ function AdminDashboard() {
     } catch (err) {
       setError(
         err.response?.data?.message ||
-          "Failed to load admin records. Please ensure you are logged in as an Administrator."
+          "Failed to load admin records. Please ensure you are logged in as the designated Administrator."
       );
     } finally {
       setLoading(false);
@@ -86,10 +94,10 @@ function AdminDashboard() {
 
   useEffect(() => {
     if (!user) {
-      navigate("/login?role=admin", { replace: true });
+      navigate("/login?portal=admin", { replace: true });
       return;
     }
-    if (user.role !== "admin") {
+    if (!isAuthorizedAdmin) {
       navigate("/my-complaints", { replace: true });
       return;
     }
@@ -240,7 +248,7 @@ function AdminDashboard() {
     document.body.removeChild(link);
   };
 
-  if (!user || user.role !== "admin") {
+  if (!isAuthorizedAdmin) {
     return (
       <div className="admin-dashboard-page" style={{ minHeight: "70vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div style={{ textAlign: "center", padding: "40px", background: "#fff", borderRadius: "12px", boxShadow: "0 4px 20px rgba(0,0,0,0.08)", maxWidth: "480px" }}>

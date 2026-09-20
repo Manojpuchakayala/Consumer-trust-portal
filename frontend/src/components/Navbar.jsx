@@ -49,6 +49,15 @@ function Navbar() {
     navigate("/");
   };
 
+  const AUTHORIZED_ADMIN_EMAILS = [
+    "manojpuchakayala321@gmail.com",
+    "admin@consumertrust.gov",
+  ];
+
+  const userEmail = (user?.email || "").toLowerCase().trim();
+  const isAuthorizedAdmin =
+    user && user.role === "admin" && AUTHORIZED_ADMIN_EMAILS.includes(userEmail);
+
   const isActive = (path) => location.pathname === path;
 
   return (
@@ -59,20 +68,22 @@ function Navbar() {
             <FaShieldAlt className="logo-icon" />
           </div>
           <div className="logo-text">
-            <span className="brand-title">Consumer Trust</span>
-            <span className="brand-subtitle">Grievance Portal</span>
+            <span className="brand-name">Consumer Trust</span>
+            <span className="tagline">Grievance Redressal Cell</span>
           </div>
         </Link>
 
+        {/* Mobile Hamburger Toggle */}
         <button
-          className="menu-toggle"
+          className={`hamburger ${menuOpen ? "open" : ""}`}
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label="Toggle navigation menu"
         >
           {menuOpen ? <FaTimes /> : <FaBars />}
         </button>
 
-        <div className={`nav-menu ${menuOpen ? "open" : ""}`}>
+        {/* Navigation & Actions */}
+        <div className={`nav-wrapper ${menuOpen ? "open" : ""}`}>
           <ul className="nav-links">
             <li>
               <Link
@@ -113,7 +124,7 @@ function Navbar() {
                 </Link>
               </li>
             )}
-            {user && user.role === "admin" && (
+            {isAuthorizedAdmin && (
               <li>
                 <Link
                   to="/admin"
