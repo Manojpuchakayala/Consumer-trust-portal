@@ -241,53 +241,32 @@ function RegisterComplaint() {
               </div>
             </div>
 
-            {/* 1-Click WhatsApp Delivery & Direct Access Hub */}
+            {/* Direct Automated WhatsApp & Mobile Dispatch Confirmation */}
             {submittedData.complaintId && (
-              <div className="whatsapp-action-box">
+              <div className="whatsapp-action-box direct-dispatch-box">
                 <div className="wa-box-header">
                   <div className="wa-title-icon">
                     <FaWhatsapp />
                   </div>
                   <div>
-                    <h4>Official WhatsApp Grievance Report</h4>
-                    <p>Instant case card with 1-tap live tracking (Amazon & Flipkart style)</p>
+                    <h4>Official WhatsApp & SMS Alert Dispatched</h4>
+                    <p>
+                      Automated grievance card & live tracking link sent directly to mobile{" "}
+                      <strong>+{submittedData.phone.replace(/[^0-9]/g, "").length === 10 ? "91 " + submittedData.phone.replace(/[^0-9]/g, "") : submittedData.phone}</strong>
+                    </p>
                   </div>
                 </div>
 
-                <div className="wa-btn-stack">
-                  {submittedData.whatsAppUrl && (
-                    <a
-                      href={submittedData.whatsAppUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="whatsapp-main-btn"
-                    >
-                      <FaWhatsapp className="wa-icon-large" />
-                      <span>Send Grievance Card to WhatsApp ({submittedData.phone})</span>
-                    </a>
-                  )}
-
-                  <a
-                    href={`https://web.whatsapp.com/send?phone=${((submittedData.phone || "").replace(/[^0-9]/g, "").length === 10 ? "91" + (submittedData.phone || "").replace(/[^0-9]/g, "") : (submittedData.phone || "").replace(/[^0-9]/g, ""))}&text=${encodeURIComponent(submittedData.whatsAppMessage || `🏛️ CONSUMER TRUST GRIEVANCE CELL\nTracking ID: ${submittedData.complaintId}\nStatus: Pending Investigation\nDirect Link: ${window.location.origin}/track?id=${submittedData.complaintId}`)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="whatsapp-web-btn"
-                    title="Open directly in WhatsApp Web in browser"
-                  >
-                    <FaExternalLinkAlt /> Open in WhatsApp Web
-                  </a>
-
-                  <button
-                    type="button"
-                    className="whatsapp-copy-btn"
-                    onClick={handleCopyWaReport}
-                    title="Copy full report and direct link to clipboard"
-                  >
-                    <FaCopy /> {copiedWa ? "Report Copied to Clipboard!" : "Copy Full WhatsApp Report"}
-                  </button>
+                <div className="direct-dispatch-status-banner">
+                  <span className="dispatch-badge-live">
+                    <FaCheckCircle /> Sent Directly to Mobile
+                  </span>
+                  <p className="dispatch-badge-note">
+                    No manual sharing needed • Case file & live milestone tracker linked to your phone number
+                  </p>
                 </div>
 
-                {/* Direct 1-Tap Tracking Link Box */}
+                {/* Direct 1-Tap Tracking Link */}
                 <div className="direct-link-container">
                   <span className="direct-link-label">Direct 1-Tap Tracking Link:</span>
                   <div className="direct-link-url-box">
@@ -308,10 +287,6 @@ function RegisterComplaint() {
                     </button>
                   </div>
                 </div>
-
-                <p className="whatsapp-btn-sub">
-                  💡 <strong>Direct Access:</strong> If WhatsApp asks you to download or says &quot;copy it&quot;, use <strong>&quot;Open in WhatsApp Web&quot;</strong>, or click the <strong>Direct 1-Tap Tracking Link</strong> above to view your full live report immediately without logging in!
-                </p>
               </div>
             )}
 

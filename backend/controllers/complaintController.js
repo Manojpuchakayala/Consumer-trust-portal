@@ -12,6 +12,8 @@ const {
   formatRegistrationWhatsAppMessage,
   formatUpdateWhatsAppMessage,
   buildWhatsAppUrl,
+  sendComplaintRegistrationWhatsApp,
+  sendComplaintStatusUpdateWhatsApp,
   logWhatsAppDispatch,
 } = require("../utils/whatsappService");
 
@@ -112,6 +114,13 @@ const createComplaint = async (req, res) => {
     if (smsEnabled) {
       sendComplaintRegistrationSMS(complaint).catch((err) => {
         console.warn("Async registration SMS error:", err.message);
+      });
+    }
+
+    // Asynchronously dispatch direct automated WhatsApp Notification
+    if (waEnabled) {
+      sendComplaintRegistrationWhatsApp(complaint).catch((err) => {
+        console.warn("Async registration direct WhatsApp error:", err.message);
       });
     }
 
@@ -346,6 +355,13 @@ const updateComplaintStatus = async (req, res) => {
     if (complaint.smsAlertsEnabled !== false) {
       sendComplaintStatusUpdateSMS(complaint).catch((err) => {
         console.warn("Async status update SMS error:", err.message);
+      });
+    }
+
+    // Asynchronously dispatch direct automated WhatsApp notification to citizen
+    if (complaint.whatsappAlertsEnabled !== false) {
+      sendComplaintStatusUpdateWhatsApp(complaint).catch((err) => {
+        console.warn("Async status update direct WhatsApp error:", err.message);
       });
     }
 
