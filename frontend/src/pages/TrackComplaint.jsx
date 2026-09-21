@@ -21,6 +21,7 @@ import {
   FaCheck,
   FaUserCheck,
   FaWhatsapp,
+  FaEnvelope,
   FaStar,
   FaGavel,
   FaQrcode,
