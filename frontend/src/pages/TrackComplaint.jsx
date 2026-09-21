@@ -48,10 +48,9 @@ export default function TrackComplaint() {
   useEffect(() => {
     const idFromQuery = searchParams.get("id");
     if (idFromQuery) {
-      setDocketInput(idFromQuery.trim().toUpperCase());
-      if (user) {
-        initiateTracking(idFromQuery.trim().toUpperCase());
-      }
+      const cleanId = idFromQuery.trim().toUpperCase();
+      setDocketInput(cleanId);
+      initiateTracking(cleanId);
     }
   }, [searchParams]);
 
@@ -69,12 +68,30 @@ export default function TrackComplaint() {
     setOtpError("");
 
     try {
-      const res = await api.post("/complaints/track/request-access", {
-        complaintId: target,
-      });
+      let res;
+      let usedPost = true;
+
+      // 1. Attempt protected 2FA / OTP access request
+      try {
+        res = await api.post("/complaints/track/request-access", {
+          complaintId: target,
+        });
+      } catch (postErr) {
+        // If POST /track/request-access endpoint is not found (404/not deployed on remote API), fallback to GET /track/:id
+        const isNotFound =
+          postErr.response?.status === 404 ||
+          postErr.response?.data?.message?.includes("not found");
+        
+        if (isNotFound) {
+          usedPost = false;
+          res = await api.get(`/complaints/track/${encodeURIComponent(target)}`);
+        } else {
+          throw postErr;
+        }
+      }
 
       if (res.data?.success) {
-        if (res.data.authorized && res.data.complaint) {
+        if (res.data.complaint) {
           setComplaint(res.data.complaint);
           if (res.data.trackToken) {
             sessionStorage.setItem("caseTrackToken", res.data.trackToken);
@@ -86,12 +103,12 @@ export default function TrackComplaint() {
           setOtpInput("");
         }
       } else {
-        throw new Error(res.data?.message || "We could not find a matching case.");
+        throw new Error(res.data?.message || `We could not find a matching case for Docket #${target}.`);
       }
     } catch (err) {
       setError(
         err.response?.data?.message ||
-          "We could not find a matching case. Please check your Docket ID or sign in to view your cases."
+          `We could not find a matching case for Docket ID "${target}". Please check your Docket ID or sign in to view your cases.`
       );
     } finally {
       setLoading(false);
