@@ -196,8 +196,18 @@ function TrackComplaint() {
 
   // WhatsApp Dispatch Message
   const waShareUrl = complaint
-    ? `https://wa.me/?text=${encodeURIComponent(
-        `🏛️ *CONSUMER TRUST GRIEVANCE TRACKER*\nDocket: *${complaint.complaintId}*\nEnterprise: *${complaint.companyName || "Disputed Entity"}*\nStatus: *${complaint.status}*\n\n🔗 Live Status: ${window.location.origin}/track?id=${complaint.complaintId}`
+    ? `https://api.whatsapp.com/send?text=${encodeURIComponent(
+        [
+          `🏛️ CONSUMER TRUST GRIEVANCE CASE UPDATE`,
+          `━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+          `📋 Tracking ID: ${complaint.complaintId}`,
+          `👤 Citizen: ${complaint.name || "Citizen"}`,
+          `📊 Status: ${complaint.status || "Pending"}`,
+          `📌 Subject: ${complaint.subject}`,
+          `🔗 Track Live Milestones & Evidence:`,
+          `${window.location.origin}/track?id=${complaint.complaintId}`,
+          `━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+        ].join("\n")
       )}`
     : "#";
 

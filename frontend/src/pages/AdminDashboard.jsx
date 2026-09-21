@@ -172,21 +172,17 @@ function AdminDashboard() {
   const getWhatsAppDispatchUrl = (complaint, customRemarks = null, customStatus = null) => {
     if (!complaint || !complaint.phone) return "#";
     const status = customStatus || complaint.status;
-    const remarks = customRemarks !== null ? customRemarks : (complaint.adminRemarks || "Grievance review active.");
     const cleanPhone = complaint.phone.replace(/[^0-9]/g, "").slice(-10);
     const text = [
-      `🏛️ *CONSUMER TRUST GRIEVANCE REDRESSAL CELL*`,
+      `🏛️ CONSUMER TRUST GRIEVANCE CASE UPDATE`,
       `━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-      `Dear ${complaint.name},`,
-      `Official resolution update regarding your case *${complaint.complaintId}* (vs ${complaint.companyName || 'Enterprise'}):`,
-      ``,
-      `📊 *Status:* *${status}*`,
-      `📝 *Authority Remarks:* "${remarks}"`,
-      ``,
-      `🔗 *View Official Case File & Resolution Details:*`,
+      `📋 Tracking ID: ${complaint.complaintId}`,
+      `👤 Citizen: ${complaint.name || "Citizen"}`,
+      `📊 Status: ${status || "Pending"}`,
+      `📌 Subject: ${complaint.subject}`,
+      `🔗 Track Live Milestones & Evidence:`,
       `${window.location.origin}/track?id=${complaint.complaintId}`,
       `━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-      `_Official Nodal Desk Notice._`,
     ].join("\n");
     return `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(text)}`;
   };

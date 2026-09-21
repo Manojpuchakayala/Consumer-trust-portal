@@ -18,22 +18,18 @@ const formatWhatsAppNumber = (phone) => {
 const formatRegistrationWhatsAppMessage = (complaint) => {
   const frontendUrl = process.env.FRONTEND_URL || "https://consumer-trust-portal.vercel.app";
   const trackUrl = `${frontendUrl}/track?id=${complaint.complaintId}`;
+  const citizenName = complaint.name || "Citizen";
 
   return [
-    `🏛️ *CONSUMER TRUST GRIEVANCE REDRESSAL CELL*`,
+    `🏛️ CONSUMER TRUST GRIEVANCE CASE UPDATE`,
     `━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-    `✅ *Grievance Successfully Registered!*`,
-    ``,
-    `📋 *Tracking ID:* ${complaint.complaintId}`,
-    `👤 *Complainant:* ${complaint.name}`,
-    `📁 *Category:* ${complaint.category}`,
-    `📌 *Subject:* ${complaint.subject}`,
-    `⏳ *Initial Status:* ${complaint.status || "Pending Investigation"}`,
-    ``,
-    `🔗 *Track Live Investigation & Milestones:*`,
+    `📋 Tracking ID: ${complaint.complaintId}`,
+    `👤 Citizen: ${citizenName}`,
+    `📊 Status: ${complaint.status || "Pending"}`,
+    `📌 Subject: ${complaint.subject}`,
+    `🔗 Track Live Milestones & Evidence:`,
     `${trackUrl}`,
     `━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-    `_This is an automated notification sent directly to your registered number._`,
   ].join("\n");
 };
 
@@ -43,39 +39,19 @@ const formatRegistrationWhatsAppMessage = (complaint) => {
 const formatUpdateWhatsAppMessage = (complaint) => {
   const frontendUrl = process.env.FRONTEND_URL || "https://consumer-trust-portal.vercel.app";
   const trackUrl = `${frontendUrl}/track?id=${complaint.complaintId}`;
-  const statusEmoji =
-    complaint.status === "Resolved"
-      ? "✅"
-      : complaint.status === "In Progress"
-      ? "🔍"
-      : complaint.status === "Rejected"
-      ? "❌"
-      : "⏳";
+  const citizenName = complaint.name || (complaint.user && complaint.user.name) || "Citizen";
 
-  const lines = [
-    `🏛️ *CONSUMER TRUST OFFICIAL STATUS UPDATE*`,
+  return [
+    `🏛️ CONSUMER TRUST GRIEVANCE CASE UPDATE`,
     `━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-    `${statusEmoji} *Status Update for Case:* ${complaint.complaintId}`,
-    ``,
-    `👤 *Complainant:* ${complaint.name}`,
-    `📁 *Category:* ${complaint.category}`,
-    `📌 *Subject:* ${complaint.subject}`,
-    `📊 *Current Status:* *${complaint.status}*`,
-  ];
-
-  if (complaint.adminRemarks) {
-    lines.push(``, `📝 *Official Authority Remarks:*`, `"${complaint.adminRemarks}"`);
-  }
-
-  lines.push(
-    ``,
-    `🔗 *View Official Case File & Resolution Details:*`,
+    `📋 Tracking ID: ${complaint.complaintId}`,
+    `👤 Citizen: ${citizenName}`,
+    `📊 Status: ${complaint.status || "Pending"}`,
+    `📌 Subject: ${complaint.subject}`,
+    `🔗 Track Live Milestones & Evidence:`,
     `${trackUrl}`,
     `━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-    `_Automated case update verified by Grievance Redressal Officer._`
-  );
-
-  return lines.join("\n");
+  ].join("\n");
 };
 
 /**
@@ -92,7 +68,6 @@ const buildWhatsAppUrl = (phone, text) => {
 
 /**
  * Direct Automated WhatsApp Notification Dispatcher
- * Sends WhatsApp notification directly to citizen phone number without manual sharing.
  */
 const dispatchDirectWhatsApp = async (phone, message) => {
   const formattedNumber = formatWhatsAppNumber(phone);
@@ -169,9 +144,6 @@ const dispatchDirectWhatsApp = async (phone, message) => {
   };
 };
 
-/**
- * 1. Direct Grievance Registration WhatsApp Notification
- */
 const sendComplaintRegistrationWhatsApp = async (complaint) => {
   const message = formatRegistrationWhatsAppMessage(complaint);
   const result = await dispatchDirectWhatsApp(complaint.phone, message);
@@ -186,9 +158,6 @@ const sendComplaintRegistrationWhatsApp = async (complaint) => {
   return result;
 };
 
-/**
- * 2. Direct Grievance Status / Resolution Update WhatsApp Notification
- */
 const sendComplaintStatusUpdateWhatsApp = async (complaint) => {
   const message = formatUpdateWhatsAppMessage(complaint);
   const result = await dispatchDirectWhatsApp(complaint.phone, message);
@@ -203,9 +172,6 @@ const sendComplaintStatusUpdateWhatsApp = async (complaint) => {
   return result;
 };
 
-/**
- * Logs dispatch simulation for audit
- */
 const logWhatsAppDispatch = (phone, message) => {
   const formattedPhone = formatWhatsAppNumber(phone);
   return {

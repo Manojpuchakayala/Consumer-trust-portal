@@ -514,7 +514,17 @@ function MyComplaints() {
                       {/* WhatsApp Share */}
                       <a
                         href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-                          `🏛️ Consumer Trust Grievance Docket\nCase ID: ${c.complaintId}\nBrand: ${brandName}\nStatus: ${c.status}\nTrack Live: ${window.location.origin}/track?id=${c.complaintId}`
+                          [
+                            `🏛️ CONSUMER TRUST GRIEVANCE CASE UPDATE`,
+                            `━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+                            `📋 Tracking ID: ${c.complaintId}`,
+                            `👤 Citizen: ${c.name || user?.name || "Citizen"}`,
+                            `📊 Status: ${c.status || "Pending"}`,
+                            `📌 Subject: ${c.subject}`,
+                            `🔗 Track Live Milestones & Evidence:`,
+                            `${window.location.origin}/track?id=${c.complaintId}`,
+                            `━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+                          ].join("\n")
                         )}`}
                         target="_blank"
                         rel="noopener noreferrer"
