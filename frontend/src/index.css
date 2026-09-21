@@ -1,15 +1,51 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  --bg-primary: #f8fafc;
+  --bg-primary: #f4f7fb;
   --bg-secondary: #ffffff;
   --card-bg: #ffffff;
-  --card-subtle: #f1f5f9;
+  --card-subtle: #f8fafc;
   --text-primary: #0f172a;
-  --text-heading: #0b2545;
+  --text-heading: #0f2b5c;
   --text-muted: #64748b;
   --border-color: #e2e8f0;
   --border-hover: #cbd5e1;
+
+  /* Vibrant Accent Palette */
+  --panel-blue: #2563eb;
+  --panel-blue-bg: #eff6ff;
+  --panel-blue-border: #bfdbfe;
+  --panel-blue-glow: rgba(37, 99, 235, 0.15);
+
+  --panel-green: #059669;
+  --panel-green-bg: #ecfdf5;
+  --panel-green-border: #a7f3d0;
+  --panel-green-glow: rgba(5, 150, 105, 0.15);
+
+  --panel-amber: #d97706;
+  --panel-amber-bg: #fffbeb;
+  --panel-amber-border: #fde68a;
+  --panel-amber-glow: rgba(217, 119, 6, 0.15);
+
+  --panel-purple: #7c3aed;
+  --panel-purple-bg: #f5f3ff;
+  --panel-purple-border: #ddd6fe;
+  --panel-purple-glow: rgba(124, 58, 237, 0.15);
+
+  --panel-cyan: #0284c7;
+  --panel-cyan-bg: #f0f9ff;
+  --panel-cyan-border: #bae6fd;
+  --panel-cyan-glow: rgba(2, 132, 199, 0.15);
+
+  --panel-coral: #ea580c;
+  --panel-coral-bg: #fff7ed;
+  --panel-coral-border: #fed7aa;
+  --panel-coral-glow: rgba(234, 88, 12, 0.15);
+
+  --panel-rose: #e11d48;
+  --panel-rose-bg: #fff1f2;
+  --panel-rose-border: #fecdd3;
+  --panel-rose-glow: rgba(225, 29, 72, 0.15);
 }
 
 [data-theme="dark"] {
@@ -22,6 +58,27 @@
   --text-muted: #94a3b8;
   --border-color: #334155;
   --border-hover: #475569;
+
+  --panel-blue-bg: rgba(37, 99, 235, 0.18);
+  --panel-blue-border: rgba(96, 165, 250, 0.35);
+
+  --panel-green-bg: rgba(5, 150, 105, 0.18);
+  --panel-green-border: rgba(52, 211, 153, 0.35);
+
+  --panel-amber-bg: rgba(217, 119, 6, 0.18);
+  --panel-amber-border: rgba(251, 191, 36, 0.35);
+
+  --panel-purple-bg: rgba(124, 58, 237, 0.18);
+  --panel-purple-border: rgba(167, 139, 250, 0.35);
+
+  --panel-cyan-bg: rgba(2, 132, 199, 0.18);
+  --panel-cyan-border: rgba(56, 189, 248, 0.35);
+
+  --panel-coral-bg: rgba(234, 88, 12, 0.18);
+  --panel-coral-border: rgba(251, 146, 60, 0.35);
+
+  --panel-rose-bg: rgba(225, 29, 72, 0.18);
+  --panel-rose-border: rgba(251, 113, 133, 0.35);
 }
 
 *, *::before, *::after {
@@ -58,4 +115,9 @@ img, svg, video, canvas, audio, iframe, embed, object {
 input, button, textarea, select {
   font-family: inherit;
   box-sizing: border-box;
+}
+
+/* Global Smooth Transitions */
+a, button {
+  transition: all 0.2s ease-in-out;
 }
