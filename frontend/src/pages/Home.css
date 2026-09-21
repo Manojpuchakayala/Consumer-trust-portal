@@ -1,5 +1,5 @@
 /* ==========================================================================
-   HOMEPAGE — REFINED TRUST + TECHNOLOGY BACKGROUND SYSTEM
+   HOMEPAGE — REFINED TRUST + TECHNOLOGY ATMOSPHERE & MODERN SURFACES
    ========================================================================== */
 
 .home-root {
@@ -18,35 +18,36 @@
   position: absolute;
   border-radius: 50%;
   pointer-events: none;
-  filter: blur(110px);
-  opacity: 0.7;
+  filter: blur(120px);
+  opacity: 0.65;
   z-index: 0;
+  transform: translate3d(0, 0, 0);
 }
 
 .home-ambient-glow.top-left {
-  top: -80px;
-  left: -140px;
-  width: 520px;
-  height: 520px;
+  top: -100px;
+  left: -150px;
+  width: 540px;
+  height: 540px;
   background: radial-gradient(circle, rgba(29, 138, 138, 0.12) 0%, rgba(56, 71, 168, 0.06) 60%, transparent 80%);
 }
 
 .home-ambient-glow.top-right {
-  top: 40px;
-  right: -100px;
-  width: 540px;
-  height: 540px;
-  background: radial-gradient(circle, rgba(56, 71, 168, 0.15) 0%, rgba(16, 42, 76, 0.08) 55%, transparent 80%);
+  top: 20px;
+  right: -120px;
+  width: 580px;
+  height: 580px;
+  background: radial-gradient(circle, rgba(56, 71, 168, 0.14) 0%, rgba(16, 42, 76, 0.07) 55%, transparent 80%);
 }
 
 [data-theme="dark"] .home-ambient-glow.top-left {
-  background: radial-gradient(circle, rgba(45, 212, 191, 0.14) 0%, rgba(59, 130, 246, 0.08) 60%, transparent 80%);
-  opacity: 0.8;
+  background: radial-gradient(circle, rgba(32, 163, 158, 0.15) 0%, rgba(70, 86, 200, 0.08) 60%, transparent 80%);
+  opacity: 0.85;
 }
 
 [data-theme="dark"] .home-ambient-glow.top-right {
-  background: radial-gradient(circle, rgba(129, 140, 248, 0.16) 0%, rgba(30, 58, 138, 0.12) 55%, transparent 80%);
-  opacity: 0.8;
+  background: radial-gradient(circle, rgba(129, 140, 248, 0.16) 0%, rgba(70, 86, 200, 0.12) 55%, transparent 80%);
+  opacity: 0.85;
 }
 
 /* Common Section Container */
@@ -103,17 +104,17 @@
 }
 
 /* ==========================================================================
-   1. HERO SECTION
+   1. HERO SECTION (Uncluttered, Confident & Focused)
    ========================================================================== */
 .home-hero-section {
-  padding: var(--space-16) 0 var(--space-16);
+  padding: var(--space-20) 0 var(--space-20);
   position: relative;
   z-index: 1;
   background: var(--bg-gradient-hero);
 }
 
 .hero-container {
-  max-width: 900px;
+  max-width: 860px;
   margin: 0 auto;
   padding: 0 var(--space-6);
   text-align: center;
@@ -128,7 +129,7 @@
   align-items: center;
 }
 
-/* Hero Pill */
+/* Hero Tag Pill */
 .hero-tag-pill {
   display: inline-flex;
   align-items: center;
@@ -141,7 +142,7 @@
   font-size: 12.5px;
   font-weight: 600;
   color: var(--text-secondary);
-  margin-bottom: var(--space-5);
+  margin-bottom: var(--space-6);
   backdrop-filter: var(--card-backdrop-blur);
 }
 
@@ -153,9 +154,9 @@
   box-shadow: 0 0 6px var(--brand-teal);
 }
 
-/* Hero Main Heading */
+/* Hero Main Title */
 .hero-main-title {
-  font-size: clamp(2.35rem, 5.5vw, 3.6rem);
+  font-size: clamp(2.4rem, 5.8vw, 3.75rem);
   font-weight: 900;
   color: var(--text-heading);
   letter-spacing: -0.035em;
@@ -166,90 +167,11 @@
 
 /* Hero Supporting Lead Text */
 .hero-lead-text {
-  font-size: clamp(15.5px, 2.2vw, 18px);
-  line-height: 1.6;
+  font-size: clamp(16px, 2.3vw, 18.5px);
+  line-height: 1.65;
   color: var(--text-secondary);
   max-width: 700px;
-  margin-bottom: var(--space-7);
-}
-
-/* Hero Non-Affiliation Card (Elevated Surface) */
-.hero-non-affiliation-card {
-  width: 100%;
-  max-width: 740px;
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-left: 4px solid var(--brand-indigo);
-  border-radius: var(--radius-lg);
-  padding: var(--space-5) var(--space-6);
   margin-bottom: var(--space-8);
-  text-align: left;
-  box-shadow: var(--shadow-card);
-  backdrop-filter: var(--card-backdrop-blur);
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.hero-non-affiliation-card:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
-
-.non-aff-badge {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12.5px;
-  font-weight: 700;
-  color: var(--text-heading);
-  margin-bottom: 4px;
-}
-
-.non-aff-icon {
-  color: var(--brand-indigo);
-  font-size: 13px;
-}
-
-[data-theme="dark"] .non-aff-icon {
-  color: var(--brand-primary);
-}
-
-.non-aff-text {
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--text-secondary);
-  margin: 0 0 8px 0;
-}
-
-.non-aff-statutory-row {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 6px;
-  font-size: 12px;
-  color: var(--text-muted);
-  padding-top: 6px;
-  border-top: 1px dashed var(--border-color);
-}
-
-.non-aff-statutory-row span {
-  font-weight: 600;
-}
-
-.statutory-link {
-  color: var(--brand-electric);
-  text-decoration: underline;
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  font-weight: 500;
-}
-
-.statutory-link:hover {
-  color: var(--brand-cta);
-}
-
-.link-sep {
-  color: var(--border-color);
 }
 
 /* Hero CTA Group (3 Buttons) */
@@ -271,7 +193,7 @@
   color: #ffffff !important;
   font-size: 15px;
   font-weight: 700;
-  padding: 12px 26px;
+  padding: 13px 28px;
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-glow-cta);
   transition: all var(--transition-fast);
@@ -282,7 +204,7 @@
 
 .hero-btn-primary:hover {
   background: var(--brand-cta-hover);
-  box-shadow: 0 10px 24px rgba(234, 88, 12, 0.42);
+  box-shadow: 0 10px 24px rgba(234, 88, 12, 0.45);
   transform: translateY(-2px);
 }
 
@@ -304,7 +226,7 @@
   color: var(--text-heading) !important;
   font-size: 14.5px;
   font-weight: 600;
-  padding: 12px 22px;
+  padding: 13px 24px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-sm);
@@ -321,6 +243,11 @@
   box-shadow: var(--shadow-md);
 }
 
+[data-theme="dark"] .hero-btn-secondary:hover {
+  border-color: var(--brand-primary);
+  color: var(--brand-primary) !important;
+}
+
 .hero-btn-tertiary {
   display: inline-flex;
   align-items: center;
@@ -330,7 +257,7 @@
   color: var(--text-secondary) !important;
   font-size: 14px;
   font-weight: 600;
-  padding: 12px 18px;
+  padding: 13px 20px;
   border-radius: var(--radius-md);
   transition: all var(--transition-fast);
   text-decoration: none;
@@ -346,7 +273,7 @@
 }
 
 /* ==========================================================================
-   2. HOW IT WORKS SECTION
+   2. HOW IT WORKS SECTION (Focused on Process & Benefits)
    ========================================================================== */
 .how-it-works-section {
   padding: var(--space-20) 0;
@@ -361,7 +288,6 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: var(--space-5);
-  margin-bottom: var(--space-8);
 }
 
 @media (max-width: 960px) {
@@ -449,39 +375,6 @@
   line-height: 1.55;
   color: var(--text-secondary);
   margin: 0;
-}
-
-/* Voluntary Clarification Banner */
-.voluntary-clarification-banner {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-4) var(--space-6);
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-3);
-  max-width: 860px;
-  margin: 0 auto;
-  box-shadow: var(--shadow-sm);
-  backdrop-filter: var(--card-backdrop-blur);
-}
-
-.clarification-icon {
-  color: var(--brand-indigo);
-  font-size: 16px;
-  margin-top: 2px;
-  flex-shrink: 0;
-}
-
-.voluntary-clarification-banner p {
-  font-size: 13px;
-  line-height: 1.55;
-  color: var(--text-secondary);
-  margin: 0;
-}
-
-.voluntary-clarification-banner p strong {
-  color: var(--text-heading);
 }
 
 /* ==========================================================================
@@ -586,7 +479,7 @@
    4. FINAL CTA SECTION (Rich Navy Gradient)
    ========================================================================== */
 .final-cta-section {
-  padding: var(--space-8) 0 var(--space-20);
+  padding: var(--space-8) 0 var(--space-16);
   position: relative;
   z-index: 1;
 }
@@ -688,10 +581,175 @@
   transform: translateY(-2px);
 }
 
+/* ==========================================================================
+   5. BOTTOM LEGAL INFORMATION SECTION (Polished Pre-Footer Area)
+   ========================================================================== */
+.home-legal-info-section {
+  padding: var(--space-8) 0 var(--space-16);
+  background: var(--bg-gradient-legal);
+  position: relative;
+  z-index: 1;
+}
+
+.legal-info-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.legal-info-header {
+  text-align: center;
+  margin-bottom: var(--space-6);
+}
+
+.legal-info-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-xs);
+  backdrop-filter: var(--card-backdrop-blur);
+}
+
+.legal-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-5);
+}
+
+@media (max-width: 768px) {
+  .legal-info-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+}
+
+.legal-info-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: var(--card-backdrop-blur);
+  display: flex;
+  flex-direction: column;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+}
+
+.legal-info-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--card-border-hover);
+}
+
+.legal-card-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: var(--space-3);
+}
+
+.legal-card-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: rgba(56, 71, 168, 0.08);
+  border: 1px solid rgba(56, 71, 168, 0.18);
+  color: var(--brand-indigo);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .legal-card-icon {
+  background: rgba(70, 86, 200, 0.18);
+  border-color: rgba(129, 140, 248, 0.3);
+  color: var(--brand-indigo);
+}
+
+.legal-card-title-row h4 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-heading);
+  margin: 0;
+}
+
+.legal-card-body {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-4) 0;
+  flex: 1;
+}
+
+.legal-statutory-links {
+  padding-top: var(--space-3);
+  border-top: 1px dashed var(--border-color);
+  font-size: 12px;
+}
+
+.legal-statutory-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  margin-bottom: 5px;
+}
+
+.legal-statutory-group {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.legal-external-link,
+.legal-internal-link {
+  color: var(--brand-electric);
+  text-decoration: underline;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 500;
+  font-size: 12px;
+  transition: color var(--transition-fast);
+}
+
+.legal-external-link:hover,
+.legal-internal-link:hover {
+  color: var(--brand-cta);
+}
+
+[data-theme="dark"] .legal-external-link,
+[data-theme="dark"] .legal-internal-link {
+  color: var(--brand-primary);
+}
+
+[data-theme="dark"] .legal-external-link:hover,
+[data-theme="dark"] .legal-internal-link:hover {
+  color: var(--brand-cta);
+}
+
+.legal-link-divider {
+  color: var(--border-color);
+  font-size: 10px;
+}
+
 /* Responsive adjustments */
 @media (max-width: 640px) {
   .home-hero-section {
-    padding: var(--space-12) 0 var(--space-12);
+    padding: var(--space-14) 0 var(--space-12);
   }
   
   .hero-cta-group,

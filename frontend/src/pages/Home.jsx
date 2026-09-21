@@ -11,6 +11,7 @@ import {
   FaEnvelopeOpenText,
   FaInfoCircle,
   FaQuestionCircle,
+  FaBalanceScale,
 } from "react-icons/fa";
 import "./Home.css";
 
@@ -30,12 +31,12 @@ export default function Home() {
       <div className="home-ambient-glow top-right" aria-hidden="true" />
 
       {/* =========================================================================
-          1. HERO SECTION
+          1. HERO SECTION (Uncluttered, Confident & Focused)
           ========================================================================= */}
       <section className="home-hero-section">
         <div className="hero-container">
           <div className="hero-content">
-            {/* Tag Pill */}
+            {/* Small Independent Platform Badge */}
             <div className="hero-tag-pill">
               <span className="pill-dot" />
               <span>Independent Dispute Facilitation</span>
@@ -46,43 +47,12 @@ export default function Home() {
               A clearer path to consumer resolution.
             </h1>
 
-            {/* Short Supporting Text */}
+            {/* Short Platform Description */}
             <p className="hero-lead-text">
               Consumer Trust helps you prepare a structured grievance, organize supporting evidence, and communicate directly with enterprise grievance desks for voluntary resolution.
             </p>
 
-            {/* Short Non-Affiliation Notice Card */}
-            <div className="hero-non-affiliation-card">
-              <div className="non-aff-badge">
-                <FaShieldAlt className="non-aff-icon" />
-                <strong>Non-Affiliation Notice:</strong>
-              </div>
-              <p className="non-aff-text">
-                Consumer Trust is an independent private dispute facilitation platform. It is not a Government of India service, consumer court, or statutory grievance portal.
-              </p>
-              <div className="non-aff-statutory-row">
-                <span>Official statutory portals:</span>
-                <a
-                  href="https://consumerhelpline.gov.in"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="statutory-link"
-                >
-                  consumerhelpline.gov.in (NCH 1915) <FaExternalLinkAlt style={{ fontSize: 9 }} />
-                </a>
-                <span className="link-sep">•</span>
-                <a
-                  href="https://edaakhil.nic.in"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="statutory-link"
-                >
-                  edaakhil.nic.in <FaExternalLinkAlt style={{ fontSize: 9 }} />
-                </a>
-              </div>
-            </div>
-
-            {/* Only 3 CTAs */}
+            {/* 3 Focused Actions */}
             <div className="hero-cta-group">
               <Link to="/register" className="hero-btn-primary">
                 <FaFileAlt />
@@ -109,7 +79,7 @@ export default function Home() {
       </section>
 
       {/* =========================================================================
-          2. HOW IT WORKS — MAIN EDUCATIONAL SECTION
+          2. HOW IT WORKS — MAIN EDUCATIONAL SECTION (Focused on Process)
           ========================================================================= */}
       <section className="how-it-works-section" id="how-it-works">
         <div className="section-container">
@@ -178,14 +148,6 @@ export default function Home() {
               </p>
             </div>
           </div>
-
-          {/* Legal Clarification Banner */}
-          <div className="voluntary-clarification-banner">
-            <FaInfoCircle className="clarification-icon" />
-            <p>
-              <strong>Legal Clarification:</strong> Consumer Trust cannot issue legal orders, compel a company, or replace consumer-court remedies. Voluntary dispute resolution does not affect your right to file statutory complaints.
-            </p>
-          </div>
         </div>
       </section>
 
@@ -245,7 +207,7 @@ export default function Home() {
       </section>
 
       {/* =========================================================================
-          4. FINAL CTA SECTION
+          4. FINAL CTA SECTION (Rich Navy Gradient)
           ========================================================================= */}
       <section className="final-cta-section">
         <div className="section-container">
@@ -263,6 +225,87 @@ export default function Home() {
                 <Link to="/track" className="final-btn-secondary">
                   <FaSearch /> Track a Case
                 </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          5. BOTTOM LEGAL INFORMATION SECTION (Discreet, Refined Pre-Footer Area)
+          ========================================================================= */}
+      <section className="home-legal-info-section" aria-label="Legal information and statutory notices">
+        <div className="section-container">
+          <div className="legal-info-wrapper">
+            <div className="legal-info-header">
+              <span className="legal-info-tag">
+                <FaInfoCircle /> Legal Clarity &amp; Official Channels
+              </span>
+            </div>
+
+            <div className="legal-info-grid">
+              {/* Column 1: Non-Affiliation Notice */}
+              <div className="legal-info-card">
+                <div className="legal-card-title-row">
+                  <div className="legal-card-icon">
+                    <FaShieldAlt />
+                  </div>
+                  <h4>Independent Platform Notice</h4>
+                </div>
+                <p className="legal-card-body">
+                  Consumer Trust is an independent private dispute facilitation platform. It is not affiliated with, endorsed by, or operated by the Government of India, the National Consumer Disputes Redressal Commission (NCDRC), Department of Consumer Affairs (DoCA), or any consumer court.
+                </p>
+                <div className="legal-statutory-links">
+                  <span className="legal-statutory-label">Official statutory portals:</span>
+                  <div className="legal-statutory-group">
+                    <a
+                      href="https://consumerhelpline.gov.in"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="legal-external-link"
+                    >
+                      National Consumer Helpline (consumerhelpline.gov.in / 1915) <FaExternalLinkAlt style={{ fontSize: 9 }} />
+                    </a>
+                    <span className="legal-link-divider">•</span>
+                    <a
+                      href="https://edaakhil.nic.in"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="legal-external-link"
+                    >
+                      e-Daakhil (edaakhil.nic.in) <FaExternalLinkAlt style={{ fontSize: 9 }} />
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              {/* Column 2: Legal Scope & Voluntary Redressal */}
+              <div className="legal-info-card">
+                <div className="legal-card-title-row">
+                  <div className="legal-card-icon">
+                    <FaBalanceScale />
+                  </div>
+                  <h4>Voluntary Facilitation Scope</h4>
+                </div>
+                <p className="legal-card-body">
+                  Consumer Trust cannot issue legal orders, compel a company, impose statutory fines, or replace consumer-court remedies. Participation in voluntary dispute facilitation is optional and does not limit your statutory rights to file before consumer commissions.
+                </p>
+                <div className="legal-statutory-links">
+                  <span className="legal-statutory-label">Platform governance:</span>
+                  <div className="legal-statutory-group">
+                    <Link to="/terms" className="legal-internal-link">
+                      Terms of Service <FaArrowRight style={{ fontSize: 9 }} />
+                    </Link>
+                    <span className="legal-link-divider">•</span>
+                    <Link to="/charter" className="legal-internal-link">
+                      Citizen Charter <FaArrowRight style={{ fontSize: 9 }} />
+                    </Link>
+                    <span className="legal-link-divider">•</span>
+                    <Link to="/methodology" className="legal-internal-link">
+                      Methodology <FaArrowRight style={{ fontSize: 9 }} />
+                    </Link>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
