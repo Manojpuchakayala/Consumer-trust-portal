@@ -337,18 +337,18 @@ export default function BrandLeaderboard() {
         {/* Page Header */}
         <div className="leaderboard-header">
           <div className="header-badge">
-            <FaShieldAlt /> Community Redressal Benchmarks
+            <FaShieldAlt /> Q3 2026 Community Redressal Benchmarks
           </div>
           <h1>Enterprise Redressal & Trust Index</h1>
           <p className="leaderboard-subtitle">
-            Community resolution response metrics, turnaround benchmarks, and verified corporate grievance officer contact channels.
+            Quarterly resolution metrics, turnaround benchmarks, and verified corporate grievance officer contact channels compiled from voluntary consumer dispute facilitations.
           </p>
 
           {/* Methodology Banner */}
           <div className="methodology-banner">
             <FaInfoCircle className="methodology-icon" />
             <span>
-              Metrics are community benchmarks computed from verified user submissions and public nodal responses. Review our <Link to="/methodology" className="methodology-link">Brand Methodology & Takedown Policy</Link>. Enterprise officers can review cases via the <Link to="/partner/resolve" className="methodology-link">Resolution Desk</Link>.
+              <strong>Independent Platform Benchmark:</strong> Metrics are community scores compiled from verified user dispute dockets, verified enterprise resolution responses, and statutory nodal disclosures. Review our <Link to="/methodology" className="methodology-link">Brand Methodology & Takedown Policy</Link>. Enterprise grievance officers can resolve cases via the <Link to="/partner/resolve" className="methodology-link">Resolution Desk</Link>.
             </span>
           </div>
 

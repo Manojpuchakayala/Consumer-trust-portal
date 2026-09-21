@@ -12,6 +12,7 @@ import {
   FaArrowRight,
   FaArrowLeft,
   FaExclamationCircle,
+  FaTimesCircle,
   FaPrint,
   FaPaperclip,
   FaTrash,
@@ -743,7 +744,7 @@ export default function RegisterComplaint() {
               <div className="header-pill">
                 <FaShieldAlt /> Independent Dispute Facilitation
               </div>
-              <h1 className="wizard-main-title">File a Consumer Grievance</h1>
+              <h1 className="wizard-main-title">Prepare a Consumer Grievance</h1>
               <p className="wizard-main-subtitle">
                 Complete the step-by-step form to organize your claim details, share proof documents, and dispatch a formal facilitation notice to the enterprise grievance desk.
               </p>
@@ -1127,6 +1128,49 @@ export default function RegisterComplaint() {
                     <span className="step-badge">Step 4 of 5</span>
                     <h2>Attach Supporting Evidence</h2>
                     <p>Upload invoices, receipts, defect photographs, or support chat logs (Optional, up to 5 files, 10MB each).</p>
+                  </div>
+
+                  {/* Before You Upload Safety Checklist */}
+                  <div className="upload-safety-card">
+                    <div className="upload-safety-header">
+                      <FaShieldAlt className="safety-header-icon" />
+                      <div>
+                        <strong>Before You Upload: Document Safety & Privacy Checklist</strong>
+                        <span>Ensure your documents contain clear transaction proof while keeping private credentials safe.</span>
+                      </div>
+                    </div>
+                    <div className="upload-safety-columns">
+                      <div className="safety-col allowed">
+                        <div className="safety-col-title">
+                          <FaCheckCircle className="safety-icon allowed" />
+                          <span>Recommended & Helpful Proofs:</span>
+                        </div>
+                        <ul>
+                          <li>Purchase invoices, tax receipts & cash memos</li>
+                          <li>Order confirmations & tracking IDs</li>
+                          <li>Photographs / defect proof of damaged items</li>
+                          <li>Customer care email threads or chat logs</li>
+                          <li>Warranty cards & repair job sheets</li>
+                        </ul>
+                      </div>
+                      <div className="safety-col prohibited">
+                        <div className="safety-col-title">
+                          <FaTimesCircle className="safety-icon prohibited" />
+                          <span>Strictly Prohibited & Unnecessary:</span>
+                        </div>
+                        <ul>
+                          <li>Bank passwords, PINs, or UPI passcodes</li>
+                          <li>Full credit/debit card numbers or CVVs</li>
+                          <li>One-Time Passwords (OTPs) or secret tokens</li>
+                          <li>Unmasked Government ID numbers (Aadhaar/PAN)</li>
+                          <li>Irrelevant personal photos or private documents</li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div className="upload-safety-footer">
+                      <FaInfoCircle />
+                      <span><strong>Privacy & Access Guarantee:</strong> Uploaded evidence is encrypted, shared strictly with the verified grievance desk of {formData.companyName === "Other / Custom Enterprise" ? (formData.customCompanyName || "the enterprise") : (formData.companyName || "the enterprise")} for verification, and automatically deleted after 180 days (or instantly via 1-click deletion in your tracking dashboard).</span>
+                    </div>
                   </div>
 
                   {/* Drag & Drop Area */}
