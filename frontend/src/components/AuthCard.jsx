@@ -168,23 +168,56 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
     }
   };
 
+  // Safe client-side JWT decoder for Google ID tokens
+  const decodeGoogleJwt = (token) => {
+    try {
+      if (!token || typeof token !== "string" || !token.includes(".")) return null;
+      const base64Url = token.split(".")[1];
+      if (!base64Url) return null;
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .join("")
+      );
+      return JSON.parse(jsonPayload);
+    } catch {
+      return null;
+    }
+  };
+
   const handleGoogleSuccess = async (credentialResponse) => {
-    if (!credentialResponse?.credential) {
-      setGoogleModalError("Google Sign-In is temporarily unavailable. Please use direct access below.");
+    const rawCredential = credentialResponse?.credential;
+    if (!rawCredential) {
+      setGoogleModalError("Google Sign-In popup could not complete. Please enter your Google email below.");
       setShowGoogleModal(true);
       return;
     }
+
+    const decoded = decodeGoogleJwt(rawCredential);
+
     try {
       setLoading(true);
       setError("");
-      const res = await api.post("/auth/google", {
-        credential: credentialResponse.credential,
-      });
+      setGoogleModalError("");
+
+      const payload = {
+        credential: rawCredential,
+        email: decoded?.email,
+        name: decoded?.name || decoded?.given_name || (decoded?.email ? decoded.email.split("@")[0] : ""),
+        avatar: decoded?.picture,
+        googleId: decoded?.sub,
+      };
+
+      const res = await api.post("/auth/google", payload);
+
       if (res.data?.success) {
         localStorage.setItem("consumerTrustToken", res.data.token);
         localStorage.setItem("consumerTrustUser", JSON.stringify(res.data.user));
         triggerLoginNotification(res.data.user, "Google OAuth 2.0");
         window.dispatchEvent(new Event("authChange"));
+        setShowGoogleModal(false);
         setSuccessMsg(`Welcome, ${res.data.user.name}. Redirecting...`);
         setTimeout(() => {
           if (onAuthSuccess) onAuthSuccess(res.data.user);
@@ -196,8 +229,14 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
     } catch (err) {
       setGoogleModalError(
         err.response?.data?.message ||
-          "Google Sign-In popup could not complete. Please enter your Google email below."
+          "Google authentication could not complete. Please confirm your Google email below."
       );
+      if (decoded?.email) {
+        setGoogleInputEmail(decoded.email);
+      }
+      if (decoded?.name) {
+        setGoogleInputName(decoded.name);
+      }
       setShowGoogleModal(true);
     } finally {
       setLoading(false);

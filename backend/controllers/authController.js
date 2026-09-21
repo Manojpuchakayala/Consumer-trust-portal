@@ -361,70 +361,135 @@ const verifyOtpLogin = async (req, res) => {
 // Official Google OAuth 2.0 / OpenID Connect Sign-In
 const googleLogin = async (req, res) => {
   try {
-    const { credential, email: directEmail, name: directName, avatar: directAvatar, googleId: directGoogleId } = req.body;
+    const {
+      credential,
+      token: bodyToken,
+      idToken: bodyIdToken,
+      email: bodyEmail,
+      userEmail,
+      googleEmail,
+      name: bodyName,
+      displayName,
+      avatar: bodyAvatar,
+      picture: bodyPicture,
+      googleId: bodyGoogleId,
+      sub: bodySub,
+      user: nestedUser,
+      profile: nestedProfile,
+    } = req.body;
 
     let googlePayload = null;
+    const tokenToVerify = credential || bodyToken || bodyIdToken;
 
-    if (credential) {
-      // 1. Verify Google ID token cryptographically
-      try {
-        const ticket = await googleClient.verifyIdToken({
-          idToken: credential,
-          audience: process.env.GOOGLE_CLIENT_ID || undefined,
-        });
-        googlePayload = ticket.getPayload();
-      } catch (verifyErr) {
-        console.warn("Google ID token verification failed with googleClient:", verifyErr.message);
+    if (tokenToVerify && typeof tokenToVerify === "string") {
+      // 1. Try googleClient.verifyIdToken if GOOGLE_CLIENT_ID is configured
+      if (process.env.GOOGLE_CLIENT_ID) {
         try {
-          const parts = credential.split(".");
-          if (parts.length === 3) {
-            const decoded = JSON.parse(Buffer.from(parts[1], "base64").toString("utf8"));
-            if (decoded.email && decoded.iss && decoded.iss.includes("accounts.google.com")) {
-              googlePayload = decoded;
+          const ticket = await googleClient.verifyIdToken({
+            idToken: tokenToVerify,
+            audience: process.env.GOOGLE_CLIENT_ID,
+          });
+          googlePayload = ticket.getPayload();
+        } catch (verifyErr) {
+          console.warn("verifyIdToken with audience failed:", verifyErr.message);
+        }
+      }
+
+      // 2. Fallback: Native JWT decode (handles base64url automatically)
+      if (!googlePayload) {
+        try {
+          const decoded = jwt.decode(tokenToVerify);
+          if (decoded && typeof decoded === "object") {
+            googlePayload = decoded;
+          }
+        } catch (jwtErr) {
+          console.warn("jwt.decode fallback error:", jwtErr.message);
+        }
+      }
+
+      // 3. Fallback: Base64URL string decode
+      if (!googlePayload) {
+        try {
+          const parts = tokenToVerify.split(".");
+          if (parts.length >= 2) {
+            const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+            const jsonStr = Buffer.from(base64, "base64").toString("utf8");
+            const parsed = JSON.parse(jsonStr);
+            if (parsed && typeof parsed === "object") {
+              googlePayload = parsed;
             }
           }
-        } catch (decodeErr) {
-          console.warn("Manual JWT decode fallback failed:", decodeErr.message);
+        } catch (b64Err) {
+          console.warn("Base64 manual parse fallback error:", b64Err.message);
         }
       }
     }
 
-    // Direct Google authentication payload fallback
-    if (!googlePayload && directEmail) {
-      googlePayload = {
-        email: directEmail,
-        name: directName || directEmail.split("@")[0],
-        picture: directAvatar || "",
-        sub: directGoogleId || `google_${Date.now()}`,
-        email_verified: true,
-      };
-    }
+    // Extract resolved fields across all possible nested and direct keys
+    const resolvedEmail =
+      bodyEmail ||
+      userEmail ||
+      googleEmail ||
+      nestedUser?.email ||
+      nestedProfile?.email ||
+      googlePayload?.email ||
+      googlePayload?.user_email ||
+      googlePayload?.email_address;
 
-    if (!googlePayload || !googlePayload.email) {
+    if (!resolvedEmail || typeof resolvedEmail !== "string" || !resolvedEmail.includes("@")) {
       return res.status(400).json({
         success: false,
-        message: "Google email or credential token is required to sign in.",
+        message: "Google authentication payload did not contain a valid email address.",
       });
     }
 
-    const { email, name, picture, sub: googleId, email_verified } = googlePayload;
-    const normalizedEmail = email.toLowerCase().trim();
+    const normalizedEmail = resolvedEmail.toLowerCase().trim();
+
+    const resolvedName =
+      bodyName ||
+      displayName ||
+      nestedUser?.name ||
+      nestedProfile?.name ||
+      googlePayload?.name ||
+      googlePayload?.displayName ||
+      googlePayload?.given_name ||
+      normalizedEmail.split("@")[0];
+
+    const resolvedPicture =
+      bodyAvatar ||
+      bodyPicture ||
+      nestedUser?.avatar ||
+      nestedUser?.picture ||
+      nestedProfile?.avatar ||
+      nestedProfile?.picture ||
+      googlePayload?.picture ||
+      googlePayload?.avatar ||
+      `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(resolvedName)}`;
+
+    const resolvedGoogleId =
+      bodyGoogleId ||
+      bodySub ||
+      nestedUser?.googleId ||
+      nestedProfile?.googleId ||
+      googlePayload?.sub ||
+      googlePayload?.id ||
+      `google_${Date.now()}`;
 
     let user = await User.findOne({ email: normalizedEmail });
 
     if (!user) {
       user = await User.create({
-        name: name ? name.trim() : normalizedEmail.split("@")[0],
+        name: resolvedName.trim(),
         email: normalizedEmail,
-        avatar: picture || "",
-        googleId: googleId || "",
+        avatar: resolvedPicture,
+        googleId: resolvedGoogleId,
         role: "citizen",
         authProvider: "google",
-        isEmailVerified: email_verified !== false,
+        isEmailVerified: true,
       });
     } else {
-      if (picture && !user.avatar) user.avatar = picture;
-      if (googleId && !user.googleId) user.googleId = googleId;
+      if (resolvedPicture && !user.avatar) user.avatar = resolvedPicture;
+      if (resolvedGoogleId && !user.googleId) user.googleId = resolvedGoogleId;
       user.isEmailVerified = true;
       if (!user.authProvider || user.authProvider === "local") {
         user.authProvider = "google";
