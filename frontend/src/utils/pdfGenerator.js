@@ -412,3 +412,160 @@ export const generateStatutoryEscalationPdf = async (complaint) => {
   printWindow.document.write(html);
   printWindow.document.close();
 };
+
+/**
+ * Generates a Formal 15-Day Pre-Litigation Legal Demand Notice (PDF)
+ * Drafted under the Consumer Protection Act, 2019 (Sections 2(11), 2(47), 35, 84).
+ */
+export const generatePreLitigationLegalNoticePdf = async (complaint) => {
+  const printWindow = window.open("", "_blank");
+  if (!printWindow) {
+    alert("Please allow pop-ups to generate your 15-Day Pre-Litigation Legal Notice PDF.");
+    return;
+  }
+
+  const currentDate = new Date().toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+
+  const incidentDate = complaint.createdAt
+    ? new Date(complaint.createdAt).toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      })
+    : currentDate;
+
+  const baseUrl = typeof window !== "undefined" ? window.location.origin : "https://consumer-trust-portal.vercel.app";
+  const trackingUrl = `${baseUrl}/track?id=${encodeURIComponent(complaint.complaintId || "")}`;
+
+  let qrDataUrl = "";
+  try {
+    qrDataUrl = await QRCode.toDataURL(trackingUrl, {
+      width: 120,
+      margin: 1,
+      color: {
+        dark: "#831843",
+        light: "#ffffff",
+      },
+    });
+  } catch (err) {
+    console.warn("QR code error:", err);
+  }
+
+  // Calculate interest (18% p.a.) if amount specified
+  const daysDiff = complaint.createdAt
+    ? Math.max(1, Math.floor((new Date() - new Date(complaint.createdAt)) / (1000 * 60 * 60 * 24)))
+    : 15;
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pre-Litigation Legal Notice - ${complaint.complaintId} vs ${complaint.companyName}</title>
+  <style>
+    @page { size: A4 portrait; margin: 14mm; }
+    body { font-family: "Georgia", "Times New Roman", serif; color: #0f172a; margin: 0; padding: 18px; line-height: 1.6; font-size: 12.5px; background: #ffffff; }
+    .header-bar { text-align: center; border-bottom: 2px solid #831843; padding-bottom: 12px; margin-bottom: 16px; }
+    .title-main { font-size: 16px; font-weight: bold; text-transform: uppercase; color: #831843; letter-spacing: 0.5px; }
+    .title-sub { font-size: 11px; color: #475569; margin-top: 4px; font-style: italic; }
+    .mode-tag { display: inline-block; background: #fdf2f8; color: #9d174d; border: 1px solid #fbcfe8; padding: 3px 10px; border-radius: 4px; font-size: 10.5px; font-weight: bold; margin-top: 8px; }
+    .address-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    .address-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px; font-size: 12px; }
+    .address-box strong { color: #831843; font-size: 12.5px; display: block; margin-bottom: 4px; }
+    .ref-bar { background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; padding: 8px 12px; font-size: 11.5px; font-weight: bold; color: #991b1b; margin-bottom: 14px; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+    .legal-body { text-align: justify; margin-bottom: 16px; }
+    .legal-body p { margin: 8px 0; }
+    .legal-body ol { padding-left: 20px; }
+    .legal-body li { margin-bottom: 8px; }
+    .demand-box { background: #fff1f2; border: 1.5px solid #e11d48; border-radius: 6px; padding: 14px; margin: 14px 0; }
+    .demand-box strong { color: #9f1239; font-size: 13px; }
+    .statute-cite { background: #f1f5f9; border-left: 3px solid #831843; padding: 6px 10px; margin: 8px 0; font-size: 11px; font-family: -apple-system, sans-serif; color: #334155; }
+    .signature-row { margin-top: 24px; display: flex; justify-content: space-between; align-items: flex-end; }
+    .qr-footer { display: flex; align-items: center; gap: 12px; border-top: 1px solid #e2e8f0; padding-top: 12px; margin-top: 20px; font-size: 10.5px; color: #64748b; font-family: -apple-system, sans-serif; }
+    .qr-footer img { width: 55px; height: 55px; border: 1px solid #cbd5e1; padding: 2px; }
+  </style>
+</head>
+<body>
+  <div class="header-bar">
+    <div class="title-main">Statutory 15-Day Pre-Litigation Legal Demand Notice</div>
+    <div class="title-sub">Under Sections 2(11), 2(47), 35 & 84 of the Consumer Protection Act, 2019</div>
+    <div class="mode-tag">TRANSMISSION VIA REGISTERED SPEED POST / RECOGNIZED ELECTRONIC COMMUNICATION</div>
+  </div>
+
+  <div class="ref-bar">
+    DOCKET TRACKING ID: #${complaint.complaintId} | DATE OF ISSUANCE: ${currentDate}
+  </div>
+
+  <div class="address-grid">
+    <div class="address-box">
+      <strong>TO (THE OPPOSITE PARTY / RESPONDENT):</strong>
+      The Principal Executive / Grievance Officer<br>
+      <strong>${complaint.companyName}</strong><br>
+      Grievance Redressal Department<br>
+      Reference ID: ${complaint.orderOrTransactionId || "N/A (Direct Commercial Transaction)"}
+    </div>
+    <div class="address-box">
+      <strong>FROM (THE AGGRIEVED CONSUMER / CLAIMANT):</strong>
+      <strong>${complaint.name}</strong><br>
+      Email on Record: ${complaint.email}<br>
+      Category: ${complaint.category || "Consumer Dispute"}<br>
+      Incident Recorded: ${incidentDate}
+    </div>
+  </div>
+
+  <div class="legal-body">
+    <p><strong>SUBJECT:</strong> Final Statutory Pre-Litigation Demand for Resolution of Deficiency in Service and Unfair Trade Practice regarding <em>"${complaint.subject}"</em>.</p>
+
+    <p><strong>SIR / MADAM,</strong></p>
+    <p>Under instructions and authorization from the Aggrieved Consumer named above, this formal Pre-Litigation Statutory Notice is hereby served upon you:</p>
+
+    <ol>
+      <li><strong>CONSUMER RELATIONSHIP:</strong> That my Client engaged the goods/services provided by your enterprise for valuable consideration under reference ID <code>${complaint.orderOrTransactionId || "Commercial Order"}</code>.</li>
+      <li><strong>STATEMENT OF FACTS & DEFICIENCY:</strong> That contrary to statutory warranties and commitments, your enterprise committed deficiency in service and/or unfair trade practices:
+        <div class="statute-cite">
+          &ldquo;${complaint.description}&rdquo;
+        </div>
+      </li>
+      <li><strong>STATUTORY VIOLATION:</strong> The aforementioned acts constitute actionable <strong>Deficiency in Service under Section 2(11)</strong> and <strong>Unfair Trade Practice under Section 2(47)</strong> of the Consumer Protection Act, 2019, causing severe financial loss, mental agony, and inconvenience to the Claimant.</li>
+    </ol>
+
+    <div class="demand-box">
+      <strong>FINAL DEMAND & 15-DAY NOTICE CURE PERIOD:</strong>
+      <p style="margin: 6px 0 0 0; font-size: 12px; color: #881337;">
+        You are hereby called upon to immediately cure the defect, deliver full refund/restitution along with statutory interest of <strong>18% per annum</strong> from ${incidentDate} within precisely <strong>FIFTEEN (15) DAYS</strong> from receipt of this notice.
+      </p>
+    </div>
+
+    <p><strong>CONSEQUENCES OF NON-COMPLIANCE:</strong> Please take notice that in the event of default or failure to settle this grievance within 15 days, my Client shall immediately initiate formal proceedings before the <strong>District Consumer Disputes Redressal Commission / e-Daakhil Court</strong> under Section 35 of the CPA, 2019 claiming full refund, damages of ₹1,00,000 for mental agony, and legal costs, entirely at your risk, cost, and consequences.</p>
+  </div>
+
+  <div class="signature-row">
+    <div>
+      <div><strong>Place:</strong> India</div>
+      <div><strong>Date:</strong> ${currentDate}</div>
+    </div>
+    <div style="text-align: right;">
+      <div>_________________________________</div>
+      <strong style="display: block; margin-top: 4px;">${complaint.name}</strong>
+      <span style="font-size: 11px; color: #64748b;">Aggrieved Consumer / Complainant</span>
+    </div>
+  </div>
+
+  <div class="qr-footer">
+    ${qrDataUrl ? `<img src="${qrDataUrl}" alt="QR" />` : ""}
+    <div>
+      <strong>Authenticity & Evidentiary Timestamp:</strong><br>
+      This notice is cryptographically recorded on the Consumer Trust Facilitation Registry.<br>
+      Verify docket status & evidence logs: <strong>${trackingUrl}</strong>
+    </div>
+  </div>
+</body>
+</html>`;
+
+  printWindow.document.write(html);
+  printWindow.document.close();
+};
+

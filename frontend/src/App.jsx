@@ -13,6 +13,7 @@ import Login from "./pages/Login";
 import AdminDashboard from "./pages/AdminDashboard";
 import CompanyResolution from "./pages/CompanyResolution";
 import BrandLeaderboard from "./pages/BrandLeaderboard";
+import ClassActionHub from "./pages/ClassActionHub";
 
 // Legal & Governance Pages
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -59,6 +60,7 @@ function App() {
             <Route path="/register" element={<RegisterComplaint />} />
             <Route path="/track" element={<TrackComplaint />} />
             <Route path="/brands" element={<BrandLeaderboard />} />
+            <Route path="/class-actions" element={<ClassActionHub />} />
             <Route
               path="/my-complaints"
               element={

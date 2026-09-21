@@ -25,6 +25,8 @@ import {
   FaGavel,
   FaQrcode,
   FaExternalLinkAlt,
+  FaCalculator,
+  FaHourglassHalf,
 } from "react-icons/fa";
 import QRCode from "qrcode";
 import api from "../services/api";
@@ -32,8 +34,10 @@ import {
   generateGrievanceNoticePdf,
   generateResolutionCertificatePdf,
   generateStatutoryEscalationPdf,
+  generatePreLitigationLegalNoticePdf,
 } from "../utils/pdfGenerator";
 import { getWhatsAppShareUrl } from "../utils/whatsappShare";
+import CourtFeeCalculator from "../components/CourtFeeCalculator";
 import "./TrackComplaint.css";
 
 export default function TrackComplaint() {
@@ -46,6 +50,7 @@ export default function TrackComplaint() {
   const [error, setError] = useState("");
   const [copiedId, setCopiedId] = useState(false);
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState("");
+  const [showCourtCalculator, setShowCourtCalculator] = useState(false);
 
   // Resolution Rating State
   const [userRating, setUserRating] = useState(5);
@@ -443,6 +448,42 @@ export default function TrackComplaint() {
               </div>
             </div>
 
+            {/* 15-Day Statutory SLA Conciliation Window Card */}
+            {complaint.status !== "Resolved" && complaint.status !== "Rejected" && (() => {
+              const createdDate = new Date(complaint.createdAt || Date.now());
+              const daysElapsed = Math.min(15, Math.max(1, Math.floor((new Date() - createdDate) / (1000 * 60 * 60 * 24))));
+              const daysLeft = Math.max(0, 15 - daysElapsed);
+              const progressPct = Math.min(100, Math.round((daysElapsed / 15) * 100));
+
+              return (
+                <div className="sla-countdown-card">
+                  <div className="sla-countdown-header">
+                    <div className="sla-title-row">
+                      <FaHourglassHalf className={`sla-timer-icon ${daysLeft <= 3 ? "urgent" : ""}`} />
+                      <div>
+                        <strong>Statutory 15-Day Voluntary Conciliation Window</strong>
+                        <span>
+                          {daysLeft > 0
+                            ? `${daysLeft} Day${daysLeft !== 1 ? "s" : ""} remaining before automatic government legal escalation unlocks`
+                            : "15-Day Conciliation Period Expired — Recommended for e-Daakhil filing"}
+                        </span>
+                      </div>
+                    </div>
+                    <span className={`sla-badge ${daysLeft <= 3 ? "badge-urgent" : "badge-normal"}`}>
+                      Day {daysElapsed} / 15
+                    </span>
+                  </div>
+
+                  <div className="sla-progress-track">
+                    <div
+                      className={`sla-progress-bar ${daysLeft <= 3 ? "bar-urgent" : ""}`}
+                      style={{ width: `${progressPct}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })()}
+
             {/* 4-Stage Visual Redressal Milestone Stepper */}
             <div className="timeline-stepper-card">
               <div className="stepper-title-row">
@@ -690,7 +731,21 @@ export default function TrackComplaint() {
                     className="btn-statutory-download"
                     onClick={() => generateStatutoryEscalationPdf(complaint)}
                   >
-                    <FaFilePdf /> Export Official Statutory Escalation Packet (PDF)
+                    <FaFilePdf /> Export Statutory Escalation Packet (PDF)
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-legal-notice-download"
+                    onClick={() => generatePreLitigationLegalNoticePdf(complaint)}
+                  >
+                    <FaFilePdf /> 15-Day Pre-Litigation Demand Notice (PDF)
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-open-court-calc"
+                    onClick={() => setShowCourtCalculator(true)}
+                  >
+                    <FaCalculator /> Check Court Fee & Jurisdiction
                   </button>
                 </div>
               </div>
@@ -723,6 +778,14 @@ export default function TrackComplaint() {
               </button>
             </div>
           </div>
+        )}
+
+        {/* Modal: CPA 2019 Pecuniary Jurisdiction & Court Fee Calculator */}
+        {showCourtCalculator && (
+          <CourtFeeCalculator
+            initialAmount={complaint?.claimAmount || 15000}
+            onClose={() => setShowCourtCalculator(false)}
+          />
         )}
       </div>
     </div>

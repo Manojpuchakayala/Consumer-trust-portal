@@ -80,9 +80,11 @@ connectDB();
 // Routes
 const authRoutes = require("./routes/authRoutes");
 const complaintRoutes = require("./routes/complaintRoutes");
+const webhookRoutes = require("./routes/webhookRoutes");
 
 app.use("/api/auth", authRoutes);
 app.use("/api/complaints", complaintRoutes);
+app.use("/api/webhooks", webhookRoutes);
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {

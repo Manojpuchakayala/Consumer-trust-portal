@@ -46,6 +46,8 @@ import {
 import { generateGrievanceNoticePdf } from "../utils/pdfGenerator";
 import { getWhatsAppShareUrl } from "../utils/whatsappShare";
 import VoiceInputButton from "../components/VoiceInputButton";
+import InvoiceOcrModal from "../components/InvoiceOcrModal";
+import EvidenceRedactorModal from "../components/EvidenceRedactorModal";
 import "./RegisterComplaint.css";
 
 const ENTERPRISE_OPTIONS = [
@@ -158,6 +160,24 @@ export default function RegisterComplaint() {
   // AI Drafting Assistant States
   const [selectedReliefs, setSelectedReliefs] = useState([]);
   const [isAiEnhancing, setIsAiEnhancing] = useState(false);
+
+  // Smart OCR & Privacy Redactor Modals
+  const [showOcrModal, setShowOcrModal] = useState(false);
+  const [redactingFile, setRedactingFile] = useState(null);
+
+  const handleApplyOcr = (extracted) => {
+    setFormData((prev) => ({
+      ...prev,
+      companyName: extracted.merchantName || prev.companyName,
+      orderOrTransactionId: extracted.orderId || prev.orderOrTransactionId,
+      category: extracted.category || prev.category,
+    }));
+  };
+
+  const handleSaveRedacted = (sanitizedFile) => {
+    setFiles((prev) => [...prev, sanitizedFile]);
+    setRedactingFile(null);
+  };
 
   // Step names
   const steps = [
@@ -914,6 +934,24 @@ export default function RegisterComplaint() {
                     <p>Select the merchant or financial platform and provide relevant order or reference codes.</p>
                   </div>
 
+                  {/* 1-Click OCR Auto-Fill Banner */}
+                  <div className="ocr-autofill-banner">
+                    <div className="ocr-banner-left">
+                      <FaMagic className="ocr-banner-icon" />
+                      <div>
+                        <strong>Have a Bill, Invoice, or Order Confirmation?</strong>
+                        <span>Auto-detect merchant, category, and order ID from your receipt.</span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      className="btn-trigger-ocr"
+                      onClick={() => setShowOcrModal(true)}
+                    >
+                      <FaMagic /> Auto-Fill from Bill / Receipt
+                    </button>
+                  </div>
+
                   <div className="category-chips-row">
                     <label className="field-label">Dispute Category *</label>
                     <div className="category-chips-grid">
@@ -1270,14 +1308,26 @@ export default function RegisterComplaint() {
                               </span>
                               <span className="file-size">{formatFileSize(file.size)}</span>
                             </div>
-                            <button
-                              type="button"
-                              className="file-delete-btn"
-                              onClick={() => removeFile(idx)}
-                              title="Remove attached file"
-                            >
-                              <FaTrash />
-                            </button>
+                            <div className="file-actions-group">
+                              {file.type.startsWith("image/") && (
+                                <button
+                                  type="button"
+                                  className="file-redact-btn"
+                                  onClick={() => setRedactingFile(file)}
+                                  title="Brush / blackout sensitive numbers on this image (DPDP Act)"
+                                >
+                                  <FaShieldAlt /> Redact
+                                </button>
+                              )}
+                              <button
+                                type="button"
+                                className="file-delete-btn"
+                                onClick={() => removeFile(idx)}
+                                title="Remove attached file"
+                              >
+                                <FaTrash />
+                              </button>
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -1467,6 +1517,23 @@ export default function RegisterComplaint() {
               </div>
             </form>
           </>
+        )}
+
+        {/* Smart Bill/Invoice OCR Auto-Filler Modal */}
+        {showOcrModal && (
+          <InvoiceOcrModal
+            onApplyFields={handleApplyOcr}
+            onClose={() => setShowOcrModal(false)}
+          />
+        )}
+
+        {/* Client-Side Evidence Privacy Redactor Modal */}
+        {redactingFile && (
+          <EvidenceRedactorModal
+            imageFile={redactingFile}
+            onSaveRedactedFile={handleSaveRedacted}
+            onClose={() => setRedactingFile(null)}
+          />
         )}
       </div>
     </div>

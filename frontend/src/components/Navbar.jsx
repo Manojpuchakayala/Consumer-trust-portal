@@ -18,6 +18,7 @@ import {
   FaCheckDouble,
   FaTrash,
   FaExternalLinkAlt,
+  FaUsers,
 } from "react-icons/fa";
 import { LANGUAGES, t } from "../utils/translations";
 import {
@@ -251,6 +252,16 @@ export default function Navbar() {
               >
                 <FaBuilding className="nav-icon" />
                 {t("nav_brands", currentLang)}
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/class-actions"
+                className={`nav-link ${isActive("/class-actions") ? "active" : ""}`}
+                onClick={() => setMenuOpen(false)}
+              >
+                <FaUsers className="nav-icon" />
+                Class Actions
               </Link>
             </li>
             {user && (

@@ -998,3 +998,139 @@
   box-shadow: 0 4px 12px rgba(234, 88, 12, 0.35);
 }
 
+.escalation-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.btn-legal-notice-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #831843;
+  color: #ffffff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: 0 2px 8px rgba(131, 24, 67, 0.25);
+}
+
+.btn-legal-notice-download:hover {
+  background: #701a75;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(131, 24, 67, 0.35);
+}
+
+.btn-open-court-calc {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-open-court-calc:hover {
+  background: var(--bg-secondary);
+  border-color: #ea580c;
+  color: #ea580c;
+}
+
+/* 15-Day Statutory SLA Conciliation Card */
+.sla-countdown-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 2px;
+}
+
+.sla-countdown-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.sla-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sla-timer-icon {
+  font-size: 18px;
+  color: var(--brand-electric);
+  flex-shrink: 0;
+}
+
+.sla-timer-icon.urgent {
+  color: #ef4444;
+  animation: pulse 1.5s infinite;
+}
+
+.sla-title-row strong {
+  display: block;
+  font-size: 13.5px;
+  color: var(--text-heading);
+}
+
+.sla-title-row span {
+  display: block;
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.sla-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+.badge-normal {
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--brand-electric);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
+.badge-urgent {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.sla-progress-track {
+  width: 100%;
+  height: 6px;
+  background: var(--bg-secondary);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.sla-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #2563eb, #3b82f6);
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+.sla-progress-bar.bar-urgent {
+  background: linear-gradient(90deg, #f59e0b, #ef4444);
+}
+
+
