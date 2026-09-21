@@ -1,22 +1,16 @@
-const AUTHORIZED_ADMIN_EMAILS = [
-  "manojpuchakayala321@gmail.com",
-  "admin@consumertrust.gov",
-];
-
+// Admin Role Authorization Middleware
 const adminMiddleware = (req, res, next) => {
   if (!req.user) {
     return res.status(401).json({
       success: false,
-      message: "Unauthorized: Please log in",
+      message: "Authentication required. Please log in.",
     });
   }
 
-  const userEmail = (req.user.email || "").toLowerCase().trim();
-
-  if (req.user.role !== "admin" || !AUTHORIZED_ADMIN_EMAILS.includes(userEmail)) {
+  if (req.user.role !== "admin") {
     return res.status(403).json({
       success: false,
-      message: "Access Denied: Administrative access is strictly restricted to the authorized administrator only.",
+      message: "Access forbidden. Administrative privileges required.",
     });
   }
 

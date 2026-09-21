@@ -8,6 +8,8 @@ import {
   FaSearch,
   FaStar,
   FaEnvelope,
+  FaInfoCircle,
+  FaExternalLinkAlt,
 } from "react-icons/fa";
 import "./BrandLeaderboard.css";
 
@@ -21,8 +23,8 @@ const BRAND_DATA = [
     totalCases: 1420,
     nodalEmail: "grievance-officer@amazon.in",
     rating: 4.8,
-    authority: "CCPA / Consumer E-Commerce Rules 2020",
-    sla: "48h Ack / 7 Days Redressal",
+    authority: "E-Commerce Rules / Voluntary Nodal Desk",
+    sla: "48h Ack / 7 Days Target",
     badge: "Top Performer",
     badgeColor: "#15803d",
   },
@@ -35,8 +37,8 @@ const BRAND_DATA = [
     totalCases: 1280,
     nodalEmail: "grievance.officer@flipkart.com",
     rating: 4.6,
-    authority: "CCPA / Consumer E-Commerce Rules 2020",
-    sla: "48h Ack / 7 Days Redressal",
+    authority: "E-Commerce Rules / Voluntary Nodal Desk",
+    sla: "48h Ack / 7 Days Target",
     badge: "Fast Responder",
     badgeColor: "#2563eb",
   },
@@ -49,8 +51,8 @@ const BRAND_DATA = [
     totalCases: 760,
     nodalEmail: "grievance-officer@meesho.com",
     rating: 4.5,
-    authority: "National Consumer Helpline (1915)",
-    sla: "48h Ack / 7 Days Redressal",
+    authority: "Consumer Care Desk",
+    sla: "48h Ack / 7 Days Target",
     badge: "Value Retail",
     badgeColor: "#d97706",
   },
@@ -63,8 +65,8 @@ const BRAND_DATA = [
     totalCases: 640,
     nodalEmail: "grievanceofficer@myntra.com",
     rating: 4.7,
-    authority: "National Consumer Helpline (1915)",
-    sla: "48h Ack / 7 Days Redressal",
+    authority: "Fashion Grievance Desk",
+    sla: "48h Ack / 7 Days Target",
     badge: "Fashion Leader",
     badgeColor: "#db2777",
   },
@@ -77,8 +79,8 @@ const BRAND_DATA = [
     totalCases: 890,
     nodalEmail: "grievance-officer@phonepe.com",
     rating: 4.9,
-    authority: "NPCI / RBI Ombudsman Scheme",
-    sla: "24h Ack / 5 Days Redressal (NPCI)",
+    authority: "NPCI / RBI Ombudsman Scheme Guidelines",
+    sla: "24h Ack / 5 Days Target",
     badge: "Quick Settlement",
     badgeColor: "#7c3aed",
   },
@@ -91,8 +93,8 @@ const BRAND_DATA = [
     totalCases: 810,
     nodalEmail: "grievanceofficer@paytm.com",
     rating: 4.4,
-    authority: "NPCI / RBI Ombudsman Scheme",
-    sla: "24h Ack / 5 Days Redressal (NPCI)",
+    authority: "NPCI / RBI Ombudsman Scheme Guidelines",
+    sla: "24h Ack / 5 Days Target",
     badge: "Verified Fintech",
     badgeColor: "#0284c7",
   },
@@ -105,8 +107,8 @@ const BRAND_DATA = [
     totalCases: 2150,
     nodalEmail: "nodalofficer@sbi.co.in",
     rating: 4.3,
-    authority: "Reserve Bank of India (RBI CMS)",
-    sla: "48h Ack / 7 Days Redressal (RBI Mandate)",
+    authority: "RBI Customer Protection Guidelines",
+    sla: "48h Ack / 7 Days Target",
     badge: "High Volume",
     badgeColor: "#0284c7",
   },
@@ -119,8 +121,8 @@ const BRAND_DATA = [
     totalCases: 940,
     nodalEmail: "grievance.redressal@hdfcbank.com",
     rating: 4.6,
-    authority: "Reserve Bank of India (RBI CMS)",
-    sla: "48h Ack / 7 Days Redressal (RBI Mandate)",
+    authority: "RBI Customer Protection Guidelines",
+    sla: "48h Ack / 7 Days Target",
     badge: "Verified Desk",
     badgeColor: "#15803d",
   },
@@ -133,8 +135,8 @@ const BRAND_DATA = [
     totalCases: 870,
     nodalEmail: "headservicequality@icicibank.com",
     rating: 4.7,
-    authority: "Reserve Bank of India (RBI CMS)",
-    sla: "48h Ack / 7 Days Redressal (RBI Mandate)",
+    authority: "RBI Customer Protection Guidelines",
+    sla: "48h Ack / 7 Days Target",
     badge: "Fast Settlement",
     badgeColor: "#b91c1c",
   },
@@ -147,8 +149,8 @@ const BRAND_DATA = [
     totalCases: 1110,
     nodalEmail: "grievance@zomato.com",
     rating: 4.8,
-    authority: "FSSAI / Consumer Protection 2019",
-    sla: "24h Ack / 3 Days Redressal",
+    authority: "FSSAI Guidelines / Consumer Support",
+    sla: "24h Ack / 3 Days Target",
     badge: "Rapid Redressal",
     badgeColor: "#dc2626",
   },
@@ -161,8 +163,8 @@ const BRAND_DATA = [
     totalCases: 980,
     nodalEmail: "grievances@swiggy.in",
     rating: 4.7,
-    authority: "FSSAI / Consumer Protection 2019",
-    sla: "24h Ack / 3 Days Redressal",
+    authority: "FSSAI Guidelines / Consumer Support",
+    sla: "24h Ack / 3 Days Target",
     badge: "Instant Support",
     badgeColor: "#ea580c",
   },
@@ -175,8 +177,8 @@ const BRAND_DATA = [
     totalCases: 620,
     nodalEmail: "grievance@blinkit.com",
     rating: 4.8,
-    authority: "FSSAI / Quick Commerce",
-    sla: "24h Ack / 3 Days Redressal",
+    authority: "Quick Commerce Support Desk",
+    sla: "24h Ack / 3 Days Target",
     badge: "10-Min Redressal",
     badgeColor: "#eab308",
   },
@@ -189,8 +191,8 @@ const BRAND_DATA = [
     totalCases: 540,
     nodalEmail: "grievance@zeptonow.com",
     rating: 4.7,
-    authority: "FSSAI / Quick Commerce",
-    sla: "24h Ack / 3 Days Redressal",
+    authority: "Quick Commerce Support Desk",
+    sla: "24h Ack / 3 Days Target",
     badge: "Quick Settlement",
     badgeColor: "#9333ea",
   },
@@ -203,9 +205,9 @@ const BRAND_DATA = [
     totalCases: 870,
     nodalEmail: "appellate.authority@jio.com",
     rating: 4.5,
-    authority: "TRAI / TDSAT Appellate Authority",
-    sla: "48h Ack / 7 Days Redressal (TRAI)",
-    badge: "Regulated",
+    authority: "TRAI Telecom Directives",
+    sla: "48h Ack / 7 Days Target",
+    badge: "Telecom Desk",
     badgeColor: "#0b2545",
   },
   {
@@ -217,9 +219,9 @@ const BRAND_DATA = [
     totalCases: 820,
     nodalEmail: "nodalofficer.india@airtel.com",
     rating: 4.4,
-    authority: "TRAI / TDSAT Appellate Authority",
-    sla: "48h Ack / 7 Days Redressal (TRAI)",
-    badge: "Regulated",
+    authority: "TRAI Telecom Directives",
+    sla: "48h Ack / 7 Days Target",
+    badge: "Telecom Desk",
     badgeColor: "#b91c1c",
   },
   {
@@ -231,8 +233,8 @@ const BRAND_DATA = [
     totalCases: 640,
     nodalEmail: "grievance.officer@makemytrip.com",
     rating: 4.6,
-    authority: "Ministry of Civil Aviation / DGCA",
-    sla: "24h Ack / 7 Days Redressal",
+    authority: "Travel & Hospitality Nodal Desk",
+    sla: "24h Ack / 7 Days Target",
     badge: "Verified Nodal",
     badgeColor: "#2563eb",
   },
@@ -245,9 +247,9 @@ const BRAND_DATA = [
     totalCases: 1150,
     nodalEmail: "customercare@irctc.co.in",
     rating: 4.3,
-    authority: "RailMadad / Ministry of Railways",
-    sla: "24h Ack / 5 Days Redressal",
-    badge: "Govt Portal",
+    authority: "Railways Redressal Channel",
+    sla: "24h Ack / 5 Days Target",
+    badge: "Rail Madad Link",
     badgeColor: "#047857",
   },
   {
@@ -259,8 +261,8 @@ const BRAND_DATA = [
     totalCases: 710,
     nodalEmail: "grievance-officer-india@uber.com",
     rating: 4.6,
-    authority: "Central Consumer Protection Authority (CCPA)",
-    sla: "24h Ack / 5 Days Redressal",
+    authority: "Mobility Grievance Desk",
+    sla: "24h Ack / 5 Days Target",
     badge: "Ride Redressal",
     badgeColor: "#0f172a",
   },
@@ -273,8 +275,8 @@ const BRAND_DATA = [
     totalCases: 590,
     nodalEmail: "grievance.india@samsung.com",
     rating: 4.7,
-    authority: "National Consumer Helpline (1915)",
-    sla: "48h Ack / 7 Days Redressal",
+    authority: "Electronics Care Support",
+    sla: "48h Ack / 7 Days Target",
     badge: "Electronics Nodal",
     badgeColor: "#1d4ed8",
   },
@@ -287,8 +289,8 @@ const BRAND_DATA = [
     totalCases: 480,
     nodalEmail: "india_grievance_officer@apple.com",
     rating: 4.9,
-    authority: "National Consumer Helpline (1915)",
-    sla: "48h Ack / 7 Days Redressal",
+    authority: "Apple Customer Relations",
+    sla: "48h Ack / 7 Days Target",
     badge: "Premium Support",
     badgeColor: "#475569",
   },
@@ -298,7 +300,7 @@ export default function BrandLeaderboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  const categories = ["All", "E-Commerce", "Banking & UPI", "Food Delivery", "Telecom", "Travel"];
+  const categories = ["All", "E-Commerce", "Banking & UPI", "Food Delivery", "Telecom", "Travel", "Electronics"];
 
   const filteredBrands = BRAND_DATA.filter((brand) => {
     const matchesSearch =
@@ -313,28 +315,48 @@ export default function BrandLeaderboard() {
       <div className="leaderboard-container">
         <div className="leaderboard-header">
           <div className="header-badge">
-            <FaShieldAlt style={{ marginRight: 6 }} /> PUBLIC TRANSPARENCY SCORECARD
+            <FaShieldAlt style={{ marginRight: 6 }} /> COMMUNITY BENCHMARK & PUBLIC SCORECARD
           </div>
           <h1>🏢 Enterprise Redressal & Brand Trust Index</h1>
           <p className="leaderboard-subtitle">
-            Real-time grievance redressal performance metrics, verified statutory nodal desks, and average resolution turnaround times across India's leading enterprises.
+            Community benchmarks, voluntary resolution response metrics, and public grievance officer contacts across India's leading enterprises.
           </p>
+
+          {/* Methodology Callout Strip */}
+          <div style={{
+            background: "#eff6ff",
+            border: "1px solid #bfdbfe",
+            borderRadius: 12,
+            padding: "12px 18px",
+            fontSize: 13,
+            color: "#1e40af",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 8,
+            maxWidth: 800,
+            margin: "0 auto 20px"
+          }}>
+            <FaInfoCircle style={{ flexShrink: 0 }} />
+            <span>
+              Ratings are community benchmarks computed from verified user reports and public nodal responses. Learn more or request data correction in our <Link to="/methodology" style={{ fontWeight: 700, color: "#1d4ed8", textDecoration: "underline" }}>Brand Methodology & Takedown Policy</Link>. Enterprise officers can resolve disputes via the <Link to="/partner/resolve" style={{ fontWeight: 700, color: "#1d4ed8", textDecoration: "underline" }}>1-Click Resolution Desk</Link>.
+            </span>
+          </div>
 
           <div className="leaderboard-stat-cards">
             <div className="summary-stat-card">
               <span className="stat-label">Average Portal Redressal Rate</span>
               <strong className="stat-value text-green">94.7%</strong>
-              <span className="stat-hint">Across 11,000+ filed disputes</span>
+              <span className="stat-hint">Across 11,000+ facilitated disputes</span>
             </div>
             <div className="summary-stat-card">
               <span className="stat-label">Average Resolution Turnaround</span>
               <strong className="stat-value text-blue">3.1 Days</strong>
-              <span className="stat-hint">Strict 7-day statutory maximum</span>
+              <span className="stat-hint">Standard 7-day target window</span>
             </div>
             <div className="summary-stat-card">
-              <span className="stat-label">Connected Nodal Desks</span>
-              <strong className="stat-value text-purple">25+ Official</strong>
-              <span className="stat-hint">Direct tokenized 1-click portal</span>
+              <span className="stat-label">Listed Corporate Desks</span>
+              <strong className="stat-value text-purple">25+ Verified</strong>
+              <span className="stat-hint">Direct 1-click tokenized desk</span>
             </div>
           </div>
         </div>
@@ -404,11 +426,11 @@ export default function BrandLeaderboard() {
                 </div>
                 <div className="detail-line">
                   <FaClock className="d-icon" />
-                  <span><strong>Mandated SLA:</strong> {brand.sla}</span>
+                  <span><strong>Target SLA:</strong> {brand.sla}</span>
                 </div>
                 <div className="detail-line">
                   <FaShieldAlt className="d-icon" />
-                  <span><strong>Regulator:</strong> {brand.authority}</span>
+                  <span><strong>Framework:</strong> {brand.authority}</span>
                 </div>
               </div>
 

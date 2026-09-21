@@ -1,4 +1,9 @@
-import { useState, useEffect } from "react";
+const fs = require("fs");
+const path = require("path");
+
+const root = path.resolve(__dirname, "..");
+
+const trackJsx = `import { useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import {
   FaSearch,
@@ -86,7 +91,7 @@ function TrackComplaint() {
     setError("");
 
     try {
-      const res = await api.get(`/complaints/track/${encodeURIComponent(idToFetch.trim())}`);
+      const res = await api.get(\`/complaints/track/\${encodeURIComponent(idToFetch.trim())}\`);
       if (res.data?.success && res.data?.complaint) {
         setComplaint(res.data.complaint);
       } else {
@@ -96,7 +101,7 @@ function TrackComplaint() {
       setComplaint(null);
       setError(
         err.response?.data?.message ||
-          `No grievance record found matching Docket ID "${idToFetch}". Please verify the code on your submission receipt.`
+          \`No grievance record found matching Docket ID "\${idToFetch}". Please verify the code on your submission receipt.\`
       );
     } finally {
       setLoading(false);
@@ -169,7 +174,7 @@ function TrackComplaint() {
   };
 
   const handleCopyLink = () => {
-    const url = `${window.location.origin}/track?id=${complaint?.complaintId}`;
+    const url = \`\${window.location.origin}/track?id=\${complaint?.complaintId}\`;
     navigator.clipboard.writeText(url);
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 3000);
@@ -191,24 +196,24 @@ function TrackComplaint() {
   };
 
   const activeMilestone = complaint ? getMilestoneStep(complaint.status) : 1;
-  const statusSlug = (complaint?.status || "Pending").toLowerCase().replace(/\s+/g, "-");
+  const statusSlug = (complaint?.status || "Pending").toLowerCase().replace(/\\s+/g, "-");
 
   // WhatsApp Case Update Card
   const buildWhatsAppCard = (c) => {
     return [
-      `CONSUMER TRUST GRIEVANCE STATUS UPDATE`,
-      `━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-      `Tracking ID: ${c.complaintId}`,
-      `Status: ${c.status || "Pending"}`,
-      `Subject: ${c.subject}`,
-      `Track Live: ${window.location.origin}/track?id=${c.complaintId}`,
-      `━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-      `Notice: Independent consumer dispute assistance platform.`,
-    ].join("\n");
+      \`CONSUMER TRUST GRIEVANCE STATUS UPDATE\`,
+      \`━━━━━━━━━━━━━━━━━━━━━━━━━━━━\`,
+      \`Tracking ID: \${c.complaintId}\`,
+      \`Status: \${c.status || "Pending"}\`,
+      \`Subject: \${c.subject}\`,
+      \`Track Live: \${window.location.origin}/track?id=\${c.complaintId}\`,
+      \`━━━━━━━━━━━━━━━━━━━━━━━━━━━━\`,
+      \`Notice: Independent consumer dispute assistance platform.\`,
+    ].join("\\n");
   };
 
   const waShareUrl = complaint
-    ? `https://api.whatsapp.com/send?text=${encodeURIComponent(buildWhatsAppCard(complaint))}`
+    ? \`https://api.whatsapp.com/send?text=\${encodeURIComponent(buildWhatsAppCard(complaint))}\`
     : "#";
 
   return (
@@ -252,12 +257,12 @@ function TrackComplaint() {
                   <button
                     key={mc._id}
                     type="button"
-                    className={`quick-case-chip ${complaint?.complaintId === mc.complaintId ? "active" : ""}`}
+                    className={\`quick-case-chip \${complaint?.complaintId === mc.complaintId ? "active" : ""}\`}
                     onClick={() => handleSelectQuickDocket(mc.complaintId)}
                   >
                     <span className="case-code">#{mc.complaintId}</span>
                     <span className="case-brand">{mc.companyName}</span>
-                    <span className={`case-badge ${(mc.status || "Pending").toLowerCase().replace(/\s+/g, "-")}`}>
+                    <span className={\`case-badge \${(mc.status || "Pending").toLowerCase().replace(/\\s+/g, "-")}\`}>
                       {mc.status}
                     </span>
                   </button>
@@ -326,7 +331,7 @@ function TrackComplaint() {
               </div>
 
               <div className="tracking-top-right">
-                <div className={`tracking-status-pill ${statusSlug}`}>
+                <div className={\`tracking-status-pill \${statusSlug}\`}>
                   <span className="status-pulse-dot"></span>
                   {complaint.status}
                 </div>
@@ -363,10 +368,10 @@ function TrackComplaint() {
                     </div>
                   </div>
 
-                  <div className={`node-connector ${activeMilestone >= 2 ? "active" : ""}`}></div>
+                  <div className={\`node-connector \${activeMilestone >= 2 ? "active" : ""}\`}></div>
 
                   {/* Step 2 */}
-                  <div className={`stepper-node ${activeMilestone >= 2 ? "completed" : "current"}`}>
+                  <div className={\`stepper-node \${activeMilestone >= 2 ? "completed" : "current"}\`}>
                     <div className="node-circle">
                       {activeMilestone >= 2 ? <FaCheckCircle /> : <FaClock />}
                     </div>
@@ -377,10 +382,10 @@ function TrackComplaint() {
                     </div>
                   </div>
 
-                  <div className={`node-connector ${activeMilestone >= 3 ? "active" : ""}`}></div>
+                  <div className={\`node-connector \${activeMilestone >= 3 ? "active" : ""}\`}></div>
 
                   {/* Step 3 */}
-                  <div className={`stepper-node ${activeMilestone >= 3 ? "completed" : activeMilestone === 2 ? "current" : ""}`}>
+                  <div className={\`stepper-node \${activeMilestone >= 3 ? "completed" : activeMilestone === 2 ? "current" : ""}\`}>
                     <div className="node-circle">
                       {activeMilestone >= 3 ? <FaCheckCircle /> : <FaHourglassHalf />}
                     </div>
@@ -391,10 +396,10 @@ function TrackComplaint() {
                     </div>
                   </div>
 
-                  <div className={`node-connector ${activeMilestone >= 4 ? "active" : ""}`}></div>
+                  <div className={\`node-connector \${activeMilestone >= 4 ? "active" : ""}\`}></div>
 
                   {/* Step 4 */}
-                  <div className={`stepper-node ${activeMilestone >= 4 ? "completed" : ""}`}>
+                  <div className={\`stepper-node \${activeMilestone >= 4 ? "completed" : ""}\`}>
                     <div className="node-circle">
                       {activeMilestone >= 4 ? <FaAward /> : <FaCheckCircle />}
                     </div>
@@ -409,7 +414,7 @@ function TrackComplaint() {
 
               {/* 7-Day Target Resolution SLA */}
               {complaint.status !== "Resolved" && complaint.status !== "Rejected" && (
-                <div className={`sla-clock-panel ${slaTime.isExpired ? "expired" : ""}`}>
+                <div className={\`sla-clock-panel \${slaTime.isExpired ? "expired" : ""}\`}>
                   <div className="sla-clock-left">
                     <FaHourglassHalf className="sla-clock-icon" />
                     <div>
@@ -490,7 +495,7 @@ function TrackComplaint() {
                   <div className="evidence-chips">
                     {complaint.attachments.map((att, idx) => {
                       const isPdf = att.mimeType === "application/pdf" || (att.filename && att.filename.endsWith(".pdf"));
-                      const fileUrl = att.url || (att.filename ? `http://localhost:5000/uploads/${att.filename}` : "#");
+                      const fileUrl = att.url || (att.filename ? \`http://localhost:5000/uploads/\${att.filename}\` : "#");
                       return (
                         <div key={idx} className="evidence-chip">
                           {isPdf ? <FaFilePdf className="pdf-ico" /> : <FaFileImage className="img-ico" />}
@@ -641,3 +646,7 @@ function TrackComplaint() {
 }
 
 export default TrackComplaint;
+`;
+
+fs.writeFileSync(path.join(root, "frontend", "src", "pages", "TrackComplaint.jsx"), trackJsx, "utf8");
+console.log("Hardened frontend/src/pages/TrackComplaint.jsx (PII masking, disclaimer, clean tracking view)");

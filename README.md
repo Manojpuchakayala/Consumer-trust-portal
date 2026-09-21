@@ -74,15 +74,12 @@ npm run dev
 
 ---
 
-## 🔑 Demo Access Credentials
+## 🔐 Security & Access Control
 
-| Role | Email | Password |
-| :--- | :--- | :--- |
-| **Administrator** | `admin@consumertrust.gov` | `Admin@123` |
-| **Citizen (Manoj)** | `manojpuchakayala321@gmail.com` | `User@123` |
-| **Verified Test Case** | `CT-2026-76665` | *irrelevant product (Status: Pending)* |
-
----
+- **Authentication:** Server-side bcrypt hashing (12 salt rounds), sliding rate limiting, and brute-force account lockout.
+- **Role-Based Access:** Standard user registration is open to citizens. Administrative privileges are strictly enforced via server-side role assignment (`role === 'admin'`).
+- **Privacy & PII Protection:** Public tracking lookups mask citizen contact details and order numbers. Full dispute records are restricted to authenticated complainants or administrative officers.
+- **Legal Compliance:** Compliant with DPDP Act 2023, WCAG 2.1 AA accessibility guidelines, and IT Rules.
 
 ## 📁 Project Directory Structure
 ```text

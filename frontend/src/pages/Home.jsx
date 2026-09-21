@@ -4,14 +4,14 @@ import {
   FaFileAlt,
   FaSearch,
   FaShieldAlt,
-  FaBolt,
-  FaLock,
   FaCheckCircle,
   FaHeadset,
-  FaClock,
   FaStar,
   FaWhatsapp,
   FaPaperclip,
+  FaExclamationTriangle,
+  FaBuilding,
+  FaExternalLinkAlt,
 } from "react-icons/fa";
 import api from "../services/api";
 import "./Home.css";
@@ -46,31 +46,40 @@ function Home() {
 
   return (
     <div className="home-page">
+      {/* Prominent Independent Platform Notice Banner */}
+      <div className="home-top-disclaimer">
+        <div className="home-disclaimer-content">
+          <FaExclamationTriangle className="home-disclaimer-icon" />
+          <span>
+            <strong>Independent Platform Notice:</strong> Consumer Trust is a private consumer support and dispute facilitation desk. We are not a government agency, consumer court, or statutory ombudsman. For formal statutory filings, visit <a href="https://consumerhelpline.gov.in" target="_blank" rel="noopener noreferrer">consumerhelpline.gov.in <FaExternalLinkAlt style={{ fontSize: 10 }} /></a>.
+          </span>
+        </div>
+      </div>
+
       {/* Hero Section */}
       <section className="hero">
         <div className="hero-content">
           <div className="hero-badge">
-            <FaShieldAlt /> Fast, Transparent & Citizen-Centric Redressal
+            <FaShieldAlt /> Independent Consumer Support & Grievance Facilitation
           </div>
-          <h1>Consumer Trust Redressal Portal</h1>
+          <h1>Consumer Trust Grievance Portal</h1>
           <p>
-            Experience seamless grievance redressal. Submit your complaints
-            with evidence documents, receive instant WhatsApp status cards, monitor
-            live investigation milestones, and rate official resolutions.
+            Experience structured consumer dispute facilitation. Draft grievance notices,
+            attach invoice evidence, track live enterprise response milestones, and rate corporate resolution settlements.
           </p>
 
           <div className="hero-buttons">
             <Link to="/register">
               <button className="primary-btn">
                 <FaFileAlt style={{ marginRight: 8 }} />
-                Register New Complaint
+                Register New Grievance
               </button>
             </Link>
 
             <Link to="/track">
               <button className="secondary-btn">
                 <FaSearch style={{ marginRight: 8 }} />
-                Track Complaint Status
+                Track Case Status
               </button>
             </Link>
           </div>
@@ -84,7 +93,7 @@ function Home() {
             <FaFileAlt className="stat-icon" />
           </div>
           <h2>{stats.total}</h2>
-          <p>Grievances Registered</p>
+          <p>Grievances Facilitated</p>
         </div>
 
         <div className="card">
@@ -92,7 +101,7 @@ function Home() {
             <FaCheckCircle className="stat-icon" />
           </div>
           <h2>{stats.resolved}</h2>
-          <p>Resolved Successfully</p>
+          <p>Resolved by Enterprises</p>
         </div>
 
         <div className="card">
@@ -100,23 +109,23 @@ function Home() {
             <FaStar className="stat-icon" style={{ color: "#f59e0b" }} />
           </div>
           <h2>★ {stats.avgRating}</h2>
-          <p>Citizen Satisfaction Score</p>
+          <p>Citizen Satisfaction Benchmark</p>
         </div>
 
         <div className="card">
           <div className="card-icon-wrap">
             <FaHeadset className="stat-icon" />
           </div>
-          <h2>24×7</h2>
-          <p>Active Consumer Desk</p>
+          <h2>Active</h2>
+          <p>Facilitation Desk</p>
         </div>
       </section>
 
       {/* Why Choose Section */}
       <section className="features">
-        <h2>Why Choose Consumer Trust?</h2>
+        <h2>Transparent Consumer Dispute Mediation</h2>
         <p className="section-sub">
-          A modern digital platform built for accountability, consumer rights protection, and rapid dispute handling.
+          A modern digital platform built for accountability, consumer rights awareness, and structured corporate escalation.
         </p>
 
         <div className="feature-grid">
@@ -124,9 +133,9 @@ function Home() {
             <div className="feature-icon-box">
               <FaPaperclip />
             </div>
-            <h3>Evidence Attachment</h3>
+            <h3>Evidence Verification</h3>
             <p>
-              Upload invoices, transaction bills, and product photos directly with your complaint to speed up verification.
+              Attach invoices, warranty receipts, and product photos to substantiate your claim directly with the enterprise.
             </p>
           </div>
 
@@ -134,9 +143,9 @@ function Home() {
             <div className="feature-icon-box" style={{ background: "#e8f5e9", color: "#25d366" }}>
               <FaWhatsapp />
             </div>
-            <h3>Instant WhatsApp Alerts</h3>
+            <h3>Instant Milestone Alerts</h3>
             <p>
-              Receive official grievance cards, milestone updates, and 1-tap tracking links on WhatsApp (100% Free & Unlimited).
+              Receive transactional status notifications and 1-tap live case tracking links directly to your mobile device.
             </p>
           </div>
 
@@ -144,9 +153,9 @@ function Home() {
             <div className="feature-icon-box">
               <FaSearch />
             </div>
-            <h3>Real-Time Tracking</h3>
+            <h3>Transparent Tracking</h3>
             <p>
-              Monitor every phase of inquiry with transparent step-by-step progress tracking, timestamps, and officer remarks.
+              Monitor inquiry phases with clear chronological step-by-step progress tracking, timestamps, and enterprise remarks.
             </p>
           </div>
 
@@ -154,9 +163,9 @@ function Home() {
             <div className="feature-icon-box">
               <FaStar />
             </div>
-            <h3>Citizen Feedback & Rating</h3>
+            <h3>Resolution Feedback</h3>
             <p>
-              Rate your resolution quality with our 5-star citizen satisfaction survey to keep redressal officers accountable.
+              Rate your resolution quality with our 5-star citizen satisfaction survey to keep corporate redressal desks accountable.
             </p>
           </div>
         </div>
@@ -164,33 +173,33 @@ function Home() {
 
       {/* How It Works Section */}
       <section className="how-it-works">
-        <h2>Simple 3-Step Process</h2>
+        <h2>Simple 3-Step Facilitation Process</h2>
         <p className="section-sub">
-          From grievance filing to official resolution, here is how our workflow protects your rights.
+          From dispute submission to corporate settlement, here is how our structured facilitation workflow works.
         </p>
 
         <div className="steps">
           <div className="step">
             <div className="step-num">1</div>
-            <h3>Submit Grievance</h3>
+            <h3>Draft & Submit</h3>
             <p>
-              Provide seller/service details, attach invoice proofs, and opt into SMS alerts to receive your unique Tracking ID.
+              Provide seller details, attach invoice proof, structure your claim with our AI assistant, and receive your unique Tracking ID.
             </p>
           </div>
 
           <div className="step">
             <div className="step-num">2</div>
-            <h3>Inquiry & Review</h3>
+            <h3>Enterprise Review</h3>
             <p>
-              Our grievance desk reviews the claim, gathers merchant feedback, and conducts an official inquiry.
+              Our platform dispatches the dispute summary to the enterprise nodal desk with a tokenized 1-click resolution link.
             </p>
           </div>
 
           <div className="step">
             <div className="step-num">3</div>
-            <h3>Resolution & Closure</h3>
+            <h3>Settlement & Rating</h3>
             <p>
-              Receive official remarks, refund/repair settlements, closing summary, and submit your satisfaction review.
+              Receive settlement remarks, refund/repair confirmation, download your Resolution Record, and rate the resolution.
             </p>
           </div>
         </div>
@@ -199,16 +208,17 @@ function Home() {
       {/* CTA Box */}
       <section className="cta-banner">
         <div className="cta-box">
-          <h2>Have an Unresolved Consumer Issue?</h2>
+          <h2>Have an Unresolved Consumer Dispute?</h2>
           <p>
-            Do not let unfair trade practices or poor service go unaddressed. Register your complaint today.
+            Do not let unfair trade practices or delayed refunds go unaddressed. Register your grievance docket today.
           </p>
-          <div className="cta-buttons">
-            <Link to="/register" className="cta-primary">
-              File a Complaint Now
+          <div className="hero-buttons">
+            <Link to="/register" className="primary-btn">
+              File a Grievance Now
             </Link>
-            <Link to="/track" className="cta-secondary">
-              Check Existing Case
+            <Link to="/brands" className="secondary-btn">
+              <FaBuilding style={{ marginRight: 8 }} />
+              View Brand Trust Index
             </Link>
           </div>
         </div>

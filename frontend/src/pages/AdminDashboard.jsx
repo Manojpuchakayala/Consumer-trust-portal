@@ -59,15 +59,8 @@ function AdminDashboard() {
   const [modalError, setModalError] = useState("");
   const [copiedTokenLink, setCopiedTokenLink] = useState(false);
 
-  const AUTHORIZED_ADMIN_EMAILS = [
-    "manojpuchakayala321@gmail.com",
-    "admin@consumertrust.gov",
-  ];
-
   const user = JSON.parse(localStorage.getItem("consumerTrustUser") || "null");
-  const userEmail = (user?.email || "").toLowerCase().trim();
-  const isAuthorizedAdmin =
-    user && user.role === "admin" && AUTHORIZED_ADMIN_EMAILS.includes(userEmail);
+  const isAuthorizedAdmin = user && user.role === "admin";
 
   const fetchData = async () => {
     if (!isAuthorizedAdmin) {

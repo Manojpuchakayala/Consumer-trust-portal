@@ -1,3 +1,35 @@
+
+// Privacy Helper: Redact PII for unauthenticated public viewers
+const maskName = (name) => {
+  if (!name) return "Citizen";
+  const parts = name.trim().split(" ");
+  if (parts.length === 1) {
+    return parts[0].charAt(0) + "***";
+  }
+  return parts.map((p) => p.charAt(0) + "***").join(" ");
+};
+
+const maskEmail = (email) => {
+  if (!email || !email.includes("@")) return "c***@domain.com";
+  const [user, domain] = email.split("@");
+  const maskedUser = user.length <= 2 ? user.charAt(0) + "***" : user.charAt(0) + "***" + user.slice(-1);
+  return `${maskedUser}@${domain}`;
+};
+
+const maskPhone = (phone) => {
+  if (!phone) return "+91 ******XXXX";
+  const digits = phone.replace(/[^0-9]/g, "");
+  if (digits.length >= 4) {
+    return `+91 ******${digits.slice(-4)}`;
+  }
+  return "+91 ******XXXX";
+};
+
+const maskRefId = (ref) => {
+  if (!ref || ref.length <= 4) return ref;
+  return ref.slice(0, 2) + "****" + ref.slice(-2);
+};
+
 const crypto = require("crypto");
 const Complaint = require("../models/Complaint");
 const User = require("../models/User");
@@ -193,7 +225,7 @@ const createComplaint = async (req, res) => {
   }
 };
 
-// Track Complaint by Tracking ID (Public)
+// Track Complaint by Docket ID (With PII Privacy Masking)
 const trackComplaint = async (req, res) => {
   try {
     const { complaintId } = req.params;
@@ -201,13 +233,12 @@ const trackComplaint = async (req, res) => {
     if (!complaintId) {
       return res.status(400).json({
         success: false,
-        message: "Complaint ID is required",
+        message: "Docket ID is required",
       });
     }
 
     const trimmedId = complaintId.trim().toUpperCase();
 
-    // Query either by complaintId or MongoDB _id if formatted as ObjectId
     let complaint = await Complaint.findOne({
       $or: [
         { complaintId: trimmedId },
@@ -218,16 +249,54 @@ const trackComplaint = async (req, res) => {
     if (!complaint) {
       return res.status(404).json({
         success: false,
-        message: `No complaint found with ID "${complaintId}"`,
+        message: `No grievance docket found matching ID "${complaintId}"`,
       });
     }
+
+    // Determine if requester is authorized complaint owner or administrator
+    const isOwner =
+      req.user &&
+      ((complaint.user && complaint.user._id && req.user._id && complaint.user._id.toString() === req.user._id.toString()) ||
+       (complaint.email && req.user.email && complaint.email.toLowerCase() === req.user.email.toLowerCase()));
+    const isAdmin = req.user && req.user.role === "admin";
+    const isAuthorized = isOwner || isAdmin;
+
+    // Build sanitized complaint response (mask PII if unauthenticated/public)
+    const sanitizedComplaint = {
+      _id: complaint._id,
+      complaintId: complaint.complaintId,
+      category: complaint.category,
+      companyName: complaint.companyName,
+      companyNoticeSent: complaint.companyNoticeSent,
+      subject: complaint.subject,
+      description: isAuthorized ? complaint.description : (complaint.description ? complaint.description.slice(0, 160) + "..." : ""),
+      status: complaint.status,
+      createdAt: complaint.createdAt,
+      resolvedAt: complaint.resolvedAt,
+      adminRemarks: complaint.adminRemarks,
+      companyResolution: complaint.companyResolution,
+      feedback: complaint.feedback,
+      attachmentsCount: complaint.attachments ? complaint.attachments.length : 0,
+      isAuthorizedViewer: isAuthorized,
+      // Masked or full PII based on verified authorization
+      name: isAuthorized ? complaint.name : maskName(complaint.name),
+      email: isAuthorized ? complaint.email : maskEmail(complaint.email),
+      phone: isAuthorized ? complaint.phone : maskPhone(complaint.phone),
+      orderOrTransactionId: isAuthorized ? complaint.orderOrTransactionId : maskRefId(complaint.orderOrTransactionId),
+      attachments: isAuthorized
+        ? complaint.attachments
+        : (complaint.attachments || []).map((att) => ({
+            originalName: att.originalName ? "Evidence_Document_" + att.originalName.slice(-8) : "Evidence_Document",
+            mimeType: att.mimeType,
+          })),
+    };
 
     const waMessage = formatUpdateWhatsAppMessage(complaint);
     const whatsAppUrl = buildWhatsAppUrl(complaint.phone, waMessage);
 
     return res.status(200).json({
       success: true,
-      complaint,
+      complaint: sanitizedComplaint,
       whatsAppUrl,
       whatsAppMessage: waMessage,
     });
@@ -235,7 +304,7 @@ const trackComplaint = async (req, res) => {
     console.error("Track Complaint Error:", error);
     return res.status(500).json({
       success: false,
-      message: error.message || "Failed to track complaint",
+      message: "An error occurred while tracking docket.",
     });
   }
 };

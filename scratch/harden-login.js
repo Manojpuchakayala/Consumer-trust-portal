@@ -1,4 +1,9 @@
-import { useState, useEffect } from "react";
+const fs = require("fs");
+const path = require("path");
+
+const root = path.resolve(__dirname, "..");
+
+const loginJsx = `import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import {
@@ -180,8 +185,8 @@ function Login() {
       const response = await api.post("/auth/google", {
         email: emailToUse,
         name: nameToUse || emailToUse.split("@")[0],
-        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(nameToUse || emailToUse)}&background=0f2b5c&color=fff`,
-        googleId: `google_${Date.now()}`,
+        avatar: \`https://ui-avatars.com/api/?name=\${encodeURIComponent(nameToUse || emailToUse)}&background=0f2b5c&color=fff\`,
+        googleId: \`google_\${Date.now()}\`,
       });
 
       if (response.data?.success) {
@@ -193,7 +198,7 @@ function Login() {
         );
 
         setShowGoogleModal(false);
-        setSuccessMsg(`Signed in via Google as ${emailToUse}!`);
+        setSuccessMsg(\`Signed in via Google as \${emailToUse}!\`);
         setTimeout(() => navigate("/my-complaints"), 1000);
       }
     } catch (err) {
@@ -210,7 +215,7 @@ function Login() {
         <div className="portal-switcher">
           <button
             type="button"
-            className={`portal-tab ${portal === "citizen" ? "active" : ""}`}
+            className={\`portal-tab \${portal === "citizen" ? "active" : ""}\`}
             onClick={() => handlePortalChange("citizen")}
           >
             <FaUser style={{ marginRight: 6 }} />
@@ -218,7 +223,7 @@ function Login() {
           </button>
           <button
             type="button"
-            className={`portal-tab ${portal === "admin" ? "active" : ""}`}
+            className={\`portal-tab \${portal === "admin" ? "active" : ""}\`}
             onClick={() => handlePortalChange("admin")}
           >
             <FaUserShield style={{ marginRight: 6 }} />
@@ -227,7 +232,7 @@ function Login() {
         </div>
 
         {/* Shield Icon Header */}
-        <div className={`login-badge-wrap ${portal === "admin" ? "admin-mode" : ""}`}>
+        <div className={\`login-badge-wrap \${portal === "admin" ? "admin-mode" : ""}\`}>
           {portal === "admin" ? (
             <FaUserShield className="login-badge-icon admin" />
           ) : (
@@ -255,7 +260,7 @@ function Login() {
           <div className="auth-tabs">
             <button
               type="button"
-              className={`tab-btn ${!isRegisterMode ? "active" : ""}`}
+              className={\`tab-btn \${!isRegisterMode ? "active" : ""}\`}
               onClick={() => {
                 setIsRegisterMode(false);
                 setError("");
@@ -266,7 +271,7 @@ function Login() {
             </button>
             <button
               type="button"
-              className={`tab-btn ${isRegisterMode ? "active" : ""}`}
+              className={\`tab-btn \${isRegisterMode ? "active" : ""}\`}
               onClick={() => {
                 setIsRegisterMode(true);
                 setError("");
@@ -485,3 +490,7 @@ function Login() {
 }
 
 export default Login;
+`;
+
+fs.writeFileSync(path.join(root, "frontend", "src", "pages", "Login.jsx"), loginJsx, "utf8");
+console.log("Hardened frontend/src/pages/Login.jsx (removed all public test credentials and auto-fill)");

@@ -1,32 +1,31 @@
 ================================================================================
-  CONSUMER TRUST : NATIONAL CITIZEN GRIEVANCE REDRESSAL PLATFORM
-  Official Cloud Deployment Links & System Reference Guide
+  CONSUMER TRUST : INDEPENDENT GRIEVANCE FACILITATION PLATFORM
+  Production Deployment Links & Platform Reference Guide
 ================================================================================
 
 1. LIVE FRONTEND APPLICATION (Vercel Global CDN)
    • Main Platform:             https://consumer-trust-portal.vercel.app
-   • Register Complaint:        https://consumer-trust-portal.vercel.app/register
-   • Track Grievance (Direct):  https://consumer-trust-portal.vercel.app/track?id=CT-2026-76665
-   • My Complaints:             https://consumer-trust-portal.vercel.app/my-complaints
+   • Register Grievance:        https://consumer-trust-portal.vercel.app/register
+   • Track Grievance Status:    https://consumer-trust-portal.vercel.app/track
+   • Enterprise Leaderboard:    https://consumer-trust-portal.vercel.app/brands
+   • Enterprise Resolution:     https://consumer-trust-portal.vercel.app/partner/resolve
+   • Privacy Policy (DPDP):     https://consumer-trust-portal.vercel.app/privacy
+   • Terms of Service:          https://consumer-trust-portal.vercel.app/terms
+   • Brand Methodology:         https://consumer-trust-portal.vercel.app/methodology
+   • Citizen Charter:           https://consumer-trust-portal.vercel.app/charter
+   • Accessibility Statement:   https://consumer-trust-portal.vercel.app/accessibility
+   • Contact & Helpdesk:        https://consumer-trust-portal.vercel.app/contact
    • Citizen Login:             https://consumer-trust-portal.vercel.app/login
-   • Admin Control Center:      https://consumer-trust-portal.vercel.app/admin
 
 2. LIVE BACKEND API & CLOUD DATABASE (Render Cloud + MongoDB Atlas)
    • API Root:                  https://consumer-trust-api.onrender.com/
    • Health & DB Endpoint:      https://consumer-trust-api.onrender.com/api/health
-   • Public Tracking API:       https://consumer-trust-api.onrender.com/api/complaints/track/CT-2026-76665
+   • Public Redacted Track API: https://consumer-trust-api.onrender.com/api/complaints/track/:id
    • GitHub Repository:         https://github.com/Manojpuchakayala/Consumer-trust-portal
-   • Cloud Database:            consumer-trust-db.rxdifnq.mongodb.net/consumer_trust
 
-3. DEMO ACCESS CREDENTIALS
-   • Administrator:             admin@consumertrust.gov / Admin@123
-   • Citizen (Manoj):           manojpuchakayala321@gmail.com / User@123
-   • Active Test Complaint ID:  CT-2026-76665 (Status: Pending)
-
-4. 100% FREE WHATSAPP 1-TAP TRACKING SYSTEM (AMAZON / SWIGGY STYLE)
-   • Features:                  Official WhatsApp Grievance Cards, Milestone Updates,
-                                1-Tap Live Tracking Links (Zero SMS Cost, Worldwide).
-   • Multi-Option Hub:          1-Click "Send to WhatsApp", "Open in WhatsApp Web",
-                                "Copy Full Report", and "Direct Tracking Link".
+3. AUTHENTICATION & ACCESS CONTROL
+   • Citizen Access:            Self-service registration via /login.
+   • Administrative Control:    Server-side role verification (role === 'admin').
+   • PII Protection:            All public lookups mask citizen name, phone, and email.
 
 ================================================================================

@@ -12,6 +12,14 @@ import AdminDashboard from "./pages/AdminDashboard";
 import CompanyResolution from "./pages/CompanyResolution";
 import BrandLeaderboard from "./pages/BrandLeaderboard";
 
+// Legal & Governance Pages
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import CitizenCharter from "./pages/CitizenCharter";
+import AccessibilityStatement from "./pages/AccessibilityStatement";
+import BrandMethodology from "./pages/BrandMethodology";
+import ContactSupport from "./pages/ContactSupport";
+
 // Route guard for authenticated users (Consumers)
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem("consumerTrustToken");
@@ -21,12 +29,7 @@ function ProtectedRoute({ children }) {
   return children;
 }
 
-// Strict Route guard for Authorized Administrator only
-const AUTHORIZED_ADMIN_EMAILS = [
-  "manojpuchakayala321@gmail.com",
-  "admin@consumertrust.gov",
-];
-
+// Route guard for Authorized Administrator
 function AdminRoute({ children }) {
   const token = localStorage.getItem("consumerTrustToken");
   const user = JSON.parse(localStorage.getItem("consumerTrustUser") || "null");
@@ -35,8 +38,7 @@ function AdminRoute({ children }) {
     return <Navigate to="/login?portal=admin" replace />;
   }
 
-  const userEmail = (user.email || "").toLowerCase().trim();
-  if (user.role !== "admin" || !AUTHORIZED_ADMIN_EMAILS.includes(userEmail)) {
+  if (user.role !== "admin") {
     return <Navigate to="/my-complaints" replace />;
   }
 
@@ -73,6 +75,15 @@ function App() {
             />
             {/* Enterprise Partner 1-Click Resolution Desk */}
             <Route path="/partner/resolve" element={<CompanyResolution />} />
+
+            {/* Legal, Compliance & Policy Routes */}
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/charter" element={<CitizenCharter />} />
+            <Route path="/accessibility" element={<AccessibilityStatement />} />
+            <Route path="/methodology" element={<BrandMethodology />} />
+            <Route path="/contact" element={<ContactSupport />} />
+
             {/* Fallback */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
@@ -84,4 +95,3 @@ function App() {
 }
 
 export default App;
-

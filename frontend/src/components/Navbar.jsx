@@ -78,15 +78,7 @@ function Navbar() {
     navigate("/");
   };
 
-  const AUTHORIZED_ADMIN_EMAILS = [
-    "manojpuchakayala321@gmail.com",
-    "admin@consumertrust.gov",
-  ];
-
-  const userEmail = (user?.email || "").toLowerCase().trim();
-  const isAuthorizedAdmin =
-    user && user.role === "admin" && AUTHORIZED_ADMIN_EMAILS.includes(userEmail);
-
+  const isAuthorizedAdmin = user && user.role === "admin";
   const isActive = (path) => location.pathname === path;
 
   return (
@@ -98,7 +90,7 @@ function Navbar() {
           </div>
           <div className="logo-text">
             <span className="brand-name">Consumer Trust</span>
-            <span className="tagline">Grievance Redressal Cell</span>
+            <span className="tagline">Independent Consumer Support & Mediation</span>
           </div>
         </Link>
 

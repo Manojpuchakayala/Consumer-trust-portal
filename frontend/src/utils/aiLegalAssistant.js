@@ -1,4 +1,5 @@
-// AI Legal Grievance Enhancer & Statutory Clause Mapper
+// AI Drafting Assistant & Grievance Formatter
+// Note: This utility provides automated dispute statement structuring and does not provide legal advice.
 
 export const enhanceGrievanceDescription = ({
   companyName = "the Enterprise",
@@ -9,39 +10,43 @@ export const enhanceGrievanceDescription = ({
   selectedReliefs = [],
 }) => {
   const effectiveRef = orderOrTransactionId
-    ? "bearing Order/Transaction Reference ID: " + orderOrTransactionId
-    : "for the recent transaction/service interaction";
+    ? "bearing Order / Transaction Reference ID: " + orderOrTransactionId
+    : "for the recent transaction / service interaction";
 
-  let legalSection = "Section 2(47) (Unfair Trade Practice) and Section 2(11) (Deficiency in Service) of the Consumer Protection Act, 2019";
+  let legalContext = "Consumer Protection Act, 2019 provisions regarding Deficiency in Service and Unfair Trade Practices";
   if (category === "Banking") {
-    legalSection = "RBI Master Directions on Digital Payment Transactions and Customer Protection (Limiting Liability of Customers in Unauthorized Electronic Banking Transactions)";
+    legalContext = "RBI Customer Protection Directives and Electronic Banking Dispute Guidelines";
   } else if (category === "Food") {
-    legalSection = "FSSAI Food Safety Norms & Section 2(11) (Deficiency in Consumer Goods/Services) of the Consumer Protection Act, 2019";
+    legalContext = "FSSAI Food Quality Directives and Consumer Protection Act, 2019";
   } else if (category === "Telecom") {
-    legalSection = "TRAI Quality of Service (QoS) Regulations & Telecom Consumer Protection Directives";
+    legalContext = "TRAI Consumer Quality of Service (QoS) Directives";
+  } else if (category === "Travel") {
+    legalContext = "Ministry of Civil Aviation / Passenger Charter Guidelines and Consumer Protection Norms";
   }
 
   const reliefBullets = selectedReliefs.length > 0
     ? selectedReliefs.map((r) => "• " + r).join("\n")
-    : "• Immediate full refund of the amount paid with statutory interest.\n• Formal written acknowledgment and compensation for undue mental agony and inconvenience.";
+    : "• Prompt full refund of the amount paid for unfulfilled or deficient goods/services.\n• Formal written explanation and rectification of the dispute.";
 
   return "1. STATEMENT OF FACTS & CHRONOLOGY:\n" +
-"I am filing this formal consumer grievance against " + companyName + " " + effectiveRef + ".\n" +
-(rawDescription ? rawDescription.trim() : "The consumer transaction resulted in severe deficiency in service, breach of warranty/terms, and failure by the merchant/service provider to provide legitimate resolution.") + "\n\n" +
-"2. STATUTORY VIOLATION & LEGAL GROUNDS:\n" +
-"The conduct of the enterprise violates " + legalSection + ". Despite genuine attempts to resolve this issue through customer support channels, the grievance remains unaddressed, causing financial loss and harassment.\n\n" +
+"I am submitting this grievance regarding " + companyName + " " + effectiveRef + ".\n" +
+(rawDescription ? rawDescription.trim() : "The transaction resulted in deficiency of service / product defects that were not resolved through initial customer care interactions.") + "\n\n" +
+"2. DISPUTE CONTEXT & CONSUMER RIGHTS:\n" +
+"This matter falls under " + legalContext + ". The complainant seeks fair commercial resolution and accountability for the inconvenience and financial impact caused.\n\n" +
 "3. SPECIFIC RELIEF SOUGHT:\n" +
-"In accordance with consumer protection mandates, I hereby seek:\n" +
 reliefBullets + "\n\n" +
-"4. NOTICE TO NODAL OFFICER:\n" +
-"Please treat this as formal notice under the 7-Day Statutory Grievance Redressal SLA. In the event of non-redressal within 168 hours, this docket shall be escalated to the Statutory Ombudsman / e-Daakhil Consumer Court with timestamped logs.";
+"4. REQUEST TO GRIEVANCE OFFICER:\n" +
+"The grievance officer is kindly requested to review this dispute for prompt amicable redressal within the standard 7-day resolution window. If unresolved, the consumer reserves the option to escalate via statutory mechanisms including the National Consumer Helpline (1915) or e-Daakhil.";
 };
 
 export const COMMON_RELIEFS = [
   "Full Refund of Amount Paid (₹)",
   "Immediate Replacement of Defective Unit",
-  "Compensation for Mental Harassment & Delay",
+  "Compensation for Delay & Inconvenience",
   "Rectification of Billing / Incorrect Charges",
   "Unblocking of Account / Wallet Balance",
-  "Written Apology & Compliance Confirmation",
+  "Written Resolution & Settlement Confirmation",
 ];
+
+export const AI_ASSISTANT_DISCLAIMER =
+  "AI Drafting Assistant provides automated formatting to structure dispute facts and relief requests clearly. It does not provide formal legal advice or representation. Please verify and edit all generated text before submission.";
