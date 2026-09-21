@@ -4,7 +4,9 @@ import {
   FaEnvelope,
   FaCheckCircle,
   FaExternalLinkAlt,
+  FaWhatsapp,
 } from "react-icons/fa";
+import { getPlatformWhatsAppShareUrl } from "../utils/whatsappShare";
 import "./Footer.css";
 
 export default function Footer() {
@@ -26,6 +28,17 @@ export default function Footer() {
             <div className="independent-status-pill">
               <FaCheckCircle className="pill-check-icon" />
               <span>Independent Private Facilitation Desk</span>
+            </div>
+            <div className="footer-share-wa-wrap" style={{ marginTop: 12 }}>
+              <a
+                href={getPlatformWhatsAppShareUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="footer-wa-share-btn"
+                title="Share Consumer Trust with others on WhatsApp"
+              >
+                <FaWhatsapp /> Share Platform on WhatsApp
+              </a>
             </div>
           </div>
 

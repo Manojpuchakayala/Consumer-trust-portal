@@ -22,9 +22,11 @@ import {
   FaArrowRight,
   FaTimes,
   FaReceipt,
+  FaWhatsapp,
 } from "react-icons/fa";
 import api from "../services/api";
 import { generateGrievanceNoticePdf } from "../utils/pdfGenerator";
+import { getWhatsAppShareUrl } from "../utils/whatsappShare";
 import "./MyComplaints.css";
 
 export default function MyComplaints() {
@@ -439,6 +441,16 @@ export default function MyComplaints() {
                     </div>
 
                     <div className="card-actions-right">
+                      <a
+                        href={getWhatsAppShareUrl(c)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn-whatsapp-mini"
+                        title="Share Case via WhatsApp"
+                      >
+                        <FaWhatsapp /> Share
+                      </a>
+
                       <button
                         type="button"
                         className="btn-pdf-mini"

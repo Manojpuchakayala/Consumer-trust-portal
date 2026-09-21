@@ -38,6 +38,7 @@ import {
 import api from "../services/api";
 import { enhanceGrievanceDescription, COMMON_RELIEFS, AI_ASSISTANT_DISCLAIMER } from "../utils/aiLegalAssistant";
 import { generateGrievanceNoticePdf } from "../utils/pdfGenerator";
+import { getWhatsAppShareUrl } from "../utils/whatsappShare";
 import "./RegisterComplaint.css";
 
 const ENTERPRISE_OPTIONS = [
@@ -662,6 +663,15 @@ export default function RegisterComplaint() {
 
             {/* Success Actions */}
             <div className="success-actions-row no-print">
+              <a
+                href={getWhatsAppShareUrl(submittedData)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-whatsapp-receipt"
+                title="Share this docket record and tracking link via WhatsApp"
+              >
+                <FaWhatsapp className="btn-icon-wa" /> Share on WhatsApp
+              </a>
               <button
                 type="button"
                 className="btn-pdf-download"

@@ -21,6 +21,7 @@ import {
   FaBalanceScale,
 } from "react-icons/fa";
 import api from "../services/api";
+import { triggerLoginNotification } from "../utils/notificationService";
 import "./AuthCard.css";
 
 export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAdminSwitch = false }) {
@@ -96,6 +97,7 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
         if (res.data?.success) {
           localStorage.setItem("consumerTrustToken", res.data.token);
           localStorage.setItem("consumerTrustUser", JSON.stringify(res.data.user));
+          triggerLoginNotification(res.data.user, "Officer Clearance");
           window.dispatchEvent(new Event("authChange"));
           setSuccessMsg("Administrator clearance verified. Redirecting...");
           setTimeout(() => {
@@ -123,6 +125,7 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
         if (res.data?.success) {
           localStorage.setItem("consumerTrustToken", res.data.token);
           localStorage.setItem("consumerTrustUser", JSON.stringify(res.data.user));
+          triggerLoginNotification(res.data.user, "Account Registration");
           window.dispatchEvent(new Event("authChange"));
           setSuccessMsg("Account created. Redirecting to your dashboard...");
           setTimeout(() => {
@@ -139,6 +142,7 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
         if (res.data?.success) {
           localStorage.setItem("consumerTrustToken", res.data.token);
           localStorage.setItem("consumerTrustUser", JSON.stringify(res.data.user));
+          triggerLoginNotification(res.data.user, "Password Sign-In");
           window.dispatchEvent(new Event("authChange"));
           setSuccessMsg("Signed in. Redirecting...");
           setTimeout(() => {
@@ -171,6 +175,7 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
       if (res.data?.success) {
         localStorage.setItem("consumerTrustToken", res.data.token);
         localStorage.setItem("consumerTrustUser", JSON.stringify(res.data.user));
+        triggerLoginNotification(res.data.user, "Google OAuth 2.0");
         window.dispatchEvent(new Event("authChange"));
         setSuccessMsg(`Welcome, ${res.data.user.name}. Redirecting...`);
         setTimeout(() => {

@@ -1202,6 +1202,30 @@
   gap: var(--space-2);
 }
 
+.btn-whatsapp-receipt {
+  background: #25D366;
+  color: #ffffff !important;
+  border: 1px solid #20bd5a;
+  padding: 9px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all var(--transition-fast);
+  box-shadow: 0 2px 6px rgba(37, 211, 102, 0.25);
+}
+
+.btn-whatsapp-receipt:hover {
+  background: #1eb957;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.35);
+}
+
 .btn-pdf-download {
   background: var(--brand-primary);
   color: #ffffff;

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   FaShieldAlt,
@@ -14,8 +14,19 @@ import {
   FaBuilding,
   FaSearch,
   FaFileAlt,
+  FaBell,
+  FaCheckDouble,
+  FaTrash,
+  FaExternalLinkAlt,
 } from "react-icons/fa";
 import { LANGUAGES, t } from "../utils/translations";
+import {
+  getNotifications,
+  markAllAsRead,
+  markAsRead,
+  clearAllNotifications,
+  getUnreadCount,
+} from "../utils/notificationService";
 import "./Navbar.css";
 
 export default function Navbar() {
@@ -30,6 +41,11 @@ export default function Navbar() {
     return localStorage.getItem("consumerTrustLang") || "en";
   });
   const [langMenuOpen, setLangMenuOpen] = useState(false);
+  const [notifMenuOpen, setNotifMenuOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const notifRef = useRef(null);
+  const langRef = useRef(null);
 
   useEffect(() => {
     if (darkMode) {
@@ -48,6 +64,12 @@ export default function Navbar() {
     window.dispatchEvent(new Event("langChange"));
   };
 
+  const loadNotifications = () => {
+    const list = getNotifications();
+    setNotifications(list);
+    setUnreadCount(getUnreadCount());
+  };
+
   useEffect(() => {
     const checkUser = () => {
       const storedUser = localStorage.getItem("consumerTrustUser");
@@ -63,13 +85,32 @@ export default function Navbar() {
     };
 
     checkUser();
+    loadNotifications();
+
     window.addEventListener("storage", checkUser);
     window.addEventListener("authChange", checkUser);
+    window.addEventListener("notificationChange", loadNotifications);
 
     return () => {
       window.removeEventListener("storage", checkUser);
       window.removeEventListener("authChange", checkUser);
+      window.removeEventListener("notificationChange", loadNotifications);
     };
+  }, []);
+
+  // Close dropdowns on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (notifRef.current && !notifRef.current.contains(e.target)) {
+        setNotifMenuOpen(false);
+      }
+      if (langRef.current && !langRef.current.contains(e.target)) {
+        setLangMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleLogout = () => {
@@ -78,6 +119,48 @@ export default function Navbar() {
     setUser(null);
     window.dispatchEvent(new Event("authChange"));
     navigate("/");
+  };
+
+  const handleToggleNotif = () => {
+    setNotifMenuOpen((prev) => !prev);
+    if (langMenuOpen) setLangMenuOpen(false);
+  };
+
+  const handleMarkAllRead = () => {
+    markAllAsRead();
+    loadNotifications();
+  };
+
+  const handleClearAllNotifs = () => {
+    clearAllNotifications();
+    loadNotifications();
+  };
+
+  const handleNotificationClick = (notif) => {
+    markAsRead(notif.id);
+    loadNotifications();
+    setNotifMenuOpen(false);
+    if (notif.link) {
+      navigate(notif.link);
+    }
+  };
+
+  const formatTimeAgo = (dateString) => {
+    if (!dateString) return "Recently";
+    try {
+      const diffMs = Date.now() - new Date(dateString).getTime();
+      const diffSec = Math.floor(diffMs / 1000);
+      const diffMin = Math.floor(diffSec / 60);
+      const diffHours = Math.floor(diffMin / 60);
+      const diffDays = Math.floor(diffHours / 24);
+
+      if (diffSec < 45) return "Just now";
+      if (diffMin < 60) return `${diffMin}m ago`;
+      if (diffHours < 24) return `${diffHours}h ago`;
+      return `${diffDays}d ago`;
+    } catch {
+      return "Recently";
+    }
   };
 
   const isAuthorizedAdmin = user && user.role === "admin";
@@ -99,6 +182,17 @@ export default function Navbar() {
 
         {/* Mobile Action Controls */}
         <div className="mobile-actions">
+          {/* Mobile Notification Bell */}
+          <button
+            type="button"
+            className="notif-toggle-btn mobile"
+            onClick={handleToggleNotif}
+            aria-label="Toggle notifications"
+          >
+            <FaBell />
+            {unreadCount > 0 && <span className="notif-badge">{unreadCount}</span>}
+          </button>
+
           <button
             type="button"
             className="theme-btn mobile"
@@ -187,8 +281,96 @@ export default function Navbar() {
 
           {/* Right Action Controls */}
           <div className="nav-actions">
+            {/* Notification Bell Dropdown */}
+            <div className="notif-menu-wrapper" ref={notifRef}>
+              <button
+                type="button"
+                className="notif-toggle-btn desktop"
+                onClick={handleToggleNotif}
+                title="View Notifications & Activity"
+                aria-label="Notifications"
+              >
+                <FaBell className="notif-icon" />
+                {unreadCount > 0 && <span className="notif-badge">{unreadCount}</span>}
+              </button>
+
+              {notifMenuOpen && (
+                <div className="notif-dropdown-panel">
+                  <div className="notif-panel-header">
+                    <div className="notif-header-title">
+                      <FaBell className="header-bell-icon" />
+                      <strong>Notifications & Alerts</strong>
+                      {unreadCount > 0 && <span className="unread-tag">{unreadCount} new</span>}
+                    </div>
+                    {unreadCount > 0 && (
+                      <button
+                        type="button"
+                        className="btn-mark-read"
+                        onClick={handleMarkAllRead}
+                        title="Mark all notifications as read"
+                      >
+                        <FaCheckDouble /> Mark read
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="notif-items-list">
+                    {notifications.length === 0 ? (
+                      <div className="notif-empty-state">
+                        <FaBell className="empty-bell-icon" />
+                        <p>No notifications yet.</p>
+                        <span>Login events, case updates, and dispute milestones will appear here.</span>
+                      </div>
+                    ) : (
+                      notifications.map((n) => (
+                        <div
+                          key={n.id}
+                          className={`notif-item ${!n.read ? "unread" : ""} ${n.type}`}
+                          onClick={() => handleNotificationClick(n)}
+                        >
+                          <div className="notif-item-icon-wrap">
+                            {n.type === "login" ? (
+                              <FaUserShield className="item-icon login" />
+                            ) : n.type === "success" ? (
+                              <FaShieldAlt className="item-icon success" />
+                            ) : (
+                              <FaBell className="item-icon default" />
+                            )}
+                          </div>
+                          <div className="notif-item-content">
+                            <div className="notif-item-top">
+                              <strong className="item-title">{n.title}</strong>
+                              <span className="item-time">{formatTimeAgo(n.createdAt)}</span>
+                            </div>
+                            <p className="item-message">{n.message}</p>
+                            {n.link && (
+                              <span className="item-link-hint">
+                                Open &rarr;
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  {notifications.length > 0 && (
+                    <div className="notif-panel-footer">
+                      <button
+                        type="button"
+                        className="btn-clear-notifs"
+                        onClick={handleClearAllNotifs}
+                      >
+                        <FaTrash /> Clear all
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
             {/* Language Selector */}
-            <div className="lang-menu-wrapper">
+            <div className="lang-menu-wrapper" ref={langRef}>
               <button
                 type="button"
                 className="lang-toggle-btn"

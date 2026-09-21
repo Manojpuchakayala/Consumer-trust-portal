@@ -20,9 +20,11 @@ import {
   FaKey,
   FaCheck,
   FaUserCheck,
+  FaWhatsapp,
 } from "react-icons/fa";
 import api from "../services/api";
 import { generateGrievanceNoticePdf, generateResolutionCertificatePdf } from "../utils/pdfGenerator";
+import { getWhatsAppShareUrl } from "../utils/whatsappShare";
 import "./TrackComplaint.css";
 
 export default function TrackComplaint() {
@@ -353,6 +355,15 @@ export default function TrackComplaint() {
                 >
                   <FaCopy /> {copiedId ? "Copied" : ""}
                 </button>
+                <a
+                  href={getWhatsAppShareUrl(complaint)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-whatsapp-mini-track"
+                  title="Share Case Record via WhatsApp"
+                >
+                  <FaWhatsapp /> Share
+                </a>
               </div>
             </div>
 
@@ -539,6 +550,15 @@ export default function TrackComplaint() {
 
             {/* Action Buttons */}
             <div className="case-actions-bar">
+              <a
+                href={getWhatsAppShareUrl(complaint)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-action-whatsapp"
+                title="Share case details and tracking link via WhatsApp"
+              >
+                <FaWhatsapp className="btn-icon-wa" /> Share Case via WhatsApp
+              </a>
               <button
                 type="button"
                 className="btn-action-primary"
