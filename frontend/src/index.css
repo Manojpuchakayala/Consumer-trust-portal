@@ -1,36 +1,63 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap');
 
 /* ==========================================================================
-   CONSUMER TRUST PORTAL — 2026 REFINED DESIGN SYSTEM & TOKENS
+   CONSUMER TRUST PORTAL — 2026 REFINED DESIGN SYSTEM & BACKGROUND TOKENS
    ========================================================================== */
 
 :root {
-  /* Color Palette — Light Mode */
-  --bg-primary: #f8fafc;
+  /* Core Foundation Palette */
+  --color-deep-navy: #0B1F3A;
+  --color-midnight-blue: #102A4C;
+  --color-premium-indigo: #3847A8;
+  --color-muted-teal: #1D8A8A;
+  --color-soft-blue: #DDEBFF;
+  --color-pale-teal: #DDF5F0;
+  --color-warm-offwhite: #F8FAFC;
+  
+  /* Semantic Tokens — Light Mode */
+  --bg-primary: #F8FAFC;
   --bg-secondary: #f1f5f9;
   --bg-tertiary: #e2e8f0;
+  --bg-soft-blue: #DDEBFF;
+  --bg-pale-teal: #DDF5F0;
   
-  --card-bg: #ffffff;
+  /* Multi-Layer Background System */
+  --bg-gradient-hero: linear-gradient(180deg, #F8FAFC 0%, #edf4fe 55%, #F8FAFC 100%);
+  --bg-gradient-howitworks: linear-gradient(180deg, #f1f5f9 0%, #e6effc 50%, #f1f5f9 100%);
+  --bg-gradient-trust: linear-gradient(180deg, rgba(221, 245, 240, 0.55) 0%, rgba(248, 250, 252, 0.95) 100%);
+  --bg-gradient-cta: linear-gradient(135deg, #0B1F3A 0%, #102A4C 55%, #1d3557 100%);
+  --bg-footer: #08162b;
+  
+  /* Elevated Cards & Surfaces */
+  --card-bg: rgba(255, 255, 255, 0.92);
+  --card-bg-solid: #ffffff;
   --card-bg-subtle: #f8fafc;
-  --card-border: #e2e8f0;
-  --card-border-hover: #cbd5e1;
-  --border-color: #e2e8f0;
-  --border-subtle: #f1f5f9;
+  --card-backdrop-blur: blur(12px);
+  --card-border: rgba(16, 42, 76, 0.1);
+  --card-border-hover: rgba(56, 71, 168, 0.35);
+  --border-color: rgba(16, 42, 76, 0.1);
+  --border-subtle: rgba(16, 42, 76, 0.06);
   
-  --text-heading: #0f172a;
-  --text-primary: #1e293b;
-  --text-secondary: #475569;
+  /* Typography Colors */
+  --text-heading: #10213A;
+  --text-primary: #10213A;
+  --text-secondary: #526176;
   --text-muted: #64748b;
   --text-faint: #94a3b8;
   
-  /* Brand Accent Tokens */
-  --brand-primary: #1e40af;       /* Deep Navy / Royal Blue */
-  --brand-primary-hover: #1d4ed8;
+  /* Brand Tokens */
+  --brand-primary: #102A4C;
+  --brand-primary-hover: #0B1F3A;
   --brand-primary-subtle: #eff6ff;
   --brand-primary-border: #bfdbfe;
   
-  --brand-electric: #2563eb;      /* Electric Royal Blue */
+  --brand-indigo: #3847A8;
+  --brand-electric: #2563eb;
   --brand-electric-hover: #1d4ed8;
+  
+  --brand-teal: #1D8A8A;
+  --brand-teal-subtle: rgba(29, 138, 138, 0.08);
+  --brand-teal-border: #99f6e4;
   
   --brand-cta: #ea580c;          /* Controlled Warm Orange CTA */
   --brand-cta-hover: #c2410c;
@@ -38,10 +65,6 @@
   --brand-cta-border: #fed7aa;
   --brand-orange: #ea580c;
   --brand-orange-hover: #c2410c;
-  
-  --brand-teal: #0f766e;         /* Subtle Teal / Emerald for Resolution */
-  --brand-teal-subtle: #f0fdfa;
-  --brand-teal-border: #99f6e4;
   
   /* Functional Status Colors */
   --status-success: #15803d;
@@ -86,63 +109,78 @@
   --font-size-3xl: 1.875rem;   /* 30px */
   --font-size-4xl: 2.25rem;    /* 36px */
 
-  /* Radii */
+  /* Radii (16-24px for elevated cards) */
   --radius-xs: 4px;
   --radius-sm: 6px;
   --radius-md: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 18px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
   --radius-full: 9999px;
 
-  /* Refined Low-Elevation Shadows */
-  --shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
-  --shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
-  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
-  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
-  --shadow-card: 0 2px 8px 0 rgba(15, 23, 42, 0.04), 0 1px 2px 0 rgba(15, 23, 42, 0.02);
-  --shadow-dropdown: 0 10px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.05);
+  /* Refined Layered Shadows */
+  --shadow-xs: 0 1px 2px 0 rgba(11, 31, 58, 0.04);
+  --shadow-sm: 0 2px 6px 0 rgba(11, 31, 58, 0.05), 0 1px 2px 0 rgba(11, 31, 58, 0.03);
+  --shadow-md: 0 6px 16px -2px rgba(11, 31, 58, 0.07), 0 2px 6px -1px rgba(11, 31, 58, 0.04);
+  --shadow-lg: 0 14px 28px -4px rgba(11, 31, 58, 0.09), 0 6px 12px -2px rgba(11, 31, 58, 0.05);
+  --shadow-card: 0 4px 20px -2px rgba(11, 31, 58, 0.06), 0 1px 4px 0 rgba(11, 31, 58, 0.03);
+  --shadow-card-hover: 0 12px 30px -4px rgba(11, 31, 58, 0.12), 0 4px 10px -2px rgba(56, 71, 168, 0.08);
+  --shadow-glow-cta: 0 8px 24px rgba(234, 88, 12, 0.32);
+  --shadow-dropdown: 0 10px 25px -5px rgba(11, 31, 58, 0.12), 0 8px 10px -6px rgba(11, 31, 58, 0.06);
 
   /* Transitions */
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-normal: 200ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Dark Mode Tokens */
+/* Dark Mode Tokens (Coordinated Deep-Navy Palette) */
 [data-theme="dark"],
 .dark {
-  --bg-primary: #090d16;
-  --bg-secondary: #0f172a;
-  --bg-tertiary: #1e293b;
+  --bg-primary: #070f1e;
+  --bg-secondary: #0b172a;
+  --bg-tertiary: #132238;
+  --bg-soft-blue: rgba(56, 71, 168, 0.15);
+  --bg-pale-teal: rgba(29, 138, 138, 0.12);
   
-  --card-bg: #0f172a;
-  --card-bg-subtle: #1e293b;
-  --card-border: #1e293b;
-  --card-border-hover: #334155;
-  --border-color: #1e293b;
-  --border-subtle: #131d33;
+  --bg-gradient-hero: linear-gradient(180deg, #070f1e 0%, #0c182b 60%, #070f1e 100%);
+  --bg-gradient-howitworks: linear-gradient(180deg, #091424 0%, #0d1e36 50%, #091424 100%);
+  --bg-gradient-trust: linear-gradient(180deg, rgba(29, 138, 138, 0.08) 0%, rgba(7, 15, 30, 0.95) 100%);
+  --bg-gradient-cta: linear-gradient(135deg, #050b14 0%, #0b1a30 50%, #0f2444 100%);
+  --bg-footer: #040810;
+  
+  --card-bg: rgba(13, 27, 48, 0.82);
+  --card-bg-solid: #0d1b30;
+  --card-bg-subtle: #11223c;
+  --card-backdrop-blur: blur(14px);
+  --card-border: rgba(255, 255, 255, 0.09);
+  --card-border-hover: rgba(96, 165, 250, 0.4);
+  --border-color: rgba(255, 255, 255, 0.09);
+  --border-subtle: rgba(255, 255, 255, 0.05);
   
   --text-heading: #f8fafc;
   --text-primary: #e2e8f0;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
-  --text-faint: #64748b;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-faint: #475569;
   
-  --brand-primary: #3b82f6;
-  --brand-primary-hover: #60a5fa;
+  --brand-primary: #60a5fa;
+  --brand-primary-hover: #93c5fd;
   --brand-primary-subtle: rgba(59, 130, 246, 0.12);
   --brand-primary-border: rgba(59, 130, 246, 0.25);
   
+  --brand-indigo: #818cf8;
   --brand-electric: #3b82f6;
   --brand-electric-hover: #60a5fa;
+  
+  --brand-teal: #2dd4bf;
+  --brand-teal-subtle: rgba(45, 212, 191, 0.12);
+  --brand-teal-border: rgba(45, 212, 191, 0.25);
   
   --brand-cta: #f97316;
   --brand-cta-hover: #fb923c;
   --brand-cta-subtle: rgba(249, 115, 22, 0.12);
   --brand-cta-border: rgba(249, 115, 22, 0.25);
-  
-  --brand-teal: #14b8a6;
-  --brand-teal-subtle: rgba(20, 184, 166, 0.12);
-  --brand-teal-border: rgba(20, 184, 166, 0.25);
+  --brand-orange: #f97316;
+  --brand-orange-hover: #fb923c;
   
   --status-success: #4ade80;
   --status-success-bg: rgba(34, 197, 94, 0.1);
@@ -160,7 +198,8 @@
   --status-info-bg: rgba(59, 130, 246, 0.1);
   --status-info-border: rgba(59, 130, 246, 0.25);
 
-  --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.45);
+  --shadow-card-hover: 0 12px 30px rgba(0, 0, 0, 0.65), 0 0 15px rgba(59, 130, 246, 0.15);
 }
 
 /* ==========================================================================
@@ -189,6 +228,29 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
+}
+
+/* Subtle, high-performance background grid overlay */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  background-image: 
+    linear-gradient(to right, rgba(16, 42, 76, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(16, 42, 76, 0.02) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+[data-theme="dark"] body::before {
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
 }
 
 #root {
@@ -196,6 +258,8 @@ body {
   flex-direction: column;
   min-height: 100vh;
   width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
 main {
@@ -230,7 +294,7 @@ a {
 }
 
 a:hover {
-  color: var(--brand-primary-hover);
+  color: var(--brand-electric-hover);
 }
 
 button, input, select, textarea {
@@ -245,6 +309,16 @@ button, input, select, textarea {
   outline-offset: 2px;
 }
 
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* Reusable Container */
 .container {
   width: 100%;
@@ -252,36 +326,6 @@ button, input, select, textarea {
   margin: 0 auto;
   padding: 0 var(--space-4);
   box-sizing: border-box;
-}
-
-/* Utility Badges & Status Chips */
-.status-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-sm);
-  font-size: var(--font-size-xs);
-  font-weight: 600;
-  line-height: 1;
-}
-
-.status-pill.success {
-  background: var(--status-success-bg);
-  color: var(--status-success);
-  border: 1px solid var(--status-success-border);
-}
-
-.status-pill.warning {
-  background: var(--status-warning-bg);
-  color: var(--status-warning);
-  border: 1px solid var(--status-warning-border);
-}
-
-.status-pill.info {
-  background: var(--status-info-bg);
-  color: var(--status-info);
-  border: 1px solid var(--status-info-border);
 }
 
 /* Custom Clean Scrollbar */
