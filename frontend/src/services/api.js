@@ -1,9 +1,9 @@
 import axios from "axios";
 
-// Smart API endpoint discovery:
-// 1. Explicit VITE_API_URL if configured
-// 2. Localhost:5000 if running on local development server
-// 3. Render cloud API as reliable production endpoint
+// Dynamic API endpoint discovery:
+// 1. Localhost development server
+// 2. Explicit VITE_API_URL if configured
+// 3. Render Cloud Backend API for production Vercel deployment
 const getBaseUrl = () => {
   // If running locally in development:
   if (
@@ -13,7 +13,8 @@ const getBaseUrl = () => {
   ) {
     return "http://localhost:5000/api";
   }
-  // If explicit production API URL is set and not localhost:
+
+  // If explicit production API URL is set:
   if (
     import.meta.env.VITE_API_URL &&
     !import.meta.env.VITE_API_URL.includes("localhost") &&
@@ -21,11 +22,9 @@ const getBaseUrl = () => {
   ) {
     return import.meta.env.VITE_API_URL.replace(/\/+$/, "");
   }
-  // When running on Vercel or any live web host, use relative /api
-  if (typeof window !== "undefined" && window.location.origin) {
-    return `${window.location.origin}/api`;
-  }
-  return "/api";
+
+  // Production Render Cloud Backend
+  return "https://consumer-trust-api.onrender.com/api";
 };
 
 const api = axios.create({
