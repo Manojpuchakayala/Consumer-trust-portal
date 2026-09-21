@@ -13,6 +13,7 @@ import {
   FaEye,
   FaEyeSlash,
   FaInfoCircle,
+  FaGoogle,
 } from "react-icons/fa";
 import api from "../services/api";
 import "./Login.css";
@@ -142,10 +143,18 @@ function Login() {
     }
   };
 
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+  const isGoogleConfigured = Boolean(
+    googleClientId &&
+    !googleClientId.includes("example.apps.googleusercontent.com") &&
+    !googleClientId.includes("unconfigured.apps.googleusercontent.com") &&
+    googleClientId.includes(".apps.googleusercontent.com")
+  );
+
   // Official Google OAuth 2.0 Success Handler
   const handleGoogleSuccess = async (credentialResponse) => {
     if (!credentialResponse?.credential) {
-      setError("No credential received from Google. Please try again.");
+      setError("Google Sign-In is temporarily unavailable. Please try again later or sign in with email.");
       return;
     }
 
@@ -164,13 +173,12 @@ function Login() {
         setSuccessMsg(`Welcome, ${response.data.user.name}! Redirecting...`);
         setTimeout(() => navigate("/my-complaints"), 800);
       } else {
-        throw new Error(response.data?.message || "Google Sign-In failed.");
+        throw new Error(response.data?.message || "Google Sign-In is temporarily unavailable. Please try again later or sign in with email.");
       }
     } catch (err) {
       setError(
         err.response?.data?.message ||
-          err.message ||
-          "Google authentication failed. Please try password login."
+          "Google Sign-In is temporarily unavailable. Please try again later or sign in with email."
       );
     } finally {
       setLoading(false);
@@ -178,7 +186,7 @@ function Login() {
   };
 
   const handleGoogleError = () => {
-    setError("Google Sign-In was cancelled or could not be completed. Please try again or use email sign-in.");
+    setError("Google Sign-In is temporarily unavailable. Please try again later or sign in with email.");
   };
 
   return (
@@ -271,15 +279,29 @@ function Login() {
         {portal === "citizen" && (
           <div className="google-oauth-wrap">
             <div className="google-btn-container">
-              <GoogleLogin
-                onSuccess={handleGoogleSuccess}
-                onError={handleGoogleError}
-                shape="pill"
-                size="large"
-                theme="outline"
-                text={isRegisterMode ? "signup_with" : "signin_with"}
-                width="100%"
-              />
+              {isGoogleConfigured ? (
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={handleGoogleError}
+                  shape="pill"
+                  size="large"
+                  theme="outline"
+                  text={isRegisterMode ? "signup_with" : "signin_with"}
+                  width="100%"
+                />
+              ) : (
+                <button
+                  type="button"
+                  className="google-fallback-btn"
+                  onClick={() => {
+                    setError("Google Sign-In is temporarily unavailable. Please try again later or sign in with email.");
+                  }}
+                  title="Sign in with Google"
+                >
+                  <FaGoogle className="google-icon-colored" />
+                  <span>{isRegisterMode ? "Sign up with Google" : "Sign in with Google"}</span>
+                </button>
+              )}
             </div>
 
             <div className="login-or-divider">

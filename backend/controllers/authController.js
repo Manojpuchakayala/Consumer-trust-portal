@@ -463,7 +463,7 @@ const googleLogin = async (req, res) => {
     console.error("Google Login Error:", error);
     return res.status(500).json({
       success: false,
-      message: "Google authentication failed. Please try password login.",
+      message: "Google Sign-In is temporarily unavailable. Please try again later or sign in with email.",
     });
   }
 };
