@@ -1133,4 +1133,78 @@
   background: linear-gradient(90deg, #f59e0b, #ef4444);
 }
 
+/* Speed Post Consignment Tracking Box */
+.speed-post-box {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  margin-bottom: 14px;
+}
+
+.speed-post-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--text-heading);
+  margin-bottom: 8px;
+}
+
+.speed-post-input-row {
+  display: flex;
+  gap: 10px;
+}
+
+@media (max-width: 600px) {
+  .speed-post-input-row {
+    flex-direction: column;
+  }
+}
+
+.speed-post-input-row input {
+  flex: 1;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 13px;
+  font-family: monospace;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  outline: none;
+}
+
+.speed-post-input-row input:focus {
+  border-color: #ea580c;
+}
+
+.btn-track-postal {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #0f172a;
+  color: #ffffff !important;
+  text-decoration: none;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+
+.btn-track-postal:hover {
+  background: #1e293b;
+}
+
+.speed-post-hint {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+
 

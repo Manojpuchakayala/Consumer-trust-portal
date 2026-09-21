@@ -10,6 +10,7 @@ import {
   FaInfoCircle,
   FaArrowRight,
   FaTimes,
+  FaUsers,
 } from "react-icons/fa";
 import ResolutionTicker from "../components/ResolutionTicker";
 import "./BrandLeaderboard.css";
@@ -438,9 +439,16 @@ export default function BrandLeaderboard() {
                     <h3 className="brand-title">{brand.name}</h3>
                   </div>
                 </div>
-                <span className="brand-status-tag">
-                  {brand.badge}
-                </span>
+                <div className="brand-status-col">
+                  <span className="brand-status-tag">
+                    {brand.badge}
+                  </span>
+                  {["Samsung", "SpiceJet", "Ola", "Flipkart", "BYJU"].some((n) => brand.name.includes(n)) && (
+                    <Link to="/class-actions" className="brand-class-tag" title="View active collective consumer petition">
+                      <FaUsers /> Class Petition
+                    </Link>
+                  )}
+                </div>
               </div>
 
               {/* Redressal Progress Bar */}

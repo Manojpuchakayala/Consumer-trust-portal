@@ -51,6 +51,7 @@ export default function TrackComplaint() {
   const [copiedId, setCopiedId] = useState(false);
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState("");
   const [showCourtCalculator, setShowCourtCalculator] = useState(false);
+  const [speedPostNo, setSpeedPostNo] = useState("");
 
   // Resolution Rating State
   const [userRating, setUserRating] = useState(5);
@@ -725,6 +726,32 @@ export default function TrackComplaint() {
                     </a>
                   </div>
                 </div>
+
+                {/* India Post Speed Post Tracking Endorsement */}
+                <div className="speed-post-box">
+                  <div className="speed-post-title">
+                    <FaEnvelope /> <strong>India Post Speed Post Tracking Endorsement:</strong>
+                  </div>
+                  <div className="speed-post-input-row">
+                    <input
+                      type="text"
+                      placeholder="e.g. EM123456789IN (Speed Post Consignment #)"
+                      value={speedPostNo}
+                      onChange={(e) => setSpeedPostNo(e.target.value.toUpperCase())}
+                      maxLength={15}
+                    />
+                    <a
+                      href={`https://www.indiapost.gov.in/_layouts/15/dop.portal.tracking/trackconsignment.aspx`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-track-postal"
+                    >
+                      Track on India Post <FaExternalLinkAlt style={{ fontSize: 9 }} />
+                    </a>
+                  </div>
+                  <small className="speed-post-hint">Record postal consignment numbers to prove statutory notice delivery before consumer commissions.</small>
+                </div>
+
                 <div className="escalation-action-row">
                   <button
                     type="button"

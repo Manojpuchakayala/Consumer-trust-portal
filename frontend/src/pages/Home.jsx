@@ -11,6 +11,10 @@ import {
   FaEnvelopeOpenText,
   FaInfoCircle,
   FaBalanceScale,
+  FaUsers,
+  FaMagic,
+  FaGavel,
+  FaBuilding,
 } from "react-icons/fa";
 import ResolutionTicker from "../components/ResolutionTicker";
 import "./Home.css";
@@ -141,6 +145,60 @@ export default function Home() {
               <p>
                 Monitor milestone progress in real time, review enterprise remarks, and access your resolution record upon completion.
               </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =========================================================================
+          2.5. COLLECTIVE ACTIONS & RECURRING DISPUTES SPOTLIGHT
+          ========================================================================= */}
+      <section className="home-class-spotlight-section">
+        <div className="section-container">
+          <div className="spotlight-card-wrapper">
+            <div className="spotlight-header-row">
+              <div>
+                <span className="spotlight-tag">
+                  <FaUsers /> Collective Citizen Legal Power • CPA 2019 Sec 35(1)(c)
+                </span>
+                <h2>Active Collective Class Actions</h2>
+                <p>Join grouped consumer petitions for systemic defects, mass cancellations, and unrefunded charges.</p>
+              </div>
+              <Link to="/class-actions" className="spotlight-view-all-btn">
+                View All Petitions <FaArrowRight />
+              </Link>
+            </div>
+
+            <div className="spotlight-cards-grid">
+              <div className="spotlight-mini-card">
+                <div className="mini-card-top">
+                  <span className="mini-brand"><FaBuilding /> Samsung</span>
+                  <span className="mini-urgency high">142 Citizens</span>
+                </div>
+                <h4>AMOLED Green Line Screen Defect</h4>
+                <p>Mass petition seeking free replacement for out-of-warranty screen line failures.</p>
+                <Link to="/class-actions" className="mini-card-link">Join Petition <FaArrowRight /></Link>
+              </div>
+
+              <div className="spotlight-mini-card">
+                <div className="mini-card-top">
+                  <span className="mini-brand"><FaBuilding /> SpiceJet</span>
+                  <span className="mini-urgency urgent">68 Citizens</span>
+                </div>
+                <h4>Flight Cancellation Refund Delays</h4>
+                <p>Demanding refund disbursement + 18% statutory interest for flight cancellations.</p>
+                <Link to="/class-actions" className="mini-card-link">Join Petition <FaArrowRight /></Link>
+              </div>
+
+              <div className="spotlight-mini-card">
+                <div className="mini-card-top">
+                  <span className="mini-brand"><FaBuilding /> Ola Electric</span>
+                  <span className="mini-urgency high">114 Citizens</span>
+                </div>
+                <h4>Service Delays & Battery Range</h4>
+                <p>Joint redressal for long repair turnaround times and battery replacement queues.</p>
+                <Link to="/class-actions" className="mini-card-link">Join Petition <FaArrowRight /></Link>
+              </div>
             </div>
           </div>
         </div>

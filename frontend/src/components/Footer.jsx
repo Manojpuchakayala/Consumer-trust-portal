@@ -49,6 +49,7 @@ export default function Footer() {
               <li><Link to="/">Home Portal</Link></li>
               <li><Link to="/register">Prepare a Grievance</Link></li>
               <li><Link to="/track">Track a Case</Link></li>
+              <li><Link to="/class-actions">Collective Class Actions</Link></li>
               <li><Link to="/brands">Brand Benchmark Index</Link></li>
               <li><Link to="/partner/resolve">Enterprise Resolution Desk</Link></li>
             </ul>

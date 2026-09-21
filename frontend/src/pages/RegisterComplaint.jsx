@@ -18,6 +18,7 @@ import {
   FaTrash,
   FaFilePdf,
   FaFileImage,
+  FaFileAudio,
   FaWhatsapp,
   FaExternalLinkAlt,
   FaBuilding,
@@ -1270,13 +1271,13 @@ export default function RegisterComplaint() {
                     </div>
                     <div className="dropzone-copy">
                       <strong>Click to upload or drag and drop files here</strong>
-                      <span>Supports JPG, PNG, WEBP, and PDF files up to 10MB each</span>
+                      <span>Supports JPG, PNG, WEBP, PDF, and Call Recordings (MP3, WAV, M4A) up to 10MB each</span>
                     </div>
                     <input
                       ref={fileInputRef}
                       type="file"
                       multiple
-                      accept=".jpg,.jpeg,.png,.webp,.gif,.pdf,image/jpeg,image/png,image/webp,image/gif,application/pdf"
+                      accept=".jpg,.jpeg,.png,.webp,.gif,.pdf,.mp3,.wav,.m4a,.ogg,image/jpeg,image/png,image/webp,image/gif,application/pdf,audio/*"
                       onChange={handleFileChange}
                       style={{ display: "none" }}
                     />
@@ -1298,6 +1299,8 @@ export default function RegisterComplaint() {
                             <div className="file-icon-wrap">
                               {file.type === "application/pdf" ? (
                                 <FaFilePdf className="file-icon pdf" />
+                              ) : file.type.startsWith("audio/") ? (
+                                <FaFileAudio className="file-icon audio" />
                               ) : (
                                 <FaFileImage className="file-icon img" />
                               )}
