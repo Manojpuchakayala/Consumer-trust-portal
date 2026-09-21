@@ -42,17 +42,17 @@ export default function ContactSupport() {
             <div className="contact-info-card">
               <h4><FaEnvelope /> General Support</h4>
               <p>For help registering complaints or tracking cases.</p>
-              <a href="mailto:support@consumertrust.org">support@consumertrust.org</a>
+              <a href="mailto:support@consumertrust.in">support@consumertrust.in</a>
             </div>
             <div className="contact-info-card">
               <h4><FaShieldAlt /> Enterprise & Nodal Desk</h4>
               <p>For company nodal updates and enterprise inquiries.</p>
-              <a href="mailto:enterprise@consumertrust.org">enterprise@consumertrust.org</a>
+              <a href="mailto:enterprise@consumertrust.in">enterprise@consumertrust.in</a>
             </div>
             <div className="contact-info-card">
               <h4><FaHeadset /> Privacy & DPDP Desk</h4>
               <p>For data correction and personal data removal.</p>
-              <a href="mailto:privacy@consumertrust.org">privacy@consumertrust.org</a>
+              <a href="mailto:privacy@consumertrust.in">privacy@consumertrust.in</a>
             </div>
           </div>
 

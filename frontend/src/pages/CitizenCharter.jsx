@@ -108,7 +108,7 @@ export default function CitizenCharter() {
           <section className="legal-section">
             <h2>6. Feedback & Charter Review</h2>
             <p>
-              We welcome suggestions to improve our service charter. Please submit your feedback to <a href="mailto:charter@consumertrust.org">charter@consumertrust.org</a>.
+              We welcome suggestions to improve our service charter. Please submit your feedback to <a href="mailto:support@consumertrust.in">support@consumertrust.in</a>.
             </p>
           </section>
         </div>

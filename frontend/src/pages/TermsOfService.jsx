@@ -112,7 +112,7 @@ export default function TermsOfService() {
             <div className="legal-callout">
               <strong>Legal & Compliance Desk:</strong><br />
               Consumer Trust Platform<br />
-              Email: <a href="mailto:legal@consumertrust.org">legal@consumertrust.org</a> / <a href="mailto:support@consumertrust.org">support@consumertrust.org</a>
+              Email: <a href="mailto:legal@consumertrust.in">legal@consumertrust.in</a> / <a href="mailto:support@consumertrust.in">support@consumertrust.in</a>
             </div>
           </section>
         </div>
