@@ -1,5 +1,33 @@
+const crypto = require("crypto");
+const jwt = require("jsonwebtoken");
+const Complaint = require("../models/Complaint");
+const User = require("../models/User");
+const { findCompany } = require("../utils/companyDirectory");
+const {
+  sendOtpEmail,
+  sendComplaintConfirmationEmail,
+  sendComplaintStatusUpdateEmail,
+  sendCompanyGrievanceNoticeEmail,
+} = require("../utils/emailService");
+const {
+  sendComplaintRegistrationSMS,
+  sendComplaintStatusUpdateSMS,
+} = require("../utils/smsService");
+const {
+  formatRegistrationWhatsAppMessage,
+  formatUpdateWhatsAppMessage,
+  buildWhatsAppUrl,
+  sendComplaintRegistrationWhatsApp,
+  sendComplaintStatusUpdateWhatsApp,
+  logWhatsAppDispatch,
+} = require("../utils/whatsappService");
 
-// Privacy Helper: Redact PII for unauthenticated public viewers
+// In-Memory Storage for Case Tracking OTP Verifications (10-minute expiry)
+const trackOtpStore = new Map();
+const TRACK_OTP_EXPIRY_MS = 10 * 60 * 1000; // 10 minutes
+const MAX_OTP_ATTEMPTS = 5;
+
+// Privacy Helpers: Masking functions
 const maskName = (name) => {
   if (!name) return "Citizen";
   const parts = name.trim().split(" ");
@@ -26,37 +54,43 @@ const maskPhone = (phone) => {
 };
 
 const maskRefId = (ref) => {
-  if (!ref || ref.length <= 4) return ref;
+  if (!ref || ref.length <= 4) return ref || "";
   return ref.slice(0, 2) + "****" + ref.slice(-2);
 };
-
-const crypto = require("crypto");
-const Complaint = require("../models/Complaint");
-const User = require("../models/User");
-const { findCompany } = require("../utils/companyDirectory");
-const {
-  sendComplaintConfirmationEmail,
-  sendComplaintStatusUpdateEmail,
-  sendCompanyGrievanceNoticeEmail,
-} = require("../utils/emailService");
-const {
-  sendComplaintRegistrationSMS,
-  sendComplaintStatusUpdateSMS,
-} = require("../utils/smsService");
-const {
-  formatRegistrationWhatsAppMessage,
-  formatUpdateWhatsAppMessage,
-  buildWhatsAppUrl,
-  sendComplaintRegistrationWhatsApp,
-  sendComplaintStatusUpdateWhatsApp,
-  logWhatsAppDispatch,
-} = require("../utils/whatsappService");
 
 // Helper to generate readable Unique Tracking ID e.g. CT-2026-89412
 const generateComplaintId = () => {
   const year = new Date().getFullYear();
   const randomNum = Math.floor(10000 + Math.random() * 90000);
   return `CT-${year}-${randomNum}`;
+};
+
+// Helper to generate 6-digit OTP
+const generate6DigitOtp = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+// Helper to issue short-lived tracking token
+const generateTrackToken = (complaintId) => {
+  const secret = process.env.JWT_SECRET || "ctp_secure_prod_jwt_secret_2026";
+  return jwt.sign({ complaintId, scope: "case-track" }, secret, { expiresIn: "2h" });
+};
+
+// Helper to verify track token from authorization header
+const verifyTrackToken = (req, complaintId) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) return false;
+    const token = authHeader.split(" ")[1];
+    const secret = process.env.JWT_SECRET || "ctp_secure_prod_jwt_secret_2026";
+    const decoded = jwt.verify(token, secret);
+    if (decoded.scope === "case-track" && decoded.complaintId === complaintId) {
+      return true;
+    }
+    return false;
+  } catch {
+    return false;
+  }
 };
 
 // Register / Create Complaint
@@ -83,7 +117,7 @@ const createComplaint = async (req, res) => {
       });
     }
 
-    // Process file attachments (via Multer or direct attachments payload)
+    // Process file attachments
     const attachments = [];
     const baseUrl = `${req.protocol}://${req.get("host")}`;
 
@@ -107,13 +141,8 @@ const createComplaint = async (req, res) => {
         mimeType: req.file.mimetype,
         size: req.file.size,
       });
-    } else if (req.body.attachments && Array.isArray(req.body.attachments)) {
-      req.body.attachments.forEach((att) => {
-        if (att && att.url) attachments.push(att);
-      });
     }
 
-    // Generate unique ID ensuring no collision
     let complaintId = generateComplaintId();
     let existing = await Complaint.findOne({ complaintId });
     while (existing) {
@@ -125,7 +154,6 @@ const createComplaint = async (req, res) => {
     const smsEnabled = smsAlertsEnabled !== false && smsAlertsEnabled !== "false";
     const waEnabled = whatsappAlertsEnabled !== false && whatsappAlertsEnabled !== "false";
 
-    // Enterprise / Company Identification & Nodal Lookup
     const matchedCompany = findCompany(companyName);
     const resolvedCompanyName = companyName
       ? companyName.trim()
@@ -138,10 +166,8 @@ const createComplaint = async (req, res) => {
       ? matchedCompany.nodalEmail
       : "";
 
-    // Generate secure 1-click resolution token for company
     const resolutionToken = crypto.randomBytes(24).toString("hex");
 
-    // Build official rich WhatsApp message & direct wa.me link
     const waMessage = formatRegistrationWhatsAppMessage({
       complaintId,
       name: name.trim(),
@@ -174,12 +200,10 @@ const createComplaint = async (req, res) => {
       whatsappLogs: [waLog],
     });
 
-    // Asynchronously dispatch official confirmation receipt email to Citizen
     sendComplaintConfirmationEmail(complaint).catch((err) => {
       console.warn("Async confirmation email error:", err.message);
     });
 
-    // Asynchronously dispatch formal statutory grievance notice to Enterprise / Bank Nodal Desk
     if (resolvedCompanyEmail) {
       const frontendUrl = process.env.FRONTEND_URL || "https://consumer-trust-portal.vercel.app";
       const resolutionUrl = `${frontendUrl}/partner/resolve?token=${resolutionToken}`;
@@ -192,14 +216,12 @@ const createComplaint = async (req, res) => {
       });
     }
 
-    // Asynchronously dispatch confirmation SMS
     if (smsEnabled) {
       sendComplaintRegistrationSMS(complaint).catch((err) => {
         console.warn("Async registration SMS error:", err.message);
       });
     }
 
-    // Asynchronously dispatch direct automated WhatsApp Notification
     if (waEnabled) {
       sendComplaintRegistrationWhatsApp(complaint).catch((err) => {
         console.warn("Async registration direct WhatsApp error:", err.message);
@@ -208,7 +230,7 @@ const createComplaint = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: `Complaint registered successfully! Formal notice dispatched to ${resolvedCompanyName} Grievance Desk.`,
+      message: `Grievance registered successfully with ID ${complaint.complaintId}!`,
       complaintId: complaint.complaintId,
       companyName: resolvedCompanyName,
       companyEmail: resolvedCompanyEmail,
@@ -220,12 +242,155 @@ const createComplaint = async (req, res) => {
     console.error("Create Complaint Error:", error);
     return res.status(500).json({
       success: false,
-      message: error.message || "Failed to register complaint",
+      message: error.message || "Failed to register grievance",
     });
   }
 };
 
-// Track Complaint by Docket ID (With PII Privacy Masking)
+// 1. Request Protected Case Tracking Access (OTP-based or Session verification)
+const requestTrackAccess = async (req, res) => {
+  try {
+    const { complaintId } = req.body;
+
+    if (!complaintId || !complaintId.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Docket ID is required to initiate tracking.",
+      });
+    }
+
+    const trimmedId = complaintId.trim().toUpperCase();
+    const complaint = await Complaint.findOne({
+      $or: [{ complaintId: trimmedId }, { complaintId: complaintId.trim() }],
+    });
+
+    // Check if requester is logged in and owns the case or is admin
+    const isOwner =
+      req.user &&
+      ((complaint && complaint.user && req.user._id && complaint.user.toString() === req.user._id.toString()) ||
+       (complaint && complaint.email && req.user.email && complaint.email.toLowerCase() === req.user.email.toLowerCase()));
+    const isAdmin = req.user && req.user.role === "admin";
+
+    if (complaint && (isOwner || isAdmin)) {
+      const trackToken = generateTrackToken(complaint.complaintId);
+      return res.status(200).json({
+        success: true,
+        authorized: true,
+        requiresOtp: false,
+        trackToken,
+        complaint,
+      });
+    }
+
+    // Neutral message if case not found
+    if (!complaint) {
+      return res.status(404).json({
+        success: false,
+        message: "We could not find a matching case. Please check your Docket ID or sign in to view your cases.",
+      });
+    }
+
+    // Generate 6-digit OTP for protected access
+    const otp = generate6DigitOtp();
+    trackOtpStore.set(trimmedId, {
+      otp,
+      expiresAt: Date.now() + TRACK_OTP_EXPIRY_MS,
+      attempts: 0,
+      email: complaint.email,
+    });
+
+    // Send verification code to the registered email on the complaint
+    await sendOtpEmail(complaint.email, otp, complaint.name);
+
+    return res.status(200).json({
+      success: true,
+      requiresOtp: true,
+      authorized: false,
+      complaintId: complaint.complaintId,
+      maskedEmail: maskEmail(complaint.email),
+      maskedPhone: maskPhone(complaint.phone),
+      message: `A 6-digit verification code has been dispatched to ${maskEmail(complaint.email)}.`,
+    });
+  } catch (error) {
+    console.error("Request Track Access Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while preparing case verification. Please try again.",
+    });
+  }
+};
+
+// 2. Verify Case Tracking OTP and Reveal Case Details
+const verifyTrackOtp = async (req, res) => {
+  try {
+    const { complaintId, otp } = req.body;
+
+    if (!complaintId || !otp) {
+      return res.status(400).json({
+        success: false,
+        message: "Docket ID and 6-digit verification code are required.",
+      });
+    }
+
+    const trimmedId = complaintId.trim().toUpperCase();
+    const record = trackOtpStore.get(trimmedId);
+
+    if (!record || Date.now() > record.expiresAt) {
+      trackOtpStore.delete(trimmedId);
+      return res.status(400).json({
+        success: false,
+        message: "Verification code has expired. Please request a new code.",
+      });
+    }
+
+    if (record.attempts >= MAX_OTP_ATTEMPTS) {
+      trackOtpStore.delete(trimmedId);
+      return res.status(429).json({
+        success: false,
+        message: "Too many failed attempts. Please request a fresh verification code.",
+      });
+    }
+
+    if (record.otp !== otp.trim()) {
+      record.attempts += 1;
+      return res.status(400).json({
+        success: false,
+        message: "Invalid verification code. Please check your email and try again.",
+      });
+    }
+
+    // Correct OTP: Clear record and fetch full case
+    trackOtpStore.delete(trimmedId);
+
+    const complaint = await Complaint.findOne({
+      $or: [{ complaintId: trimmedId }, { complaintId: complaintId.trim() }],
+    });
+
+    if (!complaint) {
+      return res.status(404).json({
+        success: false,
+        message: "We could not find a matching case. Please check your Docket ID or sign in to view your cases.",
+      });
+    }
+
+    const trackToken = generateTrackToken(complaint.complaintId);
+
+    return res.status(200).json({
+      success: true,
+      authorized: true,
+      trackToken,
+      complaint,
+    });
+  } catch (error) {
+    console.error("Verify Track OTP Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to verify tracking code. Please try again.",
+    });
+  }
+};
+
+// 3. Track Complaint (GET Endpoint - Requires Authentication or Valid Track Token)
 const trackComplaint = async (req, res) => {
   try {
     const { complaintId } = req.params;
@@ -238,67 +403,36 @@ const trackComplaint = async (req, res) => {
     }
 
     const trimmedId = complaintId.trim().toUpperCase();
-
-    let complaint = await Complaint.findOne({
-      $or: [
-        { complaintId: trimmedId },
-        { complaintId: complaintId.trim() },
-      ],
-    }).populate("user", "name email");
+    const complaint = await Complaint.findOne({
+      $or: [{ complaintId: trimmedId }, { complaintId: complaintId.trim() }],
+    });
 
     if (!complaint) {
       return res.status(404).json({
         success: false,
-        message: `No grievance docket found matching ID "${complaintId}"`,
+        message: "We could not find a matching case. Please check your Docket ID or sign in to view your cases.",
       });
     }
 
-    // Determine if requester is authorized complaint owner or administrator
     const isOwner =
       req.user &&
-      ((complaint.user && complaint.user._id && req.user._id && complaint.user._id.toString() === req.user._id.toString()) ||
+      ((complaint.user && req.user._id && complaint.user.toString() === req.user._id.toString()) ||
        (complaint.email && req.user.email && complaint.email.toLowerCase() === req.user.email.toLowerCase()));
     const isAdmin = req.user && req.user.role === "admin";
-    const isAuthorized = isOwner || isAdmin;
+    const hasValidTrackToken = verifyTrackToken(req, complaint.complaintId);
 
-    // Build sanitized complaint response (mask PII if unauthenticated/public)
-    const sanitizedComplaint = {
-      _id: complaint._id,
-      complaintId: complaint.complaintId,
-      category: complaint.category,
-      companyName: complaint.companyName,
-      companyNoticeSent: complaint.companyNoticeSent,
-      subject: complaint.subject,
-      description: isAuthorized ? complaint.description : (complaint.description ? complaint.description.slice(0, 160) + "..." : ""),
-      status: complaint.status,
-      createdAt: complaint.createdAt,
-      resolvedAt: complaint.resolvedAt,
-      adminRemarks: complaint.adminRemarks,
-      companyResolution: complaint.companyResolution,
-      feedback: complaint.feedback,
-      attachmentsCount: complaint.attachments ? complaint.attachments.length : 0,
-      isAuthorizedViewer: isAuthorized,
-      // Masked or full PII based on verified authorization
-      name: isAuthorized ? complaint.name : maskName(complaint.name),
-      email: isAuthorized ? complaint.email : maskEmail(complaint.email),
-      phone: isAuthorized ? complaint.phone : maskPhone(complaint.phone),
-      orderOrTransactionId: isAuthorized ? complaint.orderOrTransactionId : maskRefId(complaint.orderOrTransactionId),
-      attachments: isAuthorized
-        ? complaint.attachments
-        : (complaint.attachments || []).map((att) => ({
-            originalName: att.originalName ? "Evidence_Document_" + att.originalName.slice(-8) : "Evidence_Document",
-            mimeType: att.mimeType,
-          })),
-    };
-
-    const waMessage = formatUpdateWhatsAppMessage(complaint);
-    const whatsAppUrl = buildWhatsAppUrl(complaint.phone, waMessage);
+    if (!isOwner && !isAdmin && !hasValidTrackToken) {
+      return res.status(401).json({
+        success: false,
+        requiresVerification: true,
+        message: "Protected case: Multi-factor verification required to view this case.",
+      });
+    }
 
     return res.status(200).json({
       success: true,
-      complaint: sanitizedComplaint,
-      whatsAppUrl,
-      whatsAppMessage: waMessage,
+      authorized: true,
+      complaint,
     });
   } catch (error) {
     console.error("Track Complaint Error:", error);
@@ -385,12 +519,10 @@ const getAdminStats = async (req, res) => {
     const rejectedComplaints = await Complaint.countDocuments({ status: "Rejected" });
     const totalUsers = await User.countDocuments();
 
-    // Category breakdown
     const categoryStats = await Complaint.aggregate([
       { $group: { _id: "$category", count: { $sum: 1 } } },
     ]);
 
-    // Citizen satisfaction feedback aggregation
     const feedbackAgg = await Complaint.aggregate([
       { $match: { "feedback.rating": { $ne: null } } },
       {
@@ -457,7 +589,6 @@ const updateComplaintStatus = async (req, res) => {
       complaint.priority = priority;
     }
 
-    // WhatsApp dispatch log and wa.me link
     const waMessage = formatUpdateWhatsAppMessage(complaint);
     const whatsAppUrl = buildWhatsAppUrl(complaint.phone, waMessage);
     const waLog = logWhatsAppDispatch(complaint.phone, waMessage);
@@ -467,19 +598,16 @@ const updateComplaintStatus = async (req, res) => {
 
     await complaint.save();
 
-    // Asynchronously dispatch status update notification email to citizen
     sendComplaintStatusUpdateEmail(complaint).catch((err) => {
       console.warn("Async status update email error:", err.message);
     });
 
-    // Asynchronously dispatch status update notification SMS to citizen
     if (complaint.smsAlertsEnabled !== false) {
       sendComplaintStatusUpdateSMS(complaint).catch((err) => {
         console.warn("Async status update SMS error:", err.message);
       });
     }
 
-    // Asynchronously dispatch direct automated WhatsApp notification to citizen
     if (complaint.whatsappAlertsEnabled !== false) {
       sendComplaintStatusUpdateWhatsApp(complaint).catch((err) => {
         console.warn("Async status update direct WhatsApp error:", err.message);
@@ -516,7 +644,6 @@ const deleteComplaint = async (req, res) => {
       });
     }
 
-    // Check authorization: Admin or complaint owner
     const isAdmin = req.user && req.user.role === "admin";
     const isOwner =
       req.user &&
@@ -605,7 +732,6 @@ const getPublicStats = async (req, res) => {
     const resolvedComplaints = await Complaint.countDocuments({ status: "Resolved" });
     const totalUsers = await User.countDocuments();
 
-    // Citizen satisfaction feedback aggregation
     const feedbackAgg = await Complaint.aggregate([
       { $match: { "feedback.rating": { $ne: null } } },
       {
@@ -638,32 +764,10 @@ const getPublicStats = async (req, res) => {
   }
 };
 
-// Get Latest Complaint for Instant Live Tracking
-const getLatestComplaint = async (req, res) => {
-  try {
-    let complaint = await Complaint.findOne().sort({ createdAt: -1 });
-    if (!complaint) {
-      // If no complaint exists in database, create or return demo
-      return res.status(404).json({
-        success: false,
-        message: "No complaints found",
-      });
-    }
-    return res.status(200).json({
-      success: true,
-      complaint,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: error.message || "Failed to fetch latest complaint",
-    });
-  }
-};
-
 module.exports = {
-  getLatestComplaint,
   createComplaint,
+  requestTrackAccess,
+  verifyTrackOtp,
   trackComplaint,
   getMyComplaints,
   getAllComplaints,

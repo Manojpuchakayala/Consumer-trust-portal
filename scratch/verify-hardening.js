@@ -19,7 +19,7 @@ function check(title, condition, detail = "") {
   }
 }
 
-// 1. Check frontend Login.jsx for test credentials / auto-fill removal
+// 1. Check frontend Login.jsx for test credentials / auto-fill removal & Real Google OAuth
 const loginPath = path.join(__dirname, "../frontend/src/pages/Login.jsx");
 const loginContent = fs.readFileSync(loginPath, "utf8");
 check(
@@ -29,8 +29,14 @@ check(
   !loginContent.includes("User@123") &&
   !loginContent.includes("admin@consumertrust.gov")
 );
+check(
+  "Login Page: Real Google OAuth Component Integrated (@react-oauth/google)",
+  loginContent.includes("GoogleLogin") &&
+  loginContent.includes("handleGoogleSuccess") &&
+  loginContent.includes("/auth/google")
+);
 
-// 2. Check TrackComplaint.jsx for mock case autoloading removal & privacy notice
+// 2. Check TrackComplaint.jsx for mock case autoloading removal & OTP Verification flow
 const trackPath = path.join(__dirname, "../frontend/src/pages/TrackComplaint.jsx");
 const trackContent = fs.readFileSync(trackPath, "utf8");
 check(
@@ -40,11 +46,21 @@ check(
   !trackContent.includes("CT-2026-76665")
 );
 check(
-  "Track Case: Redaction & Privacy Notice Present",
-  trackContent.includes("privacy-redaction-notice") || trackContent.includes("Privacy Protected")
+  "Track Case: 2-Factor OTP Verification Modal Implemented",
+  trackContent.includes("otpStep") &&
+  trackContent.includes("handleVerifyOtp") &&
+  trackContent.includes("/complaints/track/verify-otp")
+);
+check(
+  "Track Case: Privacy & Independent Notice Present",
+  trackContent.includes("Protected Case Tracking") || trackContent.includes("Independent Platform Notice")
 );
 
-// 3. Check App.jsx for Legal, Compliance, and Methodology Routes
+// 3. Check main.jsx for GoogleOAuthProvider and App.jsx for Legal Routes
+const mainPath = path.join(__dirname, "../frontend/src/main.jsx");
+const mainContent = fs.readFileSync(mainPath, "utf8");
+check("App Root: GoogleOAuthProvider Configured in main.jsx", mainContent.includes("GoogleOAuthProvider"));
+
 const appPath = path.join(__dirname, "../frontend/src/App.jsx");
 const appContent = fs.readFileSync(appPath, "utf8");
 check("Routes: /privacy Route Registered", appContent.includes('path="/privacy"'));
@@ -54,20 +70,32 @@ check("Routes: /accessibility Route Registered", appContent.includes('path="/acc
 check("Routes: /methodology Route Registered", appContent.includes('path="/methodology"'));
 check("Routes: /contact Route Registered", appContent.includes('path="/contact"'));
 
-// 4. Check Backend complaintController.js for PII Masking
+// 4. Check Backend complaintController.js for Protected Tracking API
 const complaintCtrlPath = path.join(__dirname, "../backend/controllers/complaintController.js");
 const complaintCtrlContent = fs.readFileSync(complaintCtrlPath, "utf8");
 check(
-  "Backend Controller: Public Complaint Tracking PII Masking Active",
+  "Backend Controller: Public Complaint Tracking PII Masking & Token Verification Active",
   complaintCtrlContent.includes("maskName") &&
   complaintCtrlContent.includes("maskEmail") &&
   complaintCtrlContent.includes("maskPhone") &&
-  complaintCtrlContent.includes("isAuthorizedViewer")
+  complaintCtrlContent.includes("verifyTrackToken")
+);
+check(
+  "Backend Controller: OTP-Based Case Access Endpoints Implemented",
+  complaintCtrlContent.includes("requestTrackAccess") &&
+  complaintCtrlContent.includes("verifyTrackOtp") &&
+  complaintCtrlContent.includes("TRACK_OTP_EXPIRY_MS")
 );
 
-// 5. Check Backend authController.js for Account Lockout & Password Complexity
+// 5. Check Backend authController.js for Google Token Verification, Lockout & Password Complexity
 const authCtrlPath = path.join(__dirname, "../backend/controllers/authController.js");
 const authCtrlContent = fs.readFileSync(authCtrlPath, "utf8");
+check(
+  "Backend Auth: Google OAuth ID Token Cryptographic Verification (OAuth2Client)",
+  authCtrlContent.includes("OAuth2Client") &&
+  authCtrlContent.includes("googleLogin") &&
+  authCtrlContent.includes("verifyIdToken")
+);
 check(
   "Backend Auth: Password Complexity Enforced (8+ chars, letters & numbers)",
   authCtrlContent.includes("pwd.length < 8") || authCtrlContent.includes("password.length < 8")

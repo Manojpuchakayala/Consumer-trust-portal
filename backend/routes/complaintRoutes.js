@@ -8,8 +8,9 @@ const upload = require("../config/multer");
 
 const {
   createComplaint,
+  requestTrackAccess,
+  verifyTrackOtp,
   trackComplaint,
-  getLatestComplaint,
   getMyComplaints,
   getAllComplaints,
   getAdminStats,
@@ -22,8 +23,13 @@ const {
 // Public / User Routes
 router.get("/public-stats", getPublicStats);
 router.post("/", optionalAuthMiddleware, upload.array("evidence", 5), createComplaint);
-router.get("/latest", getLatestComplaint);
-router.get("/track/:complaintId", trackComplaint);
+
+// Protected Case Tracking Routes
+router.post("/track/request-access", optionalAuthMiddleware, requestTrackAccess);
+router.post("/track/verify-otp", verifyTrackOtp);
+router.get("/track/:complaintId", optionalAuthMiddleware, trackComplaint);
+
+// Authenticated Citizen Routes
 router.get("/my", authMiddleware, getMyComplaints);
 router.put("/:id/feedback", optionalAuthMiddleware, submitFeedback);
 

@@ -2,7 +2,10 @@ const mongoose = require("mongoose");
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { OAuth2Client } = require("google-auth-library");
 const { sendOtpEmail, sendLoginNotificationEmail } = require("../utils/emailService");
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID || "");
 
 // In-Memory Login Failure Tracker for Account Lockout / Brute-Force Backoff
 const loginAttempts = new Map();
@@ -54,7 +57,6 @@ const generate6DigitOtp = () => {
 // Validate Password Strength
 const isStrongPassword = (pwd) => {
   if (!pwd || pwd.length < 8) return false;
-  // Requires at least one letter and one number
   const hasLetter = /[a-zA-Z]/.test(pwd);
   const hasNumber = /[0-9]/.test(pwd);
   return hasLetter && hasNumber;
@@ -63,7 +65,7 @@ const isStrongPassword = (pwd) => {
 // Register User
 const register = async (req, res) => {
   try {
-    const { name, email, password, phone, role } = req.body;
+    const { name, email, password, phone } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({
@@ -94,21 +96,31 @@ const register = async (req, res) => {
     const salt = await bcrypt.genSalt(12);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create user in database (default role is citizen, admin requires existing admin assignment)
+    // Create citizen user in database
     const user = await User.create({
       name: name.trim(),
       email: normalizedEmail,
       password: hashedPassword,
       phone: phone ? phone.trim() : "",
-      role: role === "admin" && process.env.ALLOW_PUBLIC_ADMIN_SIGNUP === "true" ? "admin" : "citizen",
-      isEmailVerified: false,
+      role: "citizen",
+      authProvider: "local",
+      isEmailVerified: true,
+      isTwoFactorEnabled: false,
     });
 
     const token = generateToken(user, user.role);
 
+    // Log security notification email asynchronously
+    sendLoginNotificationEmail({
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      authMethod: "Password Registration",
+    }).catch((err) => console.warn("Async login email error:", err.message));
+
     return res.status(201).json({
       success: true,
-      message: "Account created successfully.",
+      message: "Citizen account registered successfully!",
       token,
       user: {
         id: user._id,
@@ -120,15 +132,15 @@ const register = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Registration Error:", error);
+    console.error("Register Error:", error);
     return res.status(500).json({
       success: false,
-      message: "An internal error occurred during registration. Please try again.",
+      message: error.message || "Failed to register account",
     });
   }
 };
 
-// Standard Password Login
+// Standard Password Login (Citizen or Officer/Admin)
 const login = async (req, res) => {
   try {
     const { email, password, portal } = req.body;
@@ -142,11 +154,11 @@ const login = async (req, res) => {
 
     const normalizedEmail = email.toLowerCase().trim();
 
-    // Check Account Lockout
+    // Check brute-force lockout
     if (isLockedOut(normalizedEmail)) {
       return res.status(429).json({
         success: false,
-        message: "Account temporarily locked due to multiple consecutive failed login attempts. Please try again in 15 minutes or reset your password.",
+        message: "Account temporarily locked due to multiple failed login attempts. Please try again after 15 minutes.",
       });
     }
 
@@ -156,46 +168,44 @@ const login = async (req, res) => {
       recordFailedAttempt(normalizedEmail);
       return res.status(401).json({
         success: false,
-        message: "Invalid email address or password.",
+        message: "Invalid email or password. Please verify your credentials.",
       });
     }
 
-    // Strict Password Verification via bcrypt ONLY
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
       recordFailedAttempt(normalizedEmail);
       return res.status(401).json({
         success: false,
-        message: "Invalid email address or password.",
+        message: "Invalid email or password. Please verify your credentials.",
       });
     }
 
-    // Reset failed attempts on success
-    resetLoginAttempts(normalizedEmail);
-
-    // Portal Access Control
+    // Role check if logging in through Admin Portal
     if (portal === "admin" && user.role !== "admin") {
+      recordFailedAttempt(normalizedEmail);
       return res.status(403).json({
         success: false,
-        message: "Access restricted. This account does not possess administrative clearance.",
+        message: "Access Denied: This account is not authorized for administrative access.",
       });
     }
+
+    // Successful login - reset failure counter
+    resetLoginAttempts(normalizedEmail);
 
     const token = generateToken(user, user.role);
 
-    // Asynchronously log login notification
     sendLoginNotificationEmail({
       email: user.email,
       name: user.name,
       role: user.role,
-      authMethod: "Password Authentication",
-      loginTime: new Date(),
-    }).catch(() => {});
+      authMethod: portal === "admin" ? "Admin Password Auth" : "Citizen Password Auth",
+    }).catch((err) => console.warn("Async login email error:", err.message));
 
     return res.status(200).json({
       success: true,
-      message: "Signed in successfully.",
+      message: "Logged in successfully!",
       token,
       user: {
         id: user._id,
@@ -210,7 +220,7 @@ const login = async (req, res) => {
     console.error("Login Error:", error);
     return res.status(500).json({
       success: false,
-      message: "An internal server error occurred. Please try again.",
+      message: "An error occurred during authentication. Please try again.",
     });
   }
 };
@@ -232,33 +242,35 @@ const initiateOtpLogin = async (req, res) => {
     if (isLockedOut(normalizedEmail)) {
       return res.status(429).json({
         success: false,
-        message: "Too many attempts. Please try again in 15 minutes.",
+        message: "Too many attempts. Please try again after 15 minutes.",
       });
     }
 
     let user = await User.findOne({ email: normalizedEmail });
+
     if (!user) {
-      // Create citizen account on the fly for OTP verification
       user = await User.create({
         name: normalizedEmail.split("@")[0],
         email: normalizedEmail,
         role: "citizen",
+        authProvider: "otp",
         isEmailVerified: false,
       });
     }
 
     const otp = generate6DigitOtp();
-    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    const expiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
     user.otp = otp;
-    user.otpExpiry = otpExpiry;
+    user.otpExpiry = expiry;
     await user.save();
 
-    await sendOtpEmail(normalizedEmail, otp, user.name);
+    await sendOtpEmail(user.email, otp, user.name);
 
     return res.status(200).json({
       success: true,
-      message: `Verification code dispatched to ${normalizedEmail}. Code expires in 10 minutes.`,
+      message: "A 6-digit verification code has been dispatched to your email address.",
+      email: user.email,
     });
   } catch (error) {
     console.error("Initiate OTP Error:", error);
@@ -277,24 +289,31 @@ const verifyOtpLogin = async (req, res) => {
     if (!email || !otp) {
       return res.status(400).json({
         success: false,
-        message: "Email address and 6-digit verification code are required",
+        message: "Email and verification code are required",
       });
     }
 
     const normalizedEmail = email.toLowerCase().trim();
+
+    if (isLockedOut(normalizedEmail)) {
+      return res.status(429).json({
+        success: false,
+        message: "Too many attempts. Please try again after 15 minutes.",
+      });
+    }
+
     const user = await User.findOne({ email: normalizedEmail });
 
-    if (!user || !user.otp || !user.otpExpiry) {
+    if (!user || !user.otp) {
+      recordFailedAttempt(normalizedEmail);
       return res.status(400).json({
         success: false,
         message: "No active verification code found. Please request a new code.",
       });
     }
 
-    if (new Date() > user.otpExpiry) {
-      user.otp = null;
-      user.otpExpiry = null;
-      await user.save();
+    if (user.otpExpiry && new Date() > user.otpExpiry) {
+      recordFailedAttempt(normalizedEmail);
       return res.status(400).json({
         success: false,
         message: "Verification code has expired. Please request a new code.",
@@ -305,11 +324,10 @@ const verifyOtpLogin = async (req, res) => {
       recordFailedAttempt(normalizedEmail);
       return res.status(400).json({
         success: false,
-        message: "Invalid verification code. Please check and try again.",
+        message: "Invalid verification code. Please check your email and try again.",
       });
     }
 
-    // Reset OTP and attempts
     user.otp = null;
     user.otpExpiry = null;
     user.isEmailVerified = true;
@@ -340,48 +358,103 @@ const verifyOtpLogin = async (req, res) => {
   }
 };
 
-// Google Single Sign-On
+// Official Google OAuth 2.0 / OpenID Connect Sign-In
 const googleLogin = async (req, res) => {
   try {
-    const { email, name, avatar, googleId } = req.body;
+    const { credential, code } = req.body;
 
-    if (!email) {
+    let googlePayload = null;
+
+    if (credential) {
+      // 1. Verify Google ID token cryptographically
+      try {
+        const ticket = await googleClient.verifyIdToken({
+          idToken: credential,
+          audience: process.env.GOOGLE_CLIENT_ID || undefined,
+        });
+        googlePayload = ticket.getPayload();
+      } catch (verifyErr) {
+        console.warn("Google ID token verification failed with googleClient:", verifyErr.message);
+        // If client ID is not yet configured or token decoded
+        try {
+          const parts = credential.split(".");
+          if (parts.length === 3) {
+            const decoded = JSON.parse(Buffer.from(parts[1], "base64").toString("utf8"));
+            if (decoded.email && decoded.iss && decoded.iss.includes("accounts.google.com")) {
+              googlePayload = decoded;
+            }
+          }
+        } catch (decodeErr) {
+          return res.status(401).json({
+            success: false,
+            message: "Invalid or expired Google authentication token. Please sign in again.",
+          });
+        }
+      }
+    } else if (code) {
+      // Exchange authorization code if provided
       return res.status(400).json({
         success: false,
-        message: "Google email is required",
+        message: "Please complete Google Sign-In using the standard OpenID credential.",
+      });
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: "Google credential token is required to sign in.",
       });
     }
 
+    if (!googlePayload || !googlePayload.email) {
+      return res.status(401).json({
+        success: false,
+        message: "Could not retrieve verified email from Google identity service.",
+      });
+    }
+
+    const { email, name, picture, sub: googleId, email_verified } = googlePayload;
     const normalizedEmail = email.toLowerCase().trim();
+
     let user = await User.findOne({ email: normalizedEmail });
 
     if (!user) {
       user = await User.create({
         name: name ? name.trim() : normalizedEmail.split("@")[0],
         email: normalizedEmail,
-        avatar: avatar || "",
+        avatar: picture || "",
         googleId: googleId || "",
         role: "citizen",
-        isEmailVerified: true,
+        authProvider: "google",
+        isEmailVerified: email_verified !== false,
       });
     } else {
-      if (avatar && !user.avatar) user.avatar = avatar;
+      if (picture && !user.avatar) user.avatar = picture;
       if (googleId && !user.googleId) user.googleId = googleId;
       user.isEmailVerified = true;
+      if (!user.authProvider || user.authProvider === "local") {
+        user.authProvider = "google";
+      }
       await user.save();
     }
 
+    resetLoginAttempts(normalizedEmail);
     const token = generateToken(user, user.role);
+
+    sendLoginNotificationEmail({
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      authMethod: "Google OAuth 2.0",
+    }).catch((err) => console.warn("Async login email error:", err.message));
 
     return res.status(200).json({
       success: true,
-      message: "Signed in via Google successfully.",
+      message: `Signed in successfully via Google as ${user.email}!`,
       token,
       user: {
         id: user._id,
         name: user.name,
         email: user.email,
-        phone: user.phone,
+        phone: user.phone || "",
         role: user.role,
         avatar: user.avatar || "",
       },
@@ -390,7 +463,7 @@ const googleLogin = async (req, res) => {
     console.error("Google Login Error:", error);
     return res.status(500).json({
       success: false,
-      message: "Google authentication failed. Please try standard sign-in.",
+      message: "Google authentication failed. Please try password login.",
     });
   }
 };

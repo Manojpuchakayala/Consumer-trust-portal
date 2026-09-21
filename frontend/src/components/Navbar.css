@@ -48,13 +48,16 @@
   flex-direction: column;
 }
 
+.brand-name,
 .brand-title {
   font-size: 17px;
   font-weight: 800;
   letter-spacing: 0.3px;
   line-height: 1.2;
+  color: #ffffff;
 }
 
+.tagline,
 .brand-subtitle {
   font-size: 10px;
   color: #bbdefb;

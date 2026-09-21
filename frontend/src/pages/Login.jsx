@@ -12,9 +12,6 @@ import {
   FaCheckCircle,
   FaEye,
   FaEyeSlash,
-  FaKey,
-  FaGoogle,
-  FaTimes,
   FaInfoCircle,
 } from "react-icons/fa";
 import api from "../services/api";
@@ -33,7 +30,6 @@ function Login() {
     searchParams.get("mode") === "signup" && !isInitialAdmin
   );
 
-  // Form State - strictly blank by default (NO hardcoded credentials)
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -45,26 +41,6 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
-
-  // Per-Device Dynamic Google Sign-In State
-  const [showGoogleModal, setShowGoogleModal] = useState(false);
-  const [showSetupGuide, setShowSetupGuide] = useState(false);
-  const [googleEmailInput, setGoogleEmailInput] = useState("");
-  const [googleNameInput, setGoogleNameInput] = useState("");
-  const [savedDeviceGoogleUser, setSavedDeviceGoogleUser] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("consumerTrustLastGoogleUser") || "null");
-    } catch {
-      return null;
-    }
-  });
-
-  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
-  const isRealGoogleConfigured = Boolean(
-    googleClientId &&
-      !googleClientId.includes("-example.apps.googleusercontent.com") &&
-      googleClientId.includes(".apps.googleusercontent.com")
-  );
 
   useEffect(() => {
     if (searchParams.get("portal") === "admin" || searchParams.get("role") === "admin") {
@@ -110,12 +86,13 @@ function Login() {
         if (response.data?.success) {
           localStorage.setItem("consumerTrustToken", response.data.token);
           localStorage.setItem("consumerTrustUser", JSON.stringify(response.data.user));
+          window.dispatchEvent(new Event("authChange"));
           setSuccessMsg("Administrator clearance verified! Redirecting...");
-          setTimeout(() => navigate("/admin"), 1000);
+          setTimeout(() => navigate("/admin"), 800);
         }
       } else if (isRegisterMode) {
         if (!formData.name || !formData.email || !formData.password) {
-          setError("Please complete all required fields.");
+          setError("Please fill in all required fields.");
           setLoading(false);
           return;
         }
@@ -136,8 +113,9 @@ function Login() {
         if (response.data?.success) {
           localStorage.setItem("consumerTrustToken", response.data.token);
           localStorage.setItem("consumerTrustUser", JSON.stringify(response.data.user));
+          window.dispatchEvent(new Event("authChange"));
           setSuccessMsg("Account created successfully! Redirecting...");
-          setTimeout(() => navigate("/my-complaints"), 1000);
+          setTimeout(() => navigate("/my-complaints"), 800);
         }
       } else {
         const response = await api.post("/auth/login", {
@@ -149,27 +127,25 @@ function Login() {
         if (response.data?.success) {
           localStorage.setItem("consumerTrustToken", response.data.token);
           localStorage.setItem("consumerTrustUser", JSON.stringify(response.data.user));
+          window.dispatchEvent(new Event("authChange"));
           setSuccessMsg("Signed in successfully! Redirecting...");
-          setTimeout(() => navigate("/my-complaints"), 1000);
+          setTimeout(() => navigate("/my-complaints"), 800);
         }
       }
     } catch (err) {
       setError(
         err.response?.data?.message ||
-          "Authentication failed. Please verify your credentials and try again."
+          "Authentication failed. Please check your credentials and try again."
       );
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDynamicGoogleSignIn = async (e) => {
-    e?.preventDefault();
-    const emailToUse = (googleEmailInput || savedDeviceGoogleUser?.email || "").trim().toLowerCase();
-    const nameToUse = (googleNameInput || savedDeviceGoogleUser?.name || "").trim();
-
-    if (!emailToUse) {
-      setError("Please enter your Google email address.");
+  // Official Google OAuth 2.0 Success Handler
+  const handleGoogleSuccess = async (credentialResponse) => {
+    if (!credentialResponse?.credential) {
+      setError("No credential received from Google. Please try again.");
       return;
     }
 
@@ -178,84 +154,82 @@ function Login() {
       setError("");
 
       const response = await api.post("/auth/google", {
-        email: emailToUse,
-        name: nameToUse || emailToUse.split("@")[0],
-        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(nameToUse || emailToUse)}&background=0f2b5c&color=fff`,
-        googleId: `google_${Date.now()}`,
+        credential: credentialResponse.credential,
       });
 
       if (response.data?.success) {
         localStorage.setItem("consumerTrustToken", response.data.token);
         localStorage.setItem("consumerTrustUser", JSON.stringify(response.data.user));
-        localStorage.setItem(
-          "consumerTrustLastGoogleUser",
-          JSON.stringify({ email: emailToUse, name: nameToUse || response.data.user.name })
-        );
-
-        setShowGoogleModal(false);
-        setSuccessMsg(`Signed in via Google as ${emailToUse}!`);
-        setTimeout(() => navigate("/my-complaints"), 1000);
+        window.dispatchEvent(new Event("authChange"));
+        setSuccessMsg(`Welcome, ${response.data.user.name}! Redirecting...`);
+        setTimeout(() => navigate("/my-complaints"), 800);
+      } else {
+        throw new Error(response.data?.message || "Google Sign-In failed.");
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Google Sign-In failed. Please try password login.");
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          "Google authentication failed. Please try password login."
+      );
     } finally {
       setLoading(false);
     }
   };
 
+  const handleGoogleError = () => {
+    setError("Google Sign-In was cancelled or could not be completed. Please try again or use email sign-in.");
+  };
+
   return (
     <div className="login-page">
-      <div className="login-container">
-        {/* Portal Switcher (Citizen vs Officer/Admin) */}
-        <div className="portal-switcher">
+      <div className="login-card-container">
+        {/* Portal Switcher */}
+        <div className="login-portal-toggle">
           <button
             type="button"
-            className={`portal-tab ${portal === "citizen" ? "active" : ""}`}
+            className={`portal-toggle-btn ${portal === "citizen" ? "active" : ""}`}
             onClick={() => handlePortalChange("citizen")}
           >
-            <FaUser style={{ marginRight: 6 }} />
-            Citizen Portal
+            <FaUser />
+            <span>Citizen Portal</span>
           </button>
           <button
             type="button"
-            className={`portal-tab ${portal === "admin" ? "active" : ""}`}
+            className={`portal-toggle-btn ${portal === "admin" ? "active" : ""}`}
             onClick={() => handlePortalChange("admin")}
           >
-            <FaUserShield style={{ marginRight: 6 }} />
-            Officer / Admin
+            <FaUserShield />
+            <span>Officer / Admin</span>
           </button>
         </div>
 
-        {/* Shield Icon Header */}
-        <div className={`login-badge-wrap ${portal === "admin" ? "admin-mode" : ""}`}>
-          {portal === "admin" ? (
-            <FaUserShield className="login-badge-icon admin" />
-          ) : (
-            <FaShieldAlt className="login-badge-icon" />
-          )}
+        {/* Header Badge */}
+        <div className={`login-icon-badge ${portal === "admin" ? "admin" : ""}`}>
+          {portal === "admin" ? <FaUserShield /> : <FaShieldAlt />}
         </div>
 
-        <h1>
+        <h1 className="login-heading">
           {portal === "admin"
-            ? "Administrative Sign In"
+            ? "Administrative Portal"
             : isRegisterMode
             ? "Create Citizen Account"
             : "Citizen Sign In"}
         </h1>
-        <p className="login-subtitle">
+        <p className="login-subheading">
           {portal === "admin"
-            ? "Authorized grievance redressal officers sign in to review and manage cases."
+            ? "Authorized grievance redressal officers sign in to manage cases and review responses."
             : isRegisterMode
-            ? "Create an account to submit, track, and manage your consumer grievances."
-            : "Sign in to access your registered claims and dispute history."}
+            ? "Register to file grievances, upload evidence, and monitor live resolution milestones."
+            : "Sign in to manage your consumer grievances and review resolution settlements."}
         </p>
 
-        {/* Mode Switch Tabs (Only for Citizen Portal) */}
+        {/* Mode Tabs for Citizen */}
         {portal === "citizen" && (
-          <div className="auth-tabs">
+          <div className="login-mode-tabs">
             <button
               type="button"
-              className={`tab-btn ${!isRegisterMode ? "active" : ""}`}
+              className={`mode-tab ${!isRegisterMode ? "active" : ""}`}
               onClick={() => {
                 setIsRegisterMode(false);
                 setError("");
@@ -266,80 +240,66 @@ function Login() {
             </button>
             <button
               type="button"
-              className={`tab-btn ${isRegisterMode ? "active" : ""}`}
+              className={`mode-tab ${isRegisterMode ? "active" : ""}`}
               onClick={() => {
                 setIsRegisterMode(true);
                 setError("");
                 setSuccessMsg("");
               }}
             >
-              Sign Up
+              Create Account
             </button>
           </div>
         )}
 
         {/* Alerts */}
         {error && (
-          <div className="error-alert">
-            <FaExclamationCircle /> <span>{error}</span>
+          <div className="login-alert error">
+            <FaExclamationCircle className="alert-icon" />
+            <span>{error}</span>
           </div>
         )}
 
         {successMsg && (
-          <div className="success-alert">
-            <FaCheckCircle /> <span>{successMsg}</span>
+          <div className="login-alert success">
+            <FaCheckCircle className="alert-icon" />
+            <span>{successMsg}</span>
           </div>
         )}
 
-        {/* Google 1-Tap Button for Citizen */}
+        {/* Official Google OAuth Sign-In (Citizen Portal Only) */}
         {portal === "citizen" && (
-          <div className="google-auth-section">
-            {isRealGoogleConfigured ? (
+          <div className="google-oauth-wrap">
+            <div className="google-btn-container">
               <GoogleLogin
-                onSuccess={(credentialResponse) => {
-                  try {
-                    const decoded = JSON.parse(
-                      atob(credentialResponse.credential.split(".")[1])
-                    );
-                    setGoogleEmailInput(decoded.email);
-                    setGoogleNameInput(decoded.name);
-                    handleDynamicGoogleSignIn();
-                  } catch {
-                    setShowGoogleModal(true);
-                  }
-                }}
-                onError={() => setShowGoogleModal(true)}
-                useOneTap
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
+                shape="pill"
+                size="large"
+                theme="outline"
+                text={isRegisterMode ? "signup_with" : "signin_with"}
+                width="100%"
               />
-            ) : (
-              <button
-                type="button"
-                className="google-direct-btn"
-                onClick={() => setShowGoogleModal(true)}
-              >
-                <FaGoogle className="google-g-icon" />
-                <span>Continue with Google</span>
-              </button>
-            )}
+            </div>
 
-            <div className="auth-divider">
+            <div className="login-or-divider">
               <span>or continue with email</span>
             </div>
           </div>
         )}
 
-        {/* Main Authentication Form */}
-        <form onSubmit={handleSubmit} className="login-form">
+        {/* Authentication Form */}
+        <form onSubmit={handleSubmit} className="login-form-fields">
           {portal === "citizen" && isRegisterMode && (
             <>
-              <div className="input-group">
+              <div className="form-field">
                 <label>Full Name *</label>
-                <div className="input-wrapper">
-                  <FaUser className="input-icon" />
+                <div className="field-input-wrap">
+                  <FaUser className="field-icon" />
                   <input
                     type="text"
                     name="name"
-                    placeholder="Enter your full name"
+                    placeholder="e.g. Manoj Kumar"
                     value={formData.name}
                     onChange={handleChange}
                     required
@@ -347,14 +307,14 @@ function Login() {
                 </div>
               </div>
 
-              <div className="input-group">
+              <div className="form-field">
                 <label>Mobile Number (Optional)</label>
-                <div className="input-wrapper">
-                  <FaPhone className="input-icon" />
+                <div className="field-input-wrap">
+                  <FaPhone className="field-icon" />
                   <input
                     type="tel"
                     name="phone"
-                    placeholder="10-digit mobile number"
+                    placeholder="10-digit phone number"
                     value={formData.phone}
                     onChange={handleChange}
                     maxLength={10}
@@ -364,10 +324,10 @@ function Login() {
             </>
           )}
 
-          <div className="input-group">
+          <div className="form-field">
             <label>Email Address *</label>
-            <div className="input-wrapper">
-              <FaEnvelope className="input-icon" />
+            <div className="field-input-wrap">
+              <FaEnvelope className="field-icon" />
               <input
                 type="email"
                 name="email"
@@ -380,14 +340,14 @@ function Login() {
             </div>
           </div>
 
-          <div className="input-group">
+          <div className="form-field">
             <label>Password *</label>
-            <div className="input-wrapper">
-              <FaLock className="input-icon" />
+            <div className="field-input-wrap">
+              <FaLock className="field-icon" />
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
-                placeholder={isRegisterMode ? "Min. 8 chars (letters & numbers)" : "Enter your password"}
+                placeholder={isRegisterMode ? "Min. 8 characters (letters & numbers)" : "Enter your password"}
                 value={formData.password}
                 onChange={handleChange}
                 required
@@ -395,23 +355,25 @@ function Login() {
               />
               <button
                 type="button"
-                className="toggle-password"
+                className="password-toggle-btn"
                 onClick={() => setShowPassword(!showPassword)}
                 tabIndex={-1}
+                aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
             </div>
             {isRegisterMode && (
-              <small className="password-hint">
+              <span className="field-hint">
+                <FaInfoCircle style={{ fontSize: 11, marginRight: 4 }} />
                 Must be at least 8 characters long and contain both letters and numbers.
-              </small>
+              </span>
             )}
           </div>
 
-          <button type="submit" className="login-submit-btn" disabled={loading}>
+          <button type="submit" className="login-action-btn" disabled={loading}>
             {loading
-              ? "Verifying Credentials..."
+              ? "Verifying..."
               : portal === "admin"
               ? "Sign In to Admin Portal"
               : isRegisterMode
@@ -420,66 +382,13 @@ function Login() {
           </button>
         </form>
 
-        <div className="login-legal-footer">
+        <div className="login-footer-links">
           <p>
-            By signing in, you agree to our <Link to="/terms">Terms of Service</Link> and <Link to="/privacy">Privacy Policy</Link>.
+            Protected by independent mediation protocols. Read our{" "}
+            <Link to="/terms">Terms</Link> and <Link to="/privacy">Privacy Policy</Link>.
           </p>
         </div>
       </div>
-
-      {/* Google Dynamic Modal */}
-      {showGoogleModal && (
-        <div className="google-modal-overlay" onClick={() => setShowGoogleModal(false)}>
-          <div className="google-modal-box" onClick={(e) => e.stopPropagation()}>
-            <div className="google-modal-header">
-              <div className="google-logo-row">
-                <FaGoogle className="g-logo-color" />
-                <h3>Sign in with Google</h3>
-              </div>
-              <button type="button" className="close-btn" onClick={() => setShowGoogleModal(false)}>
-                <FaTimes />
-              </button>
-            </div>
-
-            <p className="google-modal-desc">
-              Enter your Google account to sign in securely to the Consumer Trust Portal.
-            </p>
-
-            <form onSubmit={handleDynamicGoogleSignIn} className="google-modal-form">
-              <div className="input-group">
-                <label>Google Email Address *</label>
-                <input
-                  type="email"
-                  placeholder="name@gmail.com"
-                  value={googleEmailInput}
-                  onChange={(e) => setGoogleEmailInput(e.target.value)}
-                  required
-                  autoFocus
-                />
-              </div>
-
-              <div className="input-group">
-                <label>Your Name (Optional)</label>
-                <input
-                  type="text"
-                  placeholder="Full Name"
-                  value={googleNameInput}
-                  onChange={(e) => setGoogleNameInput(e.target.value)}
-                />
-              </div>
-
-              <div className="google-modal-actions">
-                <button type="button" className="cancel-g-btn" onClick={() => setShowGoogleModal(false)}>
-                  Cancel
-                </button>
-                <button type="submit" className="confirm-g-btn" disabled={loading}>
-                  {loading ? "Signing In..." : "Continue with Account"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
