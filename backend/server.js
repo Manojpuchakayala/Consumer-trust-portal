@@ -56,6 +56,24 @@ app.use(
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
+// Normalize stringified or buffer request bodies across all platforms and serverless proxies
+app.use((req, res, next) => {
+  if (typeof req.body === "string" && req.body.trim()) {
+    try {
+      req.body = JSON.parse(req.body);
+    } catch (e) {
+      // Ignore non-JSON body string
+    }
+  } else if (Buffer.isBuffer(req.body)) {
+    try {
+      req.body = JSON.parse(req.body.toString("utf8"));
+    } catch (e) {
+      // Ignore non-JSON buffer
+    }
+  }
+  next();
+});
+
 // Ensure uploads directory exists
 const uploadsDir = path.join(__dirname, "uploads");
 if (!fs.existsSync(uploadsDir)) {

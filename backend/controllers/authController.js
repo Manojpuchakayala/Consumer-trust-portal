@@ -62,10 +62,31 @@ const isStrongPassword = (pwd) => {
   return hasLetter && hasNumber;
 };
 
+// Helper to reliably parse body in serverless, proxy, and containerized runtimes
+const getRequestBody = (req) => {
+  if (!req || !req.body) return {};
+  if (typeof req.body === "string") {
+    try {
+      return JSON.parse(req.body);
+    } catch {
+      return {};
+    }
+  }
+  if (Buffer.isBuffer(req.body)) {
+    try {
+      return JSON.parse(req.body.toString("utf8"));
+    } catch {
+      return {};
+    }
+  }
+  return req.body;
+};
+
 // Register User
 const register = async (req, res) => {
   try {
-    const { name, email, password, phone } = req.body;
+    const body = getRequestBody(req);
+    const { name, email, password, phone } = body;
 
     if (!name || !email || !password) {
       return res.status(400).json({
@@ -143,7 +164,8 @@ const register = async (req, res) => {
 // Standard Password Login (Citizen or Officer/Admin)
 const login = async (req, res) => {
   try {
-    const { email, password, portal } = req.body;
+    const body = getRequestBody(req);
+    const { email, password, portal } = body;
 
     if (!email || !password) {
       return res.status(400).json({
@@ -228,7 +250,8 @@ const login = async (req, res) => {
 // Initiate 2FA OTP Login
 const initiateOtpLogin = async (req, res) => {
   try {
-    const { email } = req.body;
+    const body = getRequestBody(req);
+    const { email } = body;
 
     if (!email) {
       return res.status(400).json({
@@ -284,7 +307,8 @@ const initiateOtpLogin = async (req, res) => {
 // Verify 2FA OTP Login
 const verifyOtpLogin = async (req, res) => {
   try {
-    const { email, otp } = req.body;
+    const body = getRequestBody(req);
+    const { email, otp } = body;
 
     if (!email || !otp) {
       return res.status(400).json({
@@ -361,6 +385,7 @@ const verifyOtpLogin = async (req, res) => {
 // Official Google OAuth 2.0 / OpenID Connect Sign-In
 const googleLogin = async (req, res) => {
   try {
+    const body = getRequestBody(req);
     const {
       credential,
       token: bodyToken,
@@ -376,7 +401,7 @@ const googleLogin = async (req, res) => {
       sub: bodySub,
       user: nestedUser,
       profile: nestedProfile,
-    } = req.body;
+    } = body;
 
     let googlePayload = null;
     const tokenToVerify = credential || bodyToken || bodyIdToken;
