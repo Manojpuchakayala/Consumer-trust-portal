@@ -10,7 +10,6 @@ import {
   FaPrint,
   FaPaperclip,
   FaBuilding,
-  FaTag,
   FaCalendarAlt,
   FaCopy,
   FaExclamationTriangle,
@@ -19,13 +18,13 @@ import {
   FaInfoCircle,
   FaArrowLeft,
   FaKey,
-  FaEnvelope,
+  FaWhatsapp,
 } from "react-icons/fa";
 import api from "../services/api";
 import { generateGrievanceNoticePdf, generateResolutionCertificatePdf } from "../utils/pdfGenerator";
 import "./TrackComplaint.css";
 
-function TrackComplaint() {
+export default function TrackComplaint() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Search & Verification State - Clean empty state on load
@@ -45,19 +44,16 @@ function TrackComplaint() {
 
   const user = JSON.parse(localStorage.getItem("consumerTrustUser") || "null");
 
-  // If URL has ?id=, prefill docket input (do NOT auto-reveal data without auth/OTP)
   useEffect(() => {
     const idFromQuery = searchParams.get("id");
     if (idFromQuery) {
       setDocketInput(idFromQuery.trim().toUpperCase());
-      // If user is logged in, attempt seamless lookup
       if (user) {
         initiateTracking(idFromQuery.trim().toUpperCase());
       }
     }
   }, [searchParams]);
 
-  // Initiate Tracking Request
   const initiateTracking = async (idToTrack) => {
     const target = (idToTrack || docketInput).trim().toUpperCase();
     if (!target) {
@@ -72,26 +68,24 @@ function TrackComplaint() {
     setOtpError("");
 
     try {
-      const response = await api.post("/complaints/track/request-access", {
+      const res = await api.post("/complaints/track/request-access", {
         complaintId: target,
       });
 
-      if (response.data?.success) {
-        if (response.data.authorized && response.data.complaint) {
-          // Direct authorized access (signed-in owner or admin)
-          setComplaint(response.data.complaint);
-          if (response.data.trackToken) {
-            sessionStorage.setItem("caseTrackToken", response.data.trackToken);
+      if (res.data?.success) {
+        if (res.data.authorized && res.data.complaint) {
+          setComplaint(res.data.complaint);
+          if (res.data.trackToken) {
+            sessionStorage.setItem("caseTrackToken", res.data.trackToken);
           }
-        } else if (response.data.requiresOtp) {
-          // Requires 2-factor OTP verification
+        } else if (res.data.requiresOtp) {
           setOtpStep(true);
           setOtpTargetId(target);
-          setMaskedEmail(response.data.maskedEmail || "your registered email");
+          setMaskedEmail(res.data.maskedEmail || "your registered email");
           setOtpInput("");
         }
       } else {
-        throw new Error(response.data?.message || "We could not find a matching case.");
+        throw new Error(res.data?.message || "We could not find a matching case.");
       }
     } catch (err) {
       setError(
@@ -108,7 +102,6 @@ function TrackComplaint() {
     initiateTracking(docketInput);
   };
 
-  // Verify OTP to reveal Case Details
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
     if (!otpInput || otpInput.trim().length < 6) {
@@ -120,19 +113,19 @@ function TrackComplaint() {
     setOtpError("");
 
     try {
-      const response = await api.post("/complaints/track/verify-otp", {
+      const res = await api.post("/complaints/track/verify-otp", {
         complaintId: otpTargetId,
         otp: otpInput.trim(),
       });
 
-      if (response.data?.success && response.data.complaint) {
-        setComplaint(response.data.complaint);
+      if (res.data?.success && res.data.complaint) {
+        setComplaint(res.data.complaint);
         setOtpStep(false);
-        if (response.data.trackToken) {
-          sessionStorage.setItem("caseTrackToken", response.data.trackToken);
+        if (res.data.trackToken) {
+          sessionStorage.setItem("caseTrackToken", res.data.trackToken);
         }
       } else {
-        throw new Error(response.data?.message || "Invalid verification code.");
+        throw new Error(res.data?.message || "Invalid verification code.");
       }
     } catch (err) {
       setOtpError(
@@ -149,9 +142,8 @@ function TrackComplaint() {
     setOtpError("");
     try {
       await api.post("/complaints/track/request-access", { complaintId: otpTargetId });
-      setOtpError("");
       alert(`A fresh verification code has been dispatched to ${maskedEmail}.`);
-    } catch (err) {
+    } catch {
       setOtpError("Failed to resend verification code. Please try again in a moment.");
     } finally {
       setOtpLoading(false);
@@ -162,7 +154,7 @@ function TrackComplaint() {
     if (complaint?.complaintId) {
       navigator.clipboard.writeText(complaint.complaintId);
       setCopiedId(true);
-      setTimeout(() => setCopiedId(false), 3000);
+      setTimeout(() => setCopiedId(false), 2500);
     }
   };
 
@@ -194,37 +186,37 @@ function TrackComplaint() {
   const statusSlug = (complaint?.status || "Pending").toLowerCase().replace(/\s+/g, "-");
 
   return (
-    <div className="track-page-wrapper">
-      <div className="track-content-card">
-        {/* Top Disclaimer Strip */}
-        <div className="track-disclaimer-strip">
-          <FaInfoCircle className="disclaimer-icon" />
+    <div className="track-page-root">
+      <div className="track-container">
+        {/* Top Disclaimer */}
+        <div className="track-notice-ribbon">
+          <FaInfoCircle className="ribbon-icon" />
           <span>
-            <strong>Independent Platform Notice:</strong> Consumer Trust Portal is an independent dispute facilitation service. We are not a government court or statutory regulator.
+            <strong>Independent Platform Notice:</strong> Consumer Trust Portal is an independent dispute facilitation service and not a government court or statutory commission.
           </span>
         </div>
 
         {/* 1. INITIAL CLEAN SEARCH STATE */}
         {!complaint && !otpStep && (
-          <div className="track-initial-state">
-            <div className="track-header-badge">
+          <div className="track-initial-box">
+            <div className="track-badge">
               <FaLock /> Protected Case Tracking
             </div>
             <h1 className="track-title">Track Grievance Status</h1>
-            <p className="track-subtitle">
-              Enter your unique Grievance Docket Number to view live investigation milestones, enterprise responses, and resolution records.
+            <p className="track-desc">
+              Enter your unique Grievance Docket ID to view live investigation milestones, enterprise responses, and resolution records.
             </p>
 
             {error && (
-              <div className="track-alert-banner">
+              <div className="track-alert">
                 <FaExclamationTriangle className="alert-icon" />
                 <span>{error}</span>
               </div>
             )}
 
-            <form onSubmit={handleSearchSubmit} className="track-search-box">
-              <div className="track-input-group">
-                <FaSearch className="search-input-icon" />
+            <form onSubmit={handleSearchSubmit} className="track-search-form">
+              <div className="track-search-input-wrap">
+                <FaSearch className="input-search-icon" />
                 <input
                   type="text"
                   placeholder="Enter Docket ID (e.g. CT-2026-89412)..."
@@ -237,14 +229,14 @@ function TrackComplaint() {
                   autoFocus
                 />
               </div>
-              <button type="submit" className="track-submit-btn" disabled={loading}>
-                {loading ? <FaSpinner className="spin" /> : "Track Case"}
+              <button type="submit" className="track-submit-action" disabled={loading}>
+                {loading ? <FaSpinner className="spin-icon" /> : "Track Case"}
               </button>
             </form>
 
-            {/* Guidance & Privacy Info */}
-            <div className="track-guidance-grid">
-              <div className="guidance-card">
+            {/* Guidance Grid */}
+            <div className="track-guidance-cards">
+              <div className="guidance-box">
                 <h4>📌 Where to find your Docket ID?</h4>
                 <ul>
                   <li>On your printed Grievance Acknowledgment slip.</li>
@@ -253,13 +245,13 @@ function TrackComplaint() {
                 </ul>
               </div>
 
-              <div className="guidance-card privacy">
+              <div className="guidance-box privacy">
                 <h4>🛡️ Multi-Factor Privacy Safeguard</h4>
                 <p>
-                  To protect citizen privacy, case records and personal details are accessible only through authenticated accounts or two-factor verification sent to the registered contact on file.
+                  To protect citizen privacy, case records and personal details are accessible only through authenticated accounts or two-factor verification sent to the verified contact on file.
                 </p>
                 {!user && (
-                  <p className="sign-in-prompt">
+                  <p className="guidance-signin-link">
                     Have an account? <Link to="/login">Sign In</Link> to view all your registered cases directly.
                   </p>
                 )}
@@ -270,24 +262,24 @@ function TrackComplaint() {
 
         {/* 2. OTP VERIFICATION STEP */}
         {otpStep && !complaint && (
-          <div className="track-otp-card">
-            <div className="track-header-badge">
-              <FaKey /> Identity Verification Required
+          <div className="track-otp-box">
+            <div className="track-badge">
+              <FaKey /> Two-Factor Case Verification
             </div>
-            <h2 className="otp-heading">Verify Case Access</h2>
-            <p className="otp-desc">
-              A 6-digit verification code has been dispatched to <strong>{maskedEmail}</strong> to protect case privacy. Enter the code below to reveal your grievance milestones.
+            <h2>Verify Case Access</h2>
+            <p className="otp-subtitle">
+              A 6-digit verification code has been dispatched to <strong>{maskedEmail}</strong> to protect case confidentiality. Enter the code below to reveal your grievance milestones.
             </p>
 
             {otpError && (
-              <div className="track-alert-banner">
+              <div className="track-alert">
                 <FaExclamationTriangle className="alert-icon" />
                 <span>{otpError}</span>
               </div>
             )}
 
-            <form onSubmit={handleVerifyOtp} className="otp-form">
-              <div className="otp-input-wrap">
+            <form onSubmit={handleVerifyOtp} className="otp-form-wrap">
+              <div className="otp-code-input-box">
                 <FaLock className="otp-lock-icon" />
                 <input
                   type="text"
@@ -300,13 +292,13 @@ function TrackComplaint() {
                 />
               </div>
 
-              <div className="otp-actions-row">
-                <button type="submit" className="otp-verify-btn" disabled={otpLoading}>
-                  {otpLoading ? <FaSpinner className="spin" /> : "Verify & Reveal Case"}
+              <div className="otp-actions-group">
+                <button type="submit" className="otp-verify-action" disabled={otpLoading}>
+                  {otpLoading ? <FaSpinner className="spin-icon" /> : "Verify & Reveal Case"}
                 </button>
                 <button
                   type="button"
-                  className="otp-resend-btn"
+                  className="otp-btn-secondary"
                   onClick={handleResendOtp}
                   disabled={otpLoading}
                 >
@@ -314,7 +306,7 @@ function TrackComplaint() {
                 </button>
                 <button
                   type="button"
-                  className="otp-cancel-btn"
+                  className="otp-btn-secondary"
                   onClick={handleResetSearch}
                 >
                   Cancel
@@ -324,20 +316,20 @@ function TrackComplaint() {
           </div>
         )}
 
-        {/* 3. AUTHORIZED CASE TIMELINE DISPLAY */}
+        {/* 3. AUTHORIZED CASE TIMELINE VIEW */}
         {complaint && (
-          <div className="track-authorized-view">
-            {/* Top Bar with Back Action */}
-            <div className="case-top-bar">
-              <button type="button" className="back-to-search-btn" onClick={handleResetSearch}>
+          <div className="track-authorized-content">
+            {/* Top Bar */}
+            <div className="case-back-bar">
+              <button type="button" className="btn-back-link" onClick={handleResetSearch}>
                 <FaArrowLeft /> Track Another Case
               </button>
-              <div className="case-id-tag">
-                <span>Docket: </span>
+              <div className="case-docket-tag">
+                <span>Docket:</span>
                 <strong>#{complaint.complaintId}</strong>
                 <button
                   type="button"
-                  className="copy-mini-btn"
+                  className="btn-copy-mini"
                   onClick={handleCopyId}
                   title="Copy Docket ID"
                 >
@@ -346,12 +338,12 @@ function TrackComplaint() {
               </div>
             </div>
 
-            {/* Main Docket Summary Header */}
-            <div className="case-header-card">
-              <div className="case-header-left">
-                <span className="case-category-tag">{complaint.category || "General Dispute"}</span>
-                <h2 className="case-subject-title">{complaint.subject}</h2>
-                <div className="case-meta-tags">
+            {/* Case Header Card */}
+            <div className="case-summary-card">
+              <div className="case-header-main">
+                <span className="case-cat-badge">{complaint.category || "General Dispute"}</span>
+                <h2>{complaint.subject}</h2>
+                <div className="case-meta-chips">
                   <span><FaBuilding /> <strong>{complaint.companyName || "Enterprise"}</strong></span>
                   <span>
                     <FaCalendarAlt /> Filed{" "}
@@ -367,23 +359,23 @@ function TrackComplaint() {
                 </div>
               </div>
 
-              <div className="case-header-right">
-                <div className={`case-status-badge ${statusSlug}`}>
-                  <span className="status-dot"></span>
+              <div className="case-header-status">
+                <span className={`status-pill ${statusSlug}`}>
+                  <span className="pill-dot" />
                   {complaint.status}
-                </div>
+                </span>
               </div>
             </div>
 
             {/* 4-Stage Visual Redressal Milestone Stepper */}
-            <div className="milestone-stepper-card">
-              <div className="stepper-header">
+            <div className="timeline-stepper-card">
+              <div className="stepper-title-row">
                 <h3><FaClock /> Grievance Facilitation Timeline</h3>
-                <span className="stepper-active-indicator">● Active Milestone</span>
+                <span className="active-dot-indicator">● Active Milestone</span>
               </div>
 
               {complaint.status === "Rejected" ? (
-                <div className="rejected-state-box">
+                <div className="rejected-box">
                   <FaTimesCircle className="rejected-icon" />
                   <div>
                     <strong>Case Closed without Settlement</strong>
@@ -391,42 +383,42 @@ function TrackComplaint() {
                   </div>
                 </div>
               ) : (
-                <div className="stepper-stages-grid">
-                  <div className={`stepper-stage ${activeMilestone >= 1 ? "done" : ""}`}>
-                    <div className="stage-icon-wrap">
+                <div className="timeline-stages-grid">
+                  <div className={`timeline-stage ${activeMilestone >= 1 ? "completed" : ""}`}>
+                    <div className="stage-num-badge">
                       {activeMilestone > 1 ? <FaCheckCircle /> : "1"}
                     </div>
-                    <div className="stage-text">
+                    <div className="stage-info">
                       <strong>Grievance Logged</strong>
                       <span>Timestamped & Docketed</span>
                     </div>
                   </div>
 
-                  <div className={`stepper-stage ${activeMilestone >= 2 ? "done" : ""}`}>
-                    <div className="stage-icon-wrap">
+                  <div className={`timeline-stage ${activeMilestone >= 2 ? "completed" : ""}`}>
+                    <div className="stage-num-badge">
                       {activeMilestone > 2 ? <FaCheckCircle /> : "2"}
                     </div>
-                    <div className="stage-text">
+                    <div className="stage-info">
                       <strong>Nodal Dispatch</strong>
-                      <span>Routed to {complaint.companyName}</span>
+                      <span>Dispatched to {complaint.companyName}</span>
                     </div>
                   </div>
 
-                  <div className={`stepper-stage ${activeMilestone >= 3 ? "done" : ""}`}>
-                    <div className="stage-icon-wrap">
+                  <div className={`timeline-stage ${activeMilestone >= 3 ? "completed" : ""}`}>
+                    <div className="stage-num-badge">
                       {activeMilestone > 3 ? <FaCheckCircle /> : "3"}
                     </div>
-                    <div className="stage-text">
+                    <div className="stage-info">
                       <strong>Inquiry & Review</strong>
-                      <span>Enterprise mediation</span>
+                      <span>Enterprise mediation desk</span>
                     </div>
                   </div>
 
-                  <div className={`stepper-stage ${activeMilestone >= 4 ? "done" : ""}`}>
-                    <div className="stage-icon-wrap">
+                  <div className={`timeline-stage ${activeMilestone >= 4 ? "completed" : ""}`}>
+                    <div className="stage-num-badge">
                       {activeMilestone >= 4 ? <FaCheckCircle /> : "4"}
                     </div>
-                    <div className="stage-text">
+                    <div className="stage-info">
                       <strong>Resolution</strong>
                       <span>{complaint.status === "Resolved" ? "Settled & Closed" : "Pending Action"}</span>
                     </div>
@@ -435,82 +427,82 @@ function TrackComplaint() {
               )}
             </div>
 
-            {/* Case Narrative & Evidence */}
-            <div className="case-details-grid">
-              <div className="case-narrative-card">
+            {/* Details Grid */}
+            <div className="case-details-split">
+              <div className="narrative-box">
                 <h4>Claim Narrative</h4>
-                <div className="narrative-content">
+                <div className="narrative-text">
                   {complaint.description}
                 </div>
               </div>
 
-              <div className="case-sidebar-card">
+              <div className="sidebar-overview-box">
                 <h4>Case Overview</h4>
-                <div className="overview-item">
-                  <span className="label">Complainant:</span>
-                  <span className="val">{complaint.name}</span>
+                <div className="overview-row">
+                  <span>Complainant:</span>
+                  <strong>{complaint.name}</strong>
                 </div>
-                <div className="overview-item">
-                  <span className="label">Contact Email:</span>
-                  <span className="val">{complaint.email}</span>
+                <div className="overview-row">
+                  <span>Contact:</span>
+                  <strong>{complaint.email}</strong>
                 </div>
-                <div className="overview-item">
-                  <span className="label">Disputed Enterprise:</span>
-                  <span className="val">{complaint.companyName}</span>
+                <div className="overview-row">
+                  <span>Target Enterprise:</span>
+                  <strong>{complaint.companyName}</strong>
                 </div>
                 {complaint.orderOrTransactionId && (
-                  <div className="overview-item">
-                    <span className="label">Order / Ref #:</span>
-                    <span className="val">{complaint.orderOrTransactionId}</span>
+                  <div className="overview-row">
+                    <span>Order / Ref #:</span>
+                    <strong>{complaint.orderOrTransactionId}</strong>
                   </div>
                 )}
-                <div className="overview-item">
-                  <span className="label">Evidence Files:</span>
-                  <span className="val">
+                <div className="overview-row">
+                  <span>Evidence Files:</span>
+                  <strong>
                     {complaint.attachments?.length > 0 ? (
-                      <span className="evidence-chip">
+                      <span className="evidence-tag">
                         <FaPaperclip /> {complaint.attachments.length} attached
                       </span>
                     ) : (
                       "None"
                     )}
-                  </span>
+                  </strong>
                 </div>
               </div>
             </div>
 
             {/* Enterprise Settlement Record (if resolved) */}
             {complaint.companyResolution && (
-              <div className="resolution-settlement-card">
-                <div className="resolution-card-header">
-                  <FaCheckCircle className="res-icon" />
+              <div className="settlement-record-card">
+                <div className="settlement-header">
+                  <FaCheckCircle className="settlement-icon" />
                   <div>
                     <h4>Enterprise Settlement Record</h4>
-                    <p>Resolution submitted by {complaint.companyName} Grievance Desk</p>
+                    <p>Submitted by {complaint.companyName} Grievance Desk</p>
                   </div>
                 </div>
 
-                <div className="settlement-details-row">
+                <div className="settlement-data-grid">
                   <div>
-                    <span className="s-label">Action Taken:</span>
-                    <strong className="s-val text-green">{complaint.companyResolution.actionTaken}</strong>
+                    <span className="data-label">Action Taken:</span>
+                    <strong className="data-val text-green">{complaint.companyResolution.actionTaken}</strong>
                   </div>
                   {complaint.companyResolution.refundAmount && (
                     <div>
-                      <span className="s-label">Refund / Settlement:</span>
-                      <strong className="s-val text-green">₹{complaint.companyResolution.refundAmount}</strong>
+                      <span className="data-label">Refund / Settlement:</span>
+                      <strong className="data-val text-green">₹{complaint.companyResolution.refundAmount}</strong>
                     </div>
                   )}
                   {complaint.companyResolution.referenceNumber && (
                     <div>
-                      <span className="s-label">Bank UTR / Tracking:</span>
-                      <strong className="s-val">{complaint.companyResolution.referenceNumber}</strong>
+                      <span className="data-label">Bank UTR / Ref:</span>
+                      <strong className="data-val">{complaint.companyResolution.referenceNumber}</strong>
                     </div>
                   )}
                 </div>
 
                 {complaint.companyResolution.resolutionNotes && (
-                  <div className="settlement-notes-box">
+                  <div className="settlement-notes">
                     <strong>Settlement Remarks:</strong>
                     <p>&ldquo;{complaint.companyResolution.resolutionNotes}&rdquo;</p>
                   </div>
@@ -519,27 +511,27 @@ function TrackComplaint() {
                 <div style={{ marginTop: 14 }}>
                   <button
                     type="button"
-                    className="download-cert-btn"
+                    className="btn-cert-download"
                     onClick={() => generateResolutionCertificatePdf(complaint)}
                   >
-                    <FaFilePdf /> Download Settlement Certificate (PDF)
+                    <FaFilePdf /> Download Resolution Certificate (PDF)
                   </button>
                 </div>
               </div>
             )}
 
             {/* Action Buttons */}
-            <div className="case-actions-footer">
+            <div className="case-actions-bar">
               <button
                 type="button"
-                className="pdf-btn"
+                className="btn-action-primary"
                 onClick={() => generateGrievanceNoticePdf(complaint)}
               >
                 <FaFilePdf /> Download Claim Summary (PDF)
               </button>
               <button
                 type="button"
-                className="print-btn"
+                className="btn-action-secondary"
                 onClick={() => window.print()}
               >
                 <FaPrint /> Print Slip
@@ -551,5 +543,3 @@ function TrackComplaint() {
     </div>
   );
 }
-
-export default TrackComplaint;

@@ -4,6 +4,7 @@ import {
   FaUser,
   FaEnvelope,
   FaPhone,
+  FaMapMarkerAlt,
   FaTag,
   FaFileAlt,
   FaCheckCircle,
@@ -23,6 +24,9 @@ import {
   FaShieldAlt,
   FaMagic,
   FaInfoCircle,
+  FaEdit,
+  FaCheck,
+  FaClock,
 } from "react-icons/fa";
 import api from "../services/api";
 import { enhanceGrievanceDescription, COMMON_RELIEFS, AI_ASSISTANT_DISCLAIMER } from "../utils/aiLegalAssistant";
@@ -86,17 +90,30 @@ const ENTERPRISE_OPTIONS = [
   { id: "other", name: "Other / Custom Enterprise", category: "Other", nodal: "Custom Enterprise Desk", sla: "Standard 7 Days Target" },
 ];
 
-function RegisterComplaint() {
+const CATEGORIES = [
+  { id: "Product", label: "Product & Electronics", icon: "📦" },
+  { id: "Service", label: "E-Commerce & Services", icon: "🛍️" },
+  { id: "Food", label: "Food & Quick Commerce", icon: "🍔" },
+  { id: "Banking", label: "Banking & UPI Payments", icon: "🏦" },
+  { id: "Telecom", label: "Telecom & Internet", icon: "📱" },
+  { id: "Travel", label: "Travel, Flights & Cabs", icon: "✈️" },
+  { id: "Other", label: "Other Grievances", icon: "🏢" },
+];
+
+const DRAFT_KEY = "ctp_grievance_draft_v2";
+
+export default function RegisterComplaint() {
   const [searchParams] = useSearchParams();
   const initialCompany = searchParams.get("company") || "Amazon India";
 
-  // Multi-step Wizard State (1 to 4)
+  // Multi-step Wizard State (1 to 5)
   const [currentStep, setCurrentStep] = useState(1);
 
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
+    city: "",
     category: "Product",
     companyName: initialCompany,
     customCompanyName: "",
@@ -108,6 +125,7 @@ function RegisterComplaint() {
   const [files, setFiles] = useState([]);
   const [fileError, setFileError] = useState("");
   const fileInputRef = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   // Unselected Consent Checkboxes (Must be false by default)
   const [consentAccuracy, setConsentAccuracy] = useState(false);
@@ -120,11 +138,22 @@ function RegisterComplaint() {
   const [submittedData, setSubmittedData] = useState(null);
   const [copied, setCopied] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [hasRestoredDraft, setHasRestoredDraft] = useState(false);
 
   // AI Drafting Assistant States
   const [selectedReliefs, setSelectedReliefs] = useState([]);
   const [isAiEnhancing, setIsAiEnhancing] = useState(false);
 
+  // Step names
+  const steps = [
+    { num: 1, title: "Complainant", desc: "Contact details" },
+    { num: 2, title: "Enterprise", desc: "Company & order ref" },
+    { num: 3, title: "Narrative", desc: "Dispute facts & AI" },
+    { num: 4, title: "Evidence", desc: "Invoices & receipts" },
+    { num: 5, title: "Review", desc: "Verification & submit" },
+  ];
+
+  // Check URL query param for company
   useEffect(() => {
     const paramCompany = searchParams.get("company");
     if (paramCompany) {
@@ -145,20 +174,75 @@ function RegisterComplaint() {
     }
   }, [searchParams]);
 
+  // Load user details from auth if available & draft if exists
   useEffect(() => {
     const storedUser = localStorage.getItem("consumerTrustUser");
+    let initialUser = {};
     if (storedUser) {
       try {
         const u = JSON.parse(storedUser);
-        setFormData((prev) => ({
-          ...prev,
-          name: u.name || prev.name,
-          email: u.email || prev.email,
-          phone: u.phone || prev.phone,
-        }));
+        initialUser = {
+          name: u.name || "",
+          email: u.email || "",
+          phone: u.phone || "",
+        };
       } catch (e) {}
     }
+
+    const savedDraft = localStorage.getItem(DRAFT_KEY);
+    if (savedDraft) {
+      try {
+        const parsed = JSON.parse(savedDraft);
+        setFormData((prev) => ({
+          ...prev,
+          ...parsed,
+          name: parsed.name || initialUser.name || prev.name,
+          email: parsed.email || initialUser.email || prev.email,
+          phone: parsed.phone || initialUser.phone || prev.phone,
+        }));
+        if (parsed.selectedReliefs) {
+          setSelectedReliefs(parsed.selectedReliefs);
+        }
+        setHasRestoredDraft(true);
+      } catch (e) {
+        setFormData((prev) => ({ ...prev, ...initialUser }));
+      }
+    } else if (storedUser) {
+      setFormData((prev) => ({ ...prev, ...initialUser }));
+    }
   }, []);
+
+  // Auto-save draft on form change (excluding files)
+  useEffect(() => {
+    if (!submittedData) {
+      const timer = setTimeout(() => {
+        const draftToSave = {
+          ...formData,
+          selectedReliefs,
+        };
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(draftToSave));
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [formData, selectedReliefs, submittedData]);
+
+  const clearDraft = () => {
+    localStorage.removeItem(DRAFT_KEY);
+    setHasRestoredDraft(false);
+    setFormData({
+      name: "",
+      email: "",
+      phone: "",
+      city: "",
+      category: "Product",
+      companyName: "Amazon India",
+      customCompanyName: "",
+      orderOrTransactionId: "",
+      subject: "",
+      description: "",
+    });
+    setSelectedReliefs([]);
+  };
 
   const toggleRelief = (relief) => {
     if (selectedReliefs.includes(relief)) {
@@ -182,7 +266,7 @@ function RegisterComplaint() {
       selectedReliefs,
     });
     setFormData((prev) => ({ ...prev, description: enhanced }));
-    setTimeout(() => setIsAiEnhancing(false), 400);
+    setTimeout(() => setIsAiEnhancing(false), 350);
   };
 
   const handleChange = (e) => {
@@ -204,9 +288,8 @@ function RegisterComplaint() {
     }));
   };
 
-  const handleFileChange = (e) => {
+  const processFiles = (selectedFiles) => {
     setFileError("");
-    const selectedFiles = Array.from(e.target.files || []);
     if (!selectedFiles.length) return;
 
     if (files.length + selectedFiles.length > 5) {
@@ -225,7 +308,7 @@ function RegisterComplaint() {
     const validFiles = [];
     for (const file of selectedFiles) {
       if (!allowedTypes.includes(file.type)) {
-        setFileError(`"${file.name}" is not a supported format. Please upload JPG, PNG, WEBP, GIF, or PDF.`);
+        setFileError(`"${file.name}" is not a supported format. Please upload JPG, PNG, WEBP, or PDF.`);
         return;
       }
       if (file.size > 10 * 1024 * 1024) {
@@ -239,6 +322,28 @@ function RegisterComplaint() {
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
+  };
+
+  const handleFileChange = (e) => {
+    const selectedFiles = Array.from(e.target.files || []);
+    processFiles(selectedFiles);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const droppedFiles = Array.from(e.dataTransfer.files || []);
+    processFiles(droppedFiles);
   };
 
   const removeFile = (indexToRemove) => {
@@ -257,7 +362,7 @@ function RegisterComplaint() {
     setStepError("");
     if (step === 1) {
       if (!formData.name.trim()) {
-        setStepError("Please enter your full name.");
+        setStepError("Please enter your full legal name.");
         return false;
       }
       if (!formData.email.trim() || !formData.email.includes("@")) {
@@ -301,7 +406,7 @@ function RegisterComplaint() {
 
   const handleNextStep = () => {
     if (validateStep(currentStep)) {
-      setCurrentStep((prev) => Math.min(prev + 1, 4));
+      setCurrentStep((prev) => Math.min(prev + 1, 5));
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
@@ -356,6 +461,9 @@ function RegisterComplaint() {
       if (!response.data?.success) {
         throw new Error(response.data?.message || "Failed to submit grievance");
       }
+
+      // Clear draft on successful submission
+      localStorage.removeItem(DRAFT_KEY);
 
       setSubmittedData({
         complaintId: response.data.complaintId,
@@ -416,6 +524,7 @@ function RegisterComplaint() {
       name: "",
       email: "",
       phone: "",
+      city: "",
       category: "Product",
       companyName: "Amazon India",
       customCompanyName: "",
@@ -423,6 +532,7 @@ function RegisterComplaint() {
       subject: "",
       description: "",
     });
+    setSelectedReliefs([]);
   };
 
   const selectedEnterprise =
@@ -433,126 +543,148 @@ function RegisterComplaint() {
     <div className="register-page">
       <div className="register-container">
         {submittedData ? (
+          /* ==========================================================================
+             SUBMISSION SUCCESS RECEIPT
+             ========================================================================== */
           <div className="success-card">
-            <div className="success-icon-wrap">
-              <FaCheckCircle className="success-icon" />
+            <div className="success-header-wrap">
+              <div className="success-icon-badge">
+                <FaCheckCircle className="success-check-icon" />
+              </div>
+              <h2 className="success-title">Grievance Registered Successfully!</h2>
+              <p className="success-lead">
+                Your dispute docket against <strong>{submittedData.companyName}</strong> has been created and prepared for mediation notice dispatch.
+              </p>
             </div>
 
-            <h2>Grievance Registered Successfully!</h2>
-            <p className="success-desc">
-              Your dispute regarding <strong>{submittedData.companyName}</strong> has been logged.
-              A summary confirmation has been sent to <strong>{submittedData.email}</strong>.
-            </p>
-
-            <div className="tracking-id-box">
-              <span className="tracking-label">Official Grievance Tracking ID</span>
-              <div className="id-row">
-                <span className="id-text">{submittedData.complaintId}</span>
+            {/* Tracking ID Hero Box */}
+            <div className="tracking-hero-card">
+              <div className="tracking-hero-label">
+                <FaShieldAlt style={{ color: "#0d9488" }} /> OFFICIAL DOCKET TRACKING ID
+              </div>
+              <div className="tracking-hero-row">
+                <span className="tracking-hero-code">{submittedData.complaintId}</span>
                 <button
                   type="button"
-                  className="copy-btn"
+                  className="hero-copy-btn"
                   onClick={handleCopyId}
                   title="Copy Tracking ID"
                 >
-                  <FaCopy /> {copied ? "Copied!" : "Copy"}
+                  <FaCopy /> {copied ? "Copied!" : "Copy ID"}
                 </button>
               </div>
+              <p className="tracking-hero-note">
+                Keep this ID safe. You can track real-time resolution progress and status updates anytime.
+              </p>
             </div>
 
-            {/* Direct Link Box */}
-            <div className="direct-dispatch-box" style={{ background: "#f8fafc", border: "1px solid #e2e8f0", padding: 16, borderRadius: 10, margin: "16px 0", textAlign: "left" }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: "#475569", textTransform: "uppercase", marginBottom: 6 }}>
-                Direct Case Tracking Link:
+            {/* Direct Link Strip */}
+            <div className="direct-link-card">
+              <div className="direct-link-header">
+                <span>Direct Case Tracking URL</span>
+                <button
+                  type="button"
+                  className="direct-link-copy-btn"
+                  onClick={handleCopyDirectLink}
+                >
+                  <FaCopy /> {copiedLink ? "Link Copied!" : "Copy Link"}
+                </button>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, background: "white", padding: "8px 12px", borderRadius: 6, border: "1px solid #cbd5e1" }}>
+              <div className="direct-link-url">
                 <a
                   href={`/track?id=${submittedData.complaintId}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ color: "#1d4ed8", fontSize: 13, textDecoration: "none", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}
                 >
-                  {window.location.origin}/track?id={submittedData.complaintId} <FaExternalLinkAlt style={{ fontSize: 10 }} />
+                  {window.location.origin}/track?id={submittedData.complaintId} <FaExternalLinkAlt style={{ fontSize: 11 }} />
                 </a>
-                <button
-                  type="button"
-                  onClick={handleCopyDirectLink}
-                  style={{ background: "#2563eb", color: "white", border: "none", padding: "4px 10px", borderRadius: 4, fontSize: 11, fontWeight: 700, cursor: "pointer" }}
-                >
-                  <FaCopy /> {copiedLink ? "Copied!" : "Copy"}
-                </button>
               </div>
             </div>
 
-            <div className="success-summary">
-              <div>
-                <strong>Target Enterprise:</strong> {submittedData.companyName}
+            {/* Case Summary Details */}
+            <div className="success-details-grid">
+              <div className="detail-field">
+                <span className="detail-label">Disputed Enterprise</span>
+                <span className="detail-value">{submittedData.companyName}</span>
               </div>
               {submittedData.orderOrTransactionId && (
-                <div>
-                  <strong>Order / Ref ID:</strong> {submittedData.orderOrTransactionId}
+                <div className="detail-field">
+                  <span className="detail-label">Order / Reference ID</span>
+                  <span className="detail-value">{submittedData.orderOrTransactionId}</span>
                 </div>
               )}
-              <div>
-                <strong>Complainant:</strong> {submittedData.name}
+              <div className="detail-field">
+                <span className="detail-label">Complainant</span>
+                <span className="detail-value">{submittedData.name}</span>
               </div>
-              <div>
-                <strong>Category:</strong> {submittedData.category}
+              <div className="detail-field">
+                <span className="detail-label">Category</span>
+                <span className="detail-value">{submittedData.category}</span>
               </div>
-              <div>
-                <strong>Subject:</strong> {submittedData.subject}
+              <div className="detail-field full">
+                <span className="detail-label">Grievance Subject</span>
+                <span className="detail-value">{submittedData.subject}</span>
               </div>
-              <div>
-                <strong>Filing Timestamp:</strong> {submittedData.date}
+              <div className="detail-field">
+                <span className="detail-label">Filing Timestamp</span>
+                <span className="detail-value">{submittedData.date}</span>
               </div>
-              <div>
-                <strong>Attached Evidence:</strong>{" "}
-                {submittedData.attachmentsCount > 0 ? (
-                  <span className="evidence-badge">
-                    <FaPaperclip /> {submittedData.attachmentsCount} file(s) attached
-                  </span>
-                ) : (
-                  "No files attached"
-                )}
-              </div>
-              <div className="statutory-notice-badge-row">
-                <span className="statutory-notice-badge">
-                  <FaShieldAlt /> Grievance Notice & 1-Click Resolution Token Prepared for {submittedData.companyName} Nodal Desk
+              <div className="detail-field">
+                <span className="detail-label">Supporting Evidence</span>
+                <span className="detail-value">
+                  {submittedData.attachmentsCount > 0 ? (
+                    <span className="evidence-pill">
+                      <FaPaperclip /> {submittedData.attachmentsCount} file(s) attached
+                    </span>
+                  ) : (
+                    "No files attached"
+                  )}
                 </span>
               </div>
             </div>
 
-            <div className="success-actions no-print">
+            {/* Statutory Notice Banner */}
+            <div className="statutory-sla-strip">
+              <div className="sla-badge-icon">
+                <FaShieldAlt />
+              </div>
+              <div className="sla-badge-text">
+                <strong>Next Step: </strong> Formal grievance summary and tokenized 1-click resolution link prepared for {submittedData.companyName} grievance desk. Target acknowledgment within 24–48 hours.
+              </div>
+            </div>
+
+            {/* Success Actions */}
+            <div className="success-actions-row no-print">
               <button
                 type="button"
-                className="pdf-notice-btn"
+                className="btn-pdf-download"
                 onClick={() => generateGrievanceNoticePdf(submittedData)}
-                title="Download formatted Claim Summary & Grievance Notice PDF"
               >
                 <FaFilePdf /> Download Grievance Summary (PDF)
               </button>
+              <Link
+                to={`/track?id=${submittedData.complaintId}`}
+                className="btn-track-live"
+              >
+                Track Live Status <FaArrowRight />
+              </Link>
               <button
                 type="button"
-                className="print-slip-btn"
+                className="btn-print-slip"
                 onClick={handlePrintSlip}
               >
                 <FaPrint /> Print Slip
               </button>
-              <Link
-                to={`/track?id=${submittedData.complaintId}`}
-                className="track-now-btn"
-              >
-                Track Live <FaArrowRight />
-              </Link>
               <button
                 type="button"
-                className="register-another-btn"
+                className="btn-file-another"
                 onClick={handleReset}
               >
                 File Another Grievance
               </button>
             </div>
 
-            {/* Printable Receipt */}
+            {/* Printable Slip Wrapper */}
             <div className="print-slip-wrapper print-only">
               <div className="slip-header">
                 <h3>Consumer Trust Platform</h3>
@@ -597,58 +729,85 @@ function RegisterComplaint() {
             </div>
           </div>
         ) : (
+          /* ==========================================================================
+             5-STEP GRIEVANCE WIZARD
+             ========================================================================== */
           <>
-            <h1>Register Consumer Grievance</h1>
-            <p className="register-subtitle">
-              Follow our structured 4-step wizard to file your dispute, format your claim narrative, and attach evidence.
-            </p>
+            <div className="wizard-page-header">
+              <div className="header-pill">
+                <FaShieldAlt /> 100% FREE & INDEPENDENT GRIEVANCE FACILITATION
+              </div>
+              <h1 className="wizard-main-title">Submit a Consumer Grievance</h1>
+              <p className="wizard-main-subtitle">
+                Complete the 5-step guided form to structure your claim facts, enhance your narrative with AI, and dispatch a formal resolution notice to the enterprise grievance desk.
+              </p>
 
-            {/* Step Progress Indicators */}
-            <div className="wizard-progress-bar">
-              <div className={`wizard-step-item ${currentStep === 1 ? "active" : currentStep > 1 ? "completed" : ""}`}>
-                <div className="step-circle">{currentStep > 1 ? "✓" : "1"}</div>
-                <span>Citizen Info</span>
-              </div>
-              <div className="wizard-step-connector" />
-              <div className={`wizard-step-item ${currentStep === 2 ? "active" : currentStep > 2 ? "completed" : ""}`}>
-                <div className="step-circle">{currentStep > 2 ? "✓" : "2"}</div>
-                <span>Dispute Details</span>
-              </div>
-              <div className="wizard-step-connector" />
-              <div className={`wizard-step-item ${currentStep === 3 ? "active" : currentStep > 3 ? "completed" : ""}`}>
-                <div className="step-circle">{currentStep > 3 ? "✓" : "3"}</div>
-                <span>Claim & Proof</span>
-              </div>
-              <div className="wizard-step-connector" />
-              <div className={`wizard-step-item ${currentStep === 4 ? "active" : ""}`}>
-                <div className="step-circle">4</div>
-                <span>Review & Submit</span>
-              </div>
+              {hasRestoredDraft && (
+                <div className="draft-restored-pill">
+                  <span>✨ Draft automatically restored</span>
+                  <button type="button" onClick={clearDraft} title="Discard draft and start fresh">
+                    Discard Draft
+                  </button>
+                </div>
+              )}
             </div>
 
+            {/* Stepper Navigation */}
+            <div className="wizard-stepper">
+              {steps.map((step) => {
+                const isCompleted = currentStep > step.num;
+                const isActive = currentStep === step.num;
+                return (
+                  <div
+                    key={step.num}
+                    className={`stepper-item ${isActive ? "active" : ""} ${isCompleted ? "completed" : ""}`}
+                    onClick={() => {
+                      if (isCompleted) setCurrentStep(step.num);
+                    }}
+                  >
+                    <div className="stepper-bubble">
+                      {isCompleted ? <FaCheck /> : step.num}
+                    </div>
+                    <div className="stepper-labels">
+                      <span className="stepper-title">{step.title}</span>
+                      <span className="stepper-desc">{step.desc}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Error Banners */}
             {stepError && (
-              <div className="error-banner">
+              <div className="wizard-alert-error">
                 <FaExclamationCircle /> <span>{stepError}</span>
               </div>
             )}
-
             {error && (
-              <div className="error-banner">
+              <div className="wizard-alert-error">
                 <FaExclamationCircle /> <span>{error}</span>
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="register-form">
-              {/* STEP 1: CITIZEN DETAILS */}
+            <form onSubmit={handleSubmit} className="wizard-form-body">
+              {/* -------------------------------------------------------------
+                  STEP 1: COMPLAINANT CONTACT DETAILS
+                  ------------------------------------------------------------- */}
               {currentStep === 1 && (
-                <div className="wizard-step-content">
-                  <h3 className="wizard-step-heading">Step 1: Complainant / Citizen Information</h3>
-                  <div className="form-row">
-                    <div className="input-group">
-                      <label>Full Legal Name *</label>
-                      <div className="input-wrapper">
+                <div className="step-pane">
+                  <div className="step-pane-header">
+                    <span className="step-badge">Step 1 of 5</span>
+                    <h2>Complainant & Contact Information</h2>
+                    <p>Enter your contact information for live milestone updates and case tracking alerts.</p>
+                  </div>
+
+                  <div className="form-grid-2">
+                    <div className="form-group">
+                      <label htmlFor="name">Full Legal Name *</label>
+                      <div className="input-box">
                         <FaUser className="input-icon" />
                         <input
+                          id="name"
                           type="text"
                           name="name"
                           placeholder="e.g. Manoj Kumar"
@@ -659,11 +818,12 @@ function RegisterComplaint() {
                       </div>
                     </div>
 
-                    <div className="input-group">
-                      <label>Email Address (For Case Updates) *</label>
-                      <div className="input-wrapper">
+                    <div className="form-group">
+                      <label htmlFor="email">Email Address (For Case Updates) *</label>
+                      <div className="input-box">
                         <FaEnvelope className="input-icon" />
                         <input
+                          id="email"
                           type="email"
                           name="email"
                           placeholder="e.g. manoj@example.com"
@@ -675,12 +835,13 @@ function RegisterComplaint() {
                     </div>
                   </div>
 
-                  <div className="form-row" style={{ marginTop: 14 }}>
-                    <div className="input-group">
-                      <label>Mobile Phone Number (10 Digits) *</label>
-                      <div className="input-wrapper">
+                  <div className="form-grid-2" style={{ marginTop: 16 }}>
+                    <div className="form-group">
+                      <label htmlFor="phone">Mobile Phone Number (10 Digits) *</label>
+                      <div className="input-box">
                         <FaPhone className="input-icon" />
                         <input
+                          id="phone"
                           type="tel"
                           name="phone"
                           placeholder="e.g. 9876543210"
@@ -689,42 +850,63 @@ function RegisterComplaint() {
                           required
                         />
                       </div>
+                      <span className="input-hint">Used for 2-Factor OTP verification on case lookup.</span>
+                    </div>
+
+                    <div className="form-group">
+                      <label htmlFor="city">City / State (Optional)</label>
+                      <div className="input-box">
+                        <FaMapMarkerAlt className="input-icon" />
+                        <input
+                          id="city"
+                          type="text"
+                          name="city"
+                          placeholder="e.g. Bengaluru, Karnataka"
+                          value={formData.city}
+                          onChange={handleChange}
+                        />
+                      </div>
+                      <span className="input-hint">Helps determine applicable regional consumer jurisdiction.</span>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* STEP 2: DISPUTE & ENTERPRISE DETAILS */}
+              {/* -------------------------------------------------------------
+                  STEP 2: DISPUTED ENTERPRISE & TRANSACTION DETAILS
+                  ------------------------------------------------------------- */}
               {currentStep === 2 && (
-                <div className="wizard-step-content">
-                  <h3 className="wizard-step-heading">Step 2: Disputed Enterprise & Transaction Details</h3>
-                  <div className="form-row">
-                    <div className="input-group">
-                      <label>Dispute Category *</label>
-                      <div className="input-wrapper">
-                        <FaTag className="input-icon" />
-                        <select
-                          name="category"
-                          value={formData.category}
-                          onChange={handleChange}
-                          required
-                        >
-                          <option value="Product">Product / Electronics</option>
-                          <option value="Service">Services / E-Commerce</option>
-                          <option value="Food">Food / Quick Commerce / Restaurants</option>
-                          <option value="Banking">Banking / UPI / FinTech</option>
-                          <option value="Telecom">Telecom / Internet Providers</option>
-                          <option value="Travel">Travel / Airlines / Railways</option>
-                          <option value="Other">Other Grievance</option>
-                        </select>
-                      </div>
-                    </div>
+                <div className="step-pane">
+                  <div className="step-pane-header">
+                    <span className="step-badge">Step 2 of 5</span>
+                    <h2>Disputed Enterprise & Transaction Details</h2>
+                    <p>Select the merchant, bank, or platform and provide transaction reference codes.</p>
+                  </div>
 
-                    <div className="input-group">
-                      <label>Disputed Enterprise / Bank / Platform *</label>
-                      <div className="input-wrapper">
+                  <div className="category-chips-row">
+                    <label className="field-label">Dispute Category *</label>
+                    <div className="category-chips-grid">
+                      {CATEGORIES.map((cat) => (
+                        <button
+                          key={cat.id}
+                          type="button"
+                          className={`cat-chip-btn ${formData.category === cat.id ? "active" : ""}`}
+                          onClick={() => setFormData((prev) => ({ ...prev, category: cat.id }))}
+                        >
+                          <span className="cat-chip-icon">{cat.icon}</span>
+                          <span className="cat-chip-text">{cat.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="form-grid-2" style={{ marginTop: 18 }}>
+                    <div className="form-group">
+                      <label htmlFor="companyName">Disputed Enterprise / Platform *</label>
+                      <div className="input-box">
                         <FaBuilding className="input-icon" />
                         <select
+                          id="companyName"
                           name="companyName"
                           value={formData.companyName}
                           onChange={handleChange}
@@ -736,108 +918,115 @@ function RegisterComplaint() {
                             <option value="Myntra">Myntra</option>
                             <option value="Meesho">Meesho</option>
                             <option value="Ajio (Reliance Retail)">Ajio (Reliance Retail)</option>
+                            <option value="Nykaa">Nykaa</option>
+                            <option value="Tata CLiQ">Tata CLiQ</option>
                           </optgroup>
-                          <optgroup label="🍔 Quick Commerce & Food Delivery">
+                          <optgroup label="🍔 Quick Commerce & Food">
                             <option value="Zomato">Zomato</option>
                             <option value="Swiggy">Swiggy</option>
                             <option value="Blinkit">Blinkit</option>
                             <option value="Zepto">Zepto</option>
+                            <option value="BigBasket">BigBasket</option>
+                            <option value="Domino's Pizza India">Domino's Pizza India</option>
                           </optgroup>
-                          <optgroup label="🏦 Banks, FinTech & UPI Payments">
+                          <optgroup label="🏦 Banking, FinTech & UPI">
                             <option value="State Bank of India (SBI)">State Bank of India (SBI)</option>
                             <option value="HDFC Bank">HDFC Bank</option>
                             <option value="ICICI Bank">ICICI Bank</option>
                             <option value="Axis Bank">Axis Bank</option>
+                            <option value="Kotak Mahindra Bank">Kotak Mahindra Bank</option>
                             <option value="PhonePe (UPI & Payments)">PhonePe (UPI & Payments)</option>
                             <option value="Paytm Payments">Paytm Payments</option>
                             <option value="Google Pay India">Google Pay India</option>
+                            <option value="CRED">CRED</option>
                           </optgroup>
-                          <optgroup label="📱 Telecom & Internet Providers">
+                          <optgroup label="📱 Telecom & Internet">
                             <option value="Reliance Jio Infocomm">Reliance Jio Infocomm</option>
                             <option value="Bharti Airtel">Bharti Airtel</option>
                             <option value="Vodafone Idea (Vi)">Vodafone Idea (Vi)</option>
                           </optgroup>
-                          <optgroup label="✈️ Travel, Railways & Cabs">
+                          <optgroup label="✈️ Travel & Transport">
                             <option value="MakeMyTrip">MakeMyTrip</option>
                             <option value="IRCTC (Indian Railways)">IRCTC (Indian Railways)</option>
                             <option value="IndiGo Airlines">IndiGo Airlines</option>
                             <option value="Uber India">Uber India</option>
                             <option value="Ola Cabs">Ola Cabs</option>
                           </optgroup>
-                          <optgroup label="📱 Electronics & Manufacturers">
+                          <optgroup label="💻 Electronics & Hardware">
                             <option value="Samsung Electronics India">Samsung Electronics India</option>
                             <option value="Apple India">Apple India</option>
+                            <option value="Xiaomi / Redmi India">Xiaomi / Redmi India</option>
                           </optgroup>
-                          <optgroup label="🏢 Other Organization">
+                          <optgroup label="🏢 Other Custom Organization">
                             <option value="Other / Custom Enterprise">Other / Custom Enterprise</option>
                           </optgroup>
                         </select>
                       </div>
                     </div>
+
+                    {formData.companyName === "Other / Custom Enterprise" ? (
+                      <div className="form-group">
+                        <label htmlFor="customCompanyName">Custom Enterprise / Merchant Name *</label>
+                        <div className="input-box">
+                          <FaBuilding className="input-icon" />
+                          <input
+                            id="customCompanyName"
+                            type="text"
+                            name="customCompanyName"
+                            placeholder="e.g. Local Appliance Store / Merchant"
+                            value={formData.customCompanyName}
+                            onChange={handleChange}
+                            required
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="form-group">
+                        <label htmlFor="orderOrTransactionId">Order # / Transaction ID / PNR (Optional)</label>
+                        <div className="input-box">
+                          <FaReceipt className="input-icon" />
+                          <input
+                            id="orderOrTransactionId"
+                            type="text"
+                            name="orderOrTransactionId"
+                            placeholder="e.g. 408-1234567-8901234 or UTR 82910392"
+                            value={formData.orderOrTransactionId}
+                            onChange={handleChange}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
 
-                  {formData.companyName === "Other / Custom Enterprise" && (
-                    <div className="input-group full-width" style={{ marginTop: 14 }}>
-                      <label>Custom Enterprise / Company Name *</label>
-                      <div className="input-wrapper">
-                        <FaBuilding className="input-icon" />
-                        <input
-                          type="text"
-                          name="customCompanyName"
-                          placeholder="Enter the official commercial name of the merchant/platform"
-                          value={formData.customCompanyName}
-                          onChange={handleChange}
-                          required
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="form-row" style={{ marginTop: 14 }}>
-                    <div className="input-group">
-                      <label>Order # / UTR / Account / PNR (Optional)</label>
-                      <div className="input-wrapper">
-                        <FaReceipt className="input-icon" />
-                        <input
-                          type="text"
-                          name="orderOrTransactionId"
-                          placeholder="e.g. 408-1234567-8901234 or UTR 4291829102"
-                          value={formData.orderOrTransactionId}
-                          onChange={handleChange}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="input-group">
-                      <label>Grievance Subject / Title *</label>
-                      <div className="input-wrapper">
-                        <FaFileAlt className="input-icon" />
-                        <input
-                          type="text"
-                          name="subject"
-                          placeholder="Brief summary (e.g. Defective laptop delivered without refund)"
-                          value={formData.subject}
-                          onChange={handleChange}
-                          required
-                        />
-                      </div>
+                  <div className="form-group" style={{ marginTop: 16 }}>
+                    <label htmlFor="subject">Grievance Subject / Title *</label>
+                    <div className="input-box">
+                      <FaFileAlt className="input-icon" />
+                      <input
+                        id="subject"
+                        type="text"
+                        name="subject"
+                        placeholder="e.g. Defective phone delivered without refund or replacement"
+                        value={formData.subject}
+                        onChange={handleChange}
+                        required
+                      />
                     </div>
                   </div>
 
                   {selectedEnterprise && (
-                    <div className="nodal-sla-banner" style={{ marginTop: 18 }}>
-                      <div className="nodal-sla-icon">
+                    <div className="enterprise-desk-card">
+                      <div className="desk-card-icon">
                         <FaShieldAlt />
                       </div>
-                      <div className="nodal-sla-info">
-                        <div className="nodal-sla-title">
-                          <strong>Enterprise Grievance Desk: </strong>
+                      <div className="desk-card-content">
+                        <div className="desk-card-title">
+                          <strong>Registered Nodal Desk: </strong>
                           <span>{selectedEnterprise.nodal}</span>
                         </div>
-                        <div className="nodal-sla-meta">
+                        <div className="desk-card-meta">
                           <span>⚡ Target SLA: <strong>{selectedEnterprise.sla}</strong></span>
-                          <span className="sla-dot">•</span>
-                          <span>Dispute summary and tokenized 1-click link prepared upon submission</span>
+                          <span>• Tokenized 1-click settlement dispatch ready</span>
                         </div>
                       </div>
                     </div>
@@ -845,162 +1034,238 @@ function RegisterComplaint() {
                 </div>
               )}
 
-              {/* STEP 3: GRIEVANCE STATEMENT & EVIDENCE */}
+              {/* -------------------------------------------------------------
+                  STEP 3: GRIEVANCE STATEMENT & AI ASSISTANT
+                  ------------------------------------------------------------- */}
               {currentStep === 3 && (
-                <div className="wizard-step-content">
-                  <h3 className="wizard-step-heading">Step 3: Grievance Statement & Supporting Evidence</h3>
+                <div className="step-pane">
+                  <div className="step-pane-header">
+                    <span className="step-badge">Step 3 of 5</span>
+                    <h2>Dispute Narrative & AI Drafting Assistant</h2>
+                    <p>Describe what went wrong and use the AI assistant to structure formal chronologies & legal relief requests.</p>
+                  </div>
 
-                  {/* AI Drafting Assistant Disclaimer & Button */}
-                  <div className="ai-assistant-card">
-                    <div className="desc-header-row">
-                      <label style={{ fontWeight: 700, color: "#1e293b", fontSize: 14 }}>
-                        Grievance Narrative & Statement *
-                      </label>
-                      <button
-                        type="button"
-                        className={`ai-enhance-btn ${isAiEnhancing ? "enhancing" : ""}`}
-                        onClick={handleAiEnhance}
-                        title="Format statement into structured chronology and relief requests"
-                      >
-                        <FaMagic /> {isAiEnhancing ? "Structuring Narrative..." : "✨ AI Drafting Assistant"}
-                      </button>
+                  {/* Relief Selection Chips */}
+                  <div className="reliefs-section">
+                    <span className="reliefs-title">Select Desired Reliefs (The AI Assistant will integrate these):</span>
+                    <div className="relief-chips-container">
+                      {COMMON_RELIEFS.map((relief) => {
+                        const isSelected = selectedReliefs.includes(relief);
+                        return (
+                          <button
+                            key={relief}
+                            type="button"
+                            className={`relief-badge-btn ${isSelected ? "selected" : ""}`}
+                            onClick={() => toggleRelief(relief)}
+                          >
+                            {isSelected ? "✓ " : "+ "}
+                            {relief}
+                          </button>
+                        );
+                      })}
                     </div>
+                  </div>
 
-                    <div className="ai-disclaimer-strip">
-                      <FaInfoCircle />
-                      <span>{AI_ASSISTANT_DISCLAIMER}</span>
-                    </div>
-
-                    {/* Desired Reliefs */}
-                    <div className="relief-chips-wrap" style={{ marginTop: 12 }}>
-                      <span className="relief-chips-label">Select Desired Reliefs (Assistant will include in narrative):</span>
-                      <div className="relief-chips-list">
-                        {COMMON_RELIEFS.map((relief) => {
-                          const isSelected = selectedReliefs.includes(relief);
-                          return (
-                            <button
-                              key={relief}
-                              type="button"
-                              className={`relief-chip ${isSelected ? "selected" : ""}`}
-                              onClick={() => toggleRelief(relief)}
-                            >
-                              {isSelected ? "✓ " : "+ "}
-                              {relief}
-                            </button>
-                          );
-                        })}
+                  {/* AI Assistant Action Bar */}
+                  <div className="ai-assistant-banner">
+                    <div className="ai-assistant-left">
+                      <FaMagic className="ai-wand-icon" />
+                      <div>
+                        <strong>AI Grievance Structuring Assistant</strong>
+                        <span>Auto-formats dates, facts, CPA 2019 legal contexts, and requested remedies.</span>
                       </div>
                     </div>
+                    <button
+                      type="button"
+                      className={`btn-ai-enhance ${isAiEnhancing ? "loading" : ""}`}
+                      onClick={handleAiEnhance}
+                      disabled={isAiEnhancing}
+                    >
+                      <FaMagic /> {isAiEnhancing ? "Structuring..." : "✨ Format Narrative"}
+                    </button>
+                  </div>
 
+                  <div className="ai-disclaimer-card">
+                    <FaInfoCircle />
+                    <span>{AI_ASSISTANT_DISCLAIMER}</span>
+                  </div>
+
+                  <div className="form-group" style={{ marginTop: 14 }}>
+                    <label htmlFor="description">Detailed Dispute Description *</label>
                     <textarea
+                      id="description"
                       name="description"
-                      rows="6"
-                      placeholder="Describe the transaction details, what went wrong, and how previous customer service attempts failed. Click '✨ AI Drafting Assistant' above to structure your claim clearly..."
+                      rows="7"
+                      placeholder="Detail the timeline of events: purchase date, defect or failure, previous customer support tickets, and unmet promises. Click '✨ Format Narrative' above to structure your claim formally..."
                       value={formData.description}
                       onChange={handleChange}
                       required
-                      style={{ marginTop: 10 }}
+                    />
+                    <div className="textarea-footer">
+                      <span className="char-count">{formData.description.length} characters (min 20)</span>
+                      <span className="tip-text">Tip: Mention dates and amounts clearly for faster settlement.</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* -------------------------------------------------------------
+                  STEP 4: EVIDENCE UPLOAD & ATTACHMENTS
+                  ------------------------------------------------------------- */}
+              {currentStep === 4 && (
+                <div className="step-pane">
+                  <div className="step-pane-header">
+                    <span className="step-badge">Step 4 of 5</span>
+                    <h2>Attach Supporting Proof & Documents</h2>
+                    <p>Upload invoices, receipts, photos of defects, or customer chat transcripts (Optional, up to 5 files, 10MB each).</p>
+                  </div>
+
+                  {/* Drag & Drop Area */}
+                  <div
+                    className={`dropzone-card ${isDragging ? "dragging" : ""}`}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    onClick={() => fileInputRef.current && fileInputRef.current.click()}
+                  >
+                    <div className="dropzone-circle">
+                      <FaPaperclip />
+                    </div>
+                    <div className="dropzone-copy">
+                      <strong>Click to upload or drag & drop files here</strong>
+                      <span>Supports JPG, PNG, WEBP, and PDF files up to 10MB each</span>
+                    </div>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      multiple
+                      accept=".jpg,.jpeg,.png,.webp,.gif,.pdf,image/jpeg,image/png,image/webp,image/gif,application/pdf"
+                      onChange={handleFileChange}
+                      style={{ display: "none" }}
                     />
                   </div>
 
-                  {/* Evidence Upload Section */}
-                  <div className="input-group full-width file-upload-section" style={{ marginTop: 20 }}>
-                    <label className="file-upload-label">
-                      <FaPaperclip /> Supporting Evidence & Proof Documents (Optional, up to 5 files, 10MB each)
-                    </label>
-                    <div
-                      className="file-dropzone"
-                      onClick={() => fileInputRef.current && fileInputRef.current.click()}
-                    >
-                      <FaPaperclip className="dropzone-icon" />
-                      <div className="dropzone-text">
-                        <strong>Click here or browse to attach proof documents</strong>
-                        <span>Supports JPG, PNG, WEBP, GIF images and PDF invoices or receipts</span>
-                      </div>
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        multiple
-                        accept=".jpg,.jpeg,.png,.webp,.gif,.pdf,image/jpeg,image/png,image/webp,image/gif,application/pdf"
-                        onChange={handleFileChange}
-                        style={{ display: "none" }}
-                      />
+                  {fileError && (
+                    <div className="wizard-alert-error" style={{ marginTop: 12 }}>
+                      <FaExclamationCircle /> <span>{fileError}</span>
                     </div>
+                  )}
 
-                    {fileError && (
-                      <div className="file-error-text">
-                        <FaExclamationCircle /> {fileError}
-                      </div>
-                    )}
-
-                    {files.length > 0 && (
-                      <div className="file-preview-list">
+                  {/* Attached Files List */}
+                  {files.length > 0 && (
+                    <div className="attached-files-list">
+                      <h4 className="attached-heading">Attached Proof Files ({files.length}/5)</h4>
+                      <div className="files-grid">
                         {files.map((file, idx) => (
-                          <div key={idx} className="file-preview-item">
-                            <div className="file-preview-info">
+                          <div key={idx} className="file-chip">
+                            <div className="file-icon-wrap">
                               {file.type === "application/pdf" ? (
-                                <FaFilePdf className="file-type-icon pdf" />
+                                <FaFilePdf className="file-icon pdf" />
                               ) : (
-                                <FaFileImage className="file-type-icon img" />
+                                <FaFileImage className="file-icon img" />
                               )}
-                              <div className="file-name-size">
-                                <span className="file-name" title={file.name}>
-                                  {file.name}
-                                </span>
-                                <span className="file-size">{formatFileSize(file.size)}</span>
-                              </div>
+                            </div>
+                            <div className="file-info-wrap">
+                              <span className="file-title" title={file.name}>
+                                {file.name}
+                              </span>
+                              <span className="file-size">{formatFileSize(file.size)}</span>
                             </div>
                             <button
                               type="button"
-                              className="file-remove-btn"
+                              className="file-delete-btn"
                               onClick={() => removeFile(idx)}
-                              title="Remove file"
+                              title="Remove attached file"
                             >
                               <FaTrash />
                             </button>
                           </div>
                         ))}
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
+
+                  {files.length === 0 && (
+                    <div className="no-files-card">
+                      <FaInfoCircle />
+                      <span>No files attached yet. Attaching receipts or screenshots significantly speeds up enterprise redressal, but you can continue if you do not have files on hand.</span>
+                    </div>
+                  )}
                 </div>
               )}
 
-              {/* STEP 4: PRE-SUBMISSION REVIEW & CONSENT */}
-              {currentStep === 4 && (
-                <div className="wizard-step-content">
-                  <h3 className="wizard-step-heading">Step 4: Pre-Submission Review & Explicit Consent</h3>
+              {/* -------------------------------------------------------------
+                  STEP 5: PRE-SUBMISSION REVIEW & EXPLICIT CONSENT
+                  ------------------------------------------------------------- */}
+              {currentStep === 5 && (
+                <div className="step-pane">
+                  <div className="step-pane-header">
+                    <span className="step-badge">Step 5 of 5</span>
+                    <h2>Review & Pre-Submission Certification</h2>
+                    <p>Verify your details and provide explicit consent before submitting the grievance docket.</p>
+                  </div>
 
-                  <div className="review-card">
-                    <h4 style={{ margin: "0 0 12px", color: "#0f2b5c", fontSize: 16 }}>📋 Grievance Summary</h4>
-                    <div className="review-grid">
-                      <div><strong>Complainant:</strong> {formData.name}</div>
-                      <div><strong>Contact:</strong> {formData.email} | {formData.phone}</div>
-                      <div>
-                        <strong>Target Enterprise:</strong>{" "}
-                        {formData.companyName === "Other / Custom Enterprise"
-                          ? formData.customCompanyName || "Custom Enterprise"
-                          : formData.companyName}
-                      </div>
-                      <div><strong>Category:</strong> {formData.category}</div>
-                      {formData.orderOrTransactionId && (
-                        <div><strong>Order / Ref ID:</strong> {formData.orderOrTransactionId}</div>
-                      )}
-                      <div><strong>Subject:</strong> {formData.subject}</div>
-                      <div><strong>Attached Files:</strong> {files.length} document(s)</div>
+                  {/* Review Summary Card */}
+                  <div className="review-summary-card">
+                    <div className="review-card-header">
+                      <h3>📋 Grievance Summary</h3>
+                      <button
+                        type="button"
+                        className="btn-edit-step"
+                        onClick={() => setCurrentStep(1)}
+                      >
+                        <FaEdit /> Edit Details
+                      </button>
                     </div>
 
-                    <div style={{ marginTop: 14, borderTop: "1px solid #e2e8f0", paddingTop: 10 }}>
-                      <strong style={{ fontSize: 13, color: "#475569" }}>Grievance Statement Preview:</strong>
-                      <div className="review-description-box">
+                    <div className="review-grid">
+                      <div className="review-item">
+                        <span className="review-label">Complainant</span>
+                        <span className="review-val">{formData.name}</span>
+                      </div>
+                      <div className="review-item">
+                        <span className="review-label">Contact</span>
+                        <span className="review-val">{formData.email} • {formData.phone}</span>
+                      </div>
+                      <div className="review-item">
+                        <span className="review-label">Disputed Enterprise</span>
+                        <span className="review-val">
+                          {formData.companyName === "Other / Custom Enterprise"
+                            ? formData.customCompanyName || "Custom Enterprise"
+                            : formData.companyName}
+                        </span>
+                      </div>
+                      <div className="review-item">
+                        <span className="review-label">Category</span>
+                        <span className="review-val">{formData.category}</span>
+                      </div>
+                      {formData.orderOrTransactionId && (
+                        <div className="review-item">
+                          <span className="review-label">Order / Ref ID</span>
+                          <span className="review-val">{formData.orderOrTransactionId}</span>
+                        </div>
+                      )}
+                      <div className="review-item">
+                        <span className="review-label">Attached Files</span>
+                        <span className="review-val">{files.length} document(s)</span>
+                      </div>
+                      <div className="review-item full">
+                        <span className="review-label">Subject</span>
+                        <span className="review-val">{formData.subject}</span>
+                      </div>
+                    </div>
+
+                    <div className="review-desc-wrap">
+                      <span className="review-label">Grievance Statement Preview:</span>
+                      <div className="review-desc-box">
                         {formData.description}
                       </div>
                     </div>
                   </div>
 
-                  {/* Explicit Unselected Consent Checkboxes */}
-                  <div className="consents-container" style={{ marginTop: 20 }}>
-                    <div className="consent-checkbox-row">
+                  {/* Explicit Unselected Consents (Required by default to be unchecked) */}
+                  <div className="consents-card">
+                    <div className="consent-row required">
                       <input
                         type="checkbox"
                         id="consent-accuracy"
@@ -1009,11 +1274,11 @@ function RegisterComplaint() {
                         required
                       />
                       <label htmlFor="consent-accuracy">
-                        <strong>Accuracy Certification: *</strong> I certify that all statements and documents submitted in this grievance are genuine, accurate, and relate to a bona fide consumer transaction.
+                        <strong>Accuracy Certification: *</strong> I solemnly certify that the information and documents provided herein are authentic, genuine, and relate to a bona fide consumer transaction.
                       </label>
                     </div>
 
-                    <div className="consent-checkbox-row">
+                    <div className="consent-row required">
                       <input
                         type="checkbox"
                         id="consent-terms"
@@ -1022,11 +1287,11 @@ function RegisterComplaint() {
                         required
                       />
                       <label htmlFor="consent-terms">
-                        <strong>Terms & Independent Platform Agreement: *</strong> I have read and agree to the <Link to="/terms" target="_blank" rel="noopener noreferrer">Terms of Service</Link> and <Link to="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</Link>, and acknowledge that Consumer Trust is an independent dispute facilitation desk and not a government agency, court, or statutory commission.
+                        <strong>Platform Terms & Independent Status Agreement: *</strong> I have read and agree to the <Link to="/terms" target="_blank" rel="noopener noreferrer">Terms of Service</Link> and <Link to="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</Link>, and understand that Consumer Trust is an independent private mediation facilitator and not a court, statutory tribunal, or government agency.
                       </label>
                     </div>
 
-                    <div className="consent-checkbox-row optional">
+                    <div className="consent-row optional">
                       <input
                         type="checkbox"
                         id="consent-wa"
@@ -1035,19 +1300,19 @@ function RegisterComplaint() {
                       />
                       <label htmlFor="consent-wa">
                         <FaWhatsapp style={{ color: "#22c55e", marginRight: 4 }} />
-                        <strong>Optional Alerts:</strong> Send me transactional milestone alerts and live case tracking updates via WhatsApp / SMS.
+                        <strong>Optional Instant Updates:</strong> Send me transactional milestone alerts and live redressal updates via WhatsApp / SMS.
                       </label>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* Wizard Navigation Controls */}
-              <div className="wizard-nav-controls">
+              {/* Wizard Navigation Footer */}
+              <div className="wizard-nav-footer">
                 {currentStep > 1 && (
                   <button
                     type="button"
-                    className="wizard-back-btn"
+                    className="btn-wizard-back"
                     onClick={handlePrevStep}
                     disabled={loading}
                   >
@@ -1055,10 +1320,10 @@ function RegisterComplaint() {
                   </button>
                 )}
 
-                {currentStep < 4 ? (
+                {currentStep < 5 ? (
                   <button
                     type="button"
-                    className="wizard-next-btn"
+                    className="btn-wizard-next"
                     onClick={handleNextStep}
                   >
                     Continue to Next Step <FaArrowRight />
@@ -1066,10 +1331,10 @@ function RegisterComplaint() {
                 ) : (
                   <button
                     type="submit"
-                    className="submit-btn"
+                    className="btn-wizard-submit"
                     disabled={loading || !consentAccuracy || !consentTermsPrivacy}
                   >
-                    {loading ? "Submitting Grievance..." : "Submit Grievance Docket"}
+                    {loading ? "Submitting Grievance Docket..." : "Submit Grievance Docket"}
                   </button>
                 )}
               </div>
@@ -1080,5 +1345,3 @@ function RegisterComplaint() {
     </div>
   );
 }
-
-export default RegisterComplaint;

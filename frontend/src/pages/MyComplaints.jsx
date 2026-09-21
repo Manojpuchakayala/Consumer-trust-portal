@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   FaClipboardList,
   FaSearch,
-  FaExternalLinkAlt,
   FaPlusCircle,
   FaClock,
   FaCheckCircle,
@@ -24,14 +23,14 @@ import {
   FaUserCheck,
   FaFilter,
   FaRedoAlt,
-  FaEnvelope,
   FaCompass,
+  FaArrowRight,
 } from "react-icons/fa";
 import api from "../services/api";
 import { generateGrievanceNoticePdf } from "../utils/pdfGenerator";
 import "./MyComplaints.css";
 
-function MyComplaints() {
+export default function MyComplaints() {
   const navigate = useNavigate();
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -54,7 +53,6 @@ function MyComplaints() {
       navigate("/login");
       return;
     }
-
     fetchMyComplaints();
   }, [navigate]);
 
@@ -62,9 +60,9 @@ function MyComplaints() {
     try {
       setLoading(true);
       setError("");
-      const response = await api.get("/complaints/my");
-      if (response.data?.success) {
-        setComplaints(response.data.complaints || []);
+      const res = await api.get("/complaints/my");
+      if (res.data?.success) {
+        setComplaints(res.data.complaints || []);
       }
     } catch (err) {
       setError(
@@ -76,20 +74,17 @@ function MyComplaints() {
     }
   };
 
-  // 1-Click Copy Tracking ID
   const handleCopyId = (complaintId) => {
     navigator.clipboard.writeText(complaintId);
     setCopiedId(complaintId);
-    setTimeout(() => setCopiedId(null), 2000);
+    setTimeout(() => setCopiedId(null), 2500);
   };
 
-  // Open Delete Confirmation Modal
   const openDeleteModal = (complaint) => {
     setComplaintToDelete(complaint);
     setDeleteModalOpen(true);
   };
 
-  // Confirm Delete Grievance
   const handleConfirmDelete = async () => {
     if (!complaintToDelete) return;
     try {
@@ -97,7 +92,7 @@ function MyComplaints() {
       const res = await api.delete(`/complaints/${complaintToDelete._id}`);
       if (res.data?.success || res.status === 200) {
         setComplaints((prev) => prev.filter((c) => c._id !== complaintToDelete._id));
-        setSuccessMessage(`Grievance docket #${complaintToDelete.complaintId} has been deleted successfully.`);
+        setSuccessMessage(`Grievance docket #${complaintToDelete.complaintId} has been deleted.`);
         setTimeout(() => setSuccessMessage(""), 5000);
       }
     } catch (err) {
@@ -109,12 +104,10 @@ function MyComplaints() {
     }
   };
 
-  // Extract unique brands list from user's complaints
   const uniqueBrands = Array.from(
     new Set(complaints.map((c) => c.companyName).filter(Boolean))
   ).sort();
 
-  // Filter complaints based on Search, Status, and Brand
   const filteredComplaints = complaints.filter((c) => {
     const matchesSearch =
       c.complaintId.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -148,161 +141,155 @@ function MyComplaints() {
   };
 
   return (
-    <div className="my-complaints-page">
-      <div className="my-complaints-container">
-
-        {/* 1. Header Box Panel */}
-        <div className="my-complaints-header-panel">
-          <div className="header-text-group">
+    <div className="dashboard-page-root">
+      <div className="dashboard-container">
+        {/* 1. Header Banner */}
+        <div className="dashboard-header-card">
+          <div className="header-user-intro">
             <div className="header-badge-row">
-              <span className="official-portal-tag">
+              <span className="hub-badge">
                 <FaShieldAlt /> Citizen Redressal Hub
               </span>
-              <span className="user-email-tag">
+              <span className="user-email-chip">
                 <FaUserCheck /> {user?.name || user?.email}
               </span>
             </div>
-            <h1>My Registered Grievances</h1>
+            <h1>My Grievance Dashboard</h1>
             <p>
-              Manage, track timeline updates, download official statutory notices, or withdraw your consumer claims.
+              Manage your dispute dockets, monitor chronological investigation milestones, download statutory legal summaries, or track live enterprise resolutions.
             </p>
           </div>
-          <div className="header-actions">
-            <Link to="/register" className="file-new-btn">
-              <FaPlusCircle /> File New Grievance
+
+          <div className="header-btn-actions">
+            <Link to="/register" className="dash-primary-btn">
+              <FaPlusCircle /> Start New Grievance
+            </Link>
+            <Link to="/track" className="dash-secondary-btn">
+              <FaCompass /> Track a Case
             </Link>
           </div>
         </div>
 
-        {/* Success Alert Banner */}
+        {/* Alerts */}
         {successMessage && (
-          <div className="success-banner">
-            <FaCheckCircle className="banner-icon" />
+          <div className="dash-alert success">
+            <FaCheckCircle className="alert-icon" />
             <span>{successMessage}</span>
-            <button className="banner-close" onClick={() => setSuccessMessage("")}>
+            <button className="alert-close-btn" onClick={() => setSuccessMessage("")}>
               <FaTimesCircle />
             </button>
           </div>
         )}
 
-        {/* Error Alert Banner */}
         {error && (
-          <div className="error-banner">
-            <FaExclamationCircle className="banner-icon" />
+          <div className="dash-alert error">
+            <FaExclamationCircle className="alert-icon" />
             <span>{error}</span>
-            <button className="retry-btn" onClick={fetchMyComplaints}>
+            <button className="dash-retry-btn" onClick={fetchMyComplaints}>
               <FaRedoAlt /> Retry
             </button>
           </div>
         )}
 
-        {/* 2. Top Summary Metric Box Panels (4 Vibrant Box Panels) */}
-        <div className="summary-boxes-grid">
-          {/* Total Lodged Box */}
+        {/* 2. Top Summary Metric Cards */}
+        <div className="dash-metrics-grid">
           <div
-            className={`summary-box total ${selectedStatus === "All" ? "active-filter" : ""}`}
+            className={`metric-card total ${selectedStatus === "All" ? "active" : ""}`}
             onClick={() => setSelectedStatus("All")}
             role="button"
             tabIndex={0}
           >
-            <div className="summary-box-icon-wrap">
+            <div className="metric-icon-wrap">
               <FaClipboardList />
             </div>
-            <div className="summary-box-content">
-              <span className="summary-box-num">{totalCount}</span>
-              <span className="summary-box-title">Total Lodged</span>
-              <span className="summary-box-desc">All registered cases</span>
+            <div className="metric-data">
+              <span className="metric-num">{totalCount}</span>
+              <span className="metric-label">Total Lodged</span>
             </div>
-            <div className="summary-box-indicator"></div>
           </div>
 
-          {/* Pending Review Box */}
           <div
-            className={`summary-box pending ${selectedStatus === "Pending" ? "active-filter" : ""}`}
+            className={`metric-card pending ${selectedStatus === "Pending" ? "active" : ""}`}
             onClick={() => setSelectedStatus("Pending")}
             role="button"
             tabIndex={0}
           >
-            <div className="summary-box-icon-wrap">
+            <div className="metric-icon-wrap">
               <FaClock />
             </div>
-            <div className="summary-box-content">
-              <span className="summary-box-num">{pendingCount}</span>
-              <span className="summary-box-title">Pending Review</span>
-              <span className="summary-box-desc">Awaiting nodal action</span>
+            <div className="metric-data">
+              <span className="metric-num">{pendingCount}</span>
+              <span className="metric-label">Pending Review</span>
             </div>
-            <div className="summary-box-indicator"></div>
           </div>
 
-          {/* In Progress Box */}
           <div
-            className={`summary-box progress ${selectedStatus === "In Progress" ? "active-filter" : ""}`}
+            className={`metric-card progress ${selectedStatus === "In Progress" ? "active" : ""}`}
             onClick={() => setSelectedStatus("In Progress")}
             role="button"
             tabIndex={0}
           >
-            <div className="summary-box-icon-wrap">
+            <div className="metric-icon-wrap">
               <FaHourglassHalf />
             </div>
-            <div className="summary-box-content">
-              <span className="summary-box-num">{inProgressCount}</span>
-              <span className="summary-box-title">In Progress</span>
-              <span className="summary-box-desc">Under active redressal</span>
+            <div className="metric-data">
+              <span className="metric-num">{inProgressCount}</span>
+              <span className="metric-label">In Progress</span>
             </div>
-            <div className="summary-box-indicator"></div>
           </div>
 
-          {/* Resolved Box */}
           <div
-            className={`summary-box resolved ${selectedStatus === "Resolved" ? "active-filter" : ""}`}
+            className={`metric-card resolved ${selectedStatus === "Resolved" ? "active" : ""}`}
             onClick={() => setSelectedStatus("Resolved")}
             role="button"
             tabIndex={0}
           >
-            <div className="summary-box-icon-wrap">
+            <div className="metric-icon-wrap">
               <FaCheckCircle />
             </div>
-            <div className="summary-box-content">
-              <span className="summary-box-num">{resolvedCount}</span>
-              <span className="summary-box-title">Resolved</span>
-              <span className="summary-box-desc">Successfully settled</span>
+            <div className="metric-data">
+              <span className="metric-num">{resolvedCount}</span>
+              <span className="metric-label">Resolved</span>
             </div>
-            <div className="summary-box-indicator"></div>
           </div>
         </div>
 
-        {/* 3. Search & Multi-Filter Control Box */}
-        <div className="filter-controls-box">
-          <div className="filter-controls-top">
-            {/* Status Filter Tabs */}
-            <div className="status-tabs-group">
+        {/* 3. Filter Controls Box */}
+        <div className="dash-filter-card">
+          <div className="filter-tabs-row">
+            <div className="status-tabs-list">
               <button
-                className={`status-tab-btn ${selectedStatus === "All" ? "active" : ""}`}
+                type="button"
+                className={`status-tab ${selectedStatus === "All" ? "active" : ""}`}
                 onClick={() => setSelectedStatus("All")}
               >
-                All ({totalCount})
+                All Cases ({totalCount})
               </button>
               <button
-                className={`status-tab-btn pending ${selectedStatus === "Pending" ? "active" : ""}`}
+                type="button"
+                className={`status-tab pending ${selectedStatus === "Pending" ? "active" : ""}`}
                 onClick={() => setSelectedStatus("Pending")}
               >
                 Pending ({pendingCount})
               </button>
               <button
-                className={`status-tab-btn progress ${selectedStatus === "In Progress" ? "active" : ""}`}
+                type="button"
+                className={`status-tab progress ${selectedStatus === "In Progress" ? "active" : ""}`}
                 onClick={() => setSelectedStatus("In Progress")}
               >
-                In Progress ({inProgressCount})
+                In Review ({inProgressCount})
               </button>
               <button
-                className={`status-tab-btn resolved ${selectedStatus === "Resolved" ? "active" : ""}`}
+                type="button"
+                className={`status-tab resolved ${selectedStatus === "Resolved" ? "active" : ""}`}
                 onClick={() => setSelectedStatus("Resolved")}
               >
                 Resolved ({resolvedCount})
               </button>
               {rejectedCount > 0 && (
                 <button
-                  className={`status-tab-btn rejected ${selectedStatus === "Rejected" ? "active" : ""}`}
+                  type="button"
+                  className={`status-tab rejected ${selectedStatus === "Rejected" ? "active" : ""}`}
                   onClick={() => setSelectedStatus("Rejected")}
                 >
                   Rejected ({rejectedCount})
@@ -310,38 +297,34 @@ function MyComplaints() {
               )}
             </div>
 
-            {/* Brand Dropdown Filter */}
             {uniqueBrands.length > 0 && (
-              <div className="brand-select-wrap">
-                <FaBuilding className="brand-select-icon" />
+              <div className="brand-filter-select-wrap">
+                <FaBuilding className="select-icon" />
                 <select
                   value={selectedBrand}
                   onChange={(e) => setSelectedBrand(e.target.value)}
-                  className="brand-select-dropdown"
+                  className="brand-filter-select"
                 >
-                  <option value="All">All Disputed Brands ({uniqueBrands.length})</option>
+                  <option value="All">All Enterprises ({uniqueBrands.length})</option>
                   {uniqueBrands.map((b) => (
-                    <option key={b} value={b}>
-                      {b}
-                    </option>
+                    <option key={b} value={b}>{b}</option>
                   ))}
                 </select>
               </div>
             )}
           </div>
 
-          {/* Search Input Bar */}
-          <div className="search-bar-row">
-            <div className="search-input-box">
-              <FaSearch className="search-input-icon" />
+          <div className="search-bar-wrap">
+            <div className="dash-search-input-box">
+              <FaSearch className="search-icon" />
               <input
                 type="text"
-                placeholder="Search by Docket ID, Brand Name (Amazon, SBI, etc.), Order #, or Subject..."
+                placeholder="Search by Docket ID, Enterprise Name, Order #, or Subject..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
               {searchTerm && (
-                <button className="search-clear-btn" onClick={() => setSearchTerm("")}>
+                <button className="clear-search-btn" onClick={() => setSearchTerm("")}>
                   <FaTimesCircle />
                 </button>
               )}
@@ -355,38 +338,38 @@ function MyComplaints() {
           </div>
         </div>
 
-        {/* 4. Complaints Modular Box Panels List */}
+        {/* 4. Modular Case Cards Grid */}
         {loading ? (
-          <div className="complaints-loading-box">
-            <div className="spinner-orbit"></div>
-            <p>Loading your grievances and statutory dockets...</p>
+          <div className="dash-loading-box">
+            <div className="dash-spinner"></div>
+            <p>Loading your registered grievances...</p>
           </div>
         ) : filteredComplaints.length === 0 ? (
-          <div className="complaints-empty-box">
-            <div className="empty-icon-wrap">
+          <div className="dash-empty-card">
+            <div className="empty-icon-circle">
               <FaClipboardList />
             </div>
             <h3>No Complaints Found</h3>
             <p>
               {searchTerm || selectedStatus !== "All" || selectedBrand !== "All"
-                ? "No grievances match the selected filters or keyword. Try resetting filters."
-                : "You have not registered any consumer complaints yet. Lodge your first grievance now to trigger statutory resolution."}
+                ? "No dispute records match your search or selected filters."
+                : "You haven't filed any grievances yet. Lodge your first dispute now to initiate structured mediation with the enterprise."}
             </p>
             {searchTerm || selectedStatus !== "All" || selectedBrand !== "All" ? (
-              <button className="empty-reset-btn" onClick={resetFilters}>
+              <button className="empty-action-btn" onClick={resetFilters}>
                 Clear All Filters
               </button>
             ) : (
-              <Link to="/register" className="empty-register-cta">
-                <FaPlusCircle /> Register a Grievance Now
+              <Link to="/register" className="empty-action-btn primary">
+                <FaPlusCircle /> File Your First Grievance
               </Link>
             )}
           </div>
         ) : (
-          <div className="complaints-box-grid">
+          <div className="dash-cases-grid">
             {filteredComplaints.map((c) => {
-              const statusKey = (c.status || "Pending").toLowerCase().replace(/\s+/g, "-");
-              const brandName = c.companyName || "General Enterprise";
+              const statusSlug = (c.status || "Pending").toLowerCase().replace(/\s+/g, "-");
+              const brandName = c.companyName || "Disputed Enterprise";
               const dateStr = c.createdAt
                 ? new Date(c.createdAt).toLocaleDateString("en-IN", {
                     day: "numeric",
@@ -396,196 +379,150 @@ function MyComplaints() {
                 : "Recent";
 
               return (
-                <div key={c._id} className={`complaint-box-panel ${statusKey}`}>
-
-                  {/* Panel Header Bar */}
-                  <div className="panel-header-bar">
-                    <div className="panel-header-left">
-                      {/* Brand Badge */}
-                      <span className="brand-badge-pill" title={`Enterprise: ${brandName}`}>
-                        <FaBuilding className="brand-icon" /> {brandName}
+                <div key={c._id} className={`case-card ${statusSlug}`}>
+                  {/* Card Header Bar */}
+                  <div className="case-card-header">
+                    <div className="header-left-badges">
+                      <span className="brand-chip">
+                        <FaBuilding /> {brandName}
                       </span>
-
-                      {/* Category Badge */}
-                      <span className="category-badge-pill">
-                        <FaTag /> {c.category || "Consumer"}
+                      <span className="category-chip">
+                        <FaTag /> {c.category || "Product"}
                       </span>
-
-                      {/* Docket ID with 1-Click Copy */}
                       <button
-                        className="docket-id-pill"
+                        type="button"
+                        className="docket-chip"
                         onClick={() => handleCopyId(c.complaintId)}
-                        title="Click to copy Tracking ID"
+                        title="Click to copy Docket ID"
                       >
-                        <span className="docket-code">#{c.complaintId}</span>
+                        <span>#{c.complaintId}</span>
                         <FaCopy className="copy-icon" />
-                        {copiedId === c.complaintId && <span className="copied-tooltip">Copied!</span>}
+                        {copiedId === c.complaintId && <span className="copied-pill">Copied!</span>}
                       </button>
                     </div>
 
-                    <div className="panel-header-right">
-                      {/* Status Badge */}
-                      <span className={`status-pill ${statusKey}`}>
-                        <span className="status-dot"></span>
+                    <div className="header-right-badges">
+                      <span className={`status-badge ${statusSlug}`}>
+                        <span className="status-dot" />
                         {c.status || "Pending"}
                       </span>
-
-                      {/* Date */}
-                      <span className="filing-date-pill">
+                      <span className="date-chip">
                         <FaCalendarAlt /> {dateStr}
                       </span>
                     </div>
                   </div>
 
-                  {/* Panel Content Body */}
-                  <div className="panel-body-box">
-                    <h3 className="complaint-subject-heading">{c.subject}</h3>
+                  {/* Card Body */}
+                  <div className="case-card-body">
+                    <h3 className="case-subject">{c.subject}</h3>
 
-                    {/* Order / Transaction ID Callout */}
                     {c.orderOrTransactionId && (
-                      <div className="order-ref-box">
-                        <FaReceipt className="receipt-icon" />
-                        <span className="order-label">Order / Transaction Ref:</span>
-                        <strong className="order-value">{c.orderOrTransactionId}</strong>
+                      <div className="case-order-ref">
+                        <FaReceipt className="ref-icon" />
+                        <span>Order / Ref ID:</span>
+                        <strong>{c.orderOrTransactionId}</strong>
                       </div>
                     )}
 
-                    {/* Complaint Description Snippet */}
-                    <div className="complaint-desc-box">
-                      <p>{c.description}</p>
-                    </div>
+                    <p className="case-description">{c.description}</p>
                   </div>
 
-                  {/* Evidence & Feature Badges Bar */}
-                  <div className="panel-meta-badges-row">
+                  {/* Badges Row */}
+                  <div className="case-badges-row">
                     {c.attachments && c.attachments.length > 0 && (
-                      <span className="meta-badge evidence" title={`${c.attachments.length} proof document(s) uploaded`}>
-                        <FaPaperclip /> {c.attachments.length} Evidence Doc{c.attachments.length > 1 ? "s" : ""}
+                      <span className="feature-badge evidence">
+                        <FaPaperclip /> {c.attachments.length} Evidence File{c.attachments.length > 1 ? "s" : ""}
                       </span>
                     )}
-
                     {c.whatsappAlertsEnabled !== false && (
-                      <span className="meta-badge whatsapp" title="WhatsApp real-time alert updates enabled">
+                      <span className="feature-badge whatsapp">
                         <FaWhatsapp /> WhatsApp Alerts Active
                       </span>
                     )}
-
                     {c.companyNoticeSent && (
-                      <span className="meta-badge notice" title="Formal statutory legal notice dispatched to enterprise nodal desk">
-                        <FaShieldAlt /> Nodal Notice Dispatched
+                      <span className="feature-badge notice">
+                        <FaShieldAlt /> Nodal Notice Sent
                       </span>
                     )}
-
                     {c.status === "Resolved" && c.feedback?.rating && (
-                      <span className="meta-badge rating" title={`Citizen rating: ${c.feedback.rating}/5`}>
+                      <span className="feature-badge rating">
                         <FaStar /> Rated {c.feedback.rating}.0 / 5.0
                       </span>
                     )}
                   </div>
 
-                  {/* Authority / Nodal Remarks Box */}
+                  {/* Remarks Box if present */}
                   {c.adminRemarks && (
-                    <div className="authority-remarks-box">
-                      <div className="remarks-header">
-                        <FaShieldAlt className="shield-icon" />
-                        <span>Official Authority & Redressal Remarks</span>
-                      </div>
-                      <p className="remarks-text">{c.adminRemarks}</p>
+                    <div className="case-remarks-box">
+                      <strong>Authority & Redressal Remarks:</strong>
+                      <p>{c.adminRemarks}</p>
                     </div>
                   )}
 
-                  {/* Panel Actions Footer Box */}
-                  <div className="panel-actions-footer">
-                    <div className="actions-left-group">
-                      {/* Track Live Timeline */}
-                      <Link to={`/track?id=${c.complaintId}`} className="action-btn track-btn">
+                  {/* Card Actions Footer */}
+                  <div className="case-card-footer">
+                    <div className="footer-actions-left">
+                      <Link to={`/track?id=${c.complaintId}`} className="card-btn primary">
                         <FaCompass /> Track Live Status
                       </Link>
 
-                      {/* Download Official Notice PDF */}
                       <button
+                        type="button"
                         onClick={() => generateGrievanceNoticePdf(c)}
-                        className="action-btn pdf-btn"
-                        title="Download official statutory notice with seal & QR"
+                        className="card-btn secondary"
+                        title="Download official claim summary PDF"
                       >
                         <FaFilePdf /> Notice PDF
                       </button>
 
-                      {/* WhatsApp Share */}
                       <a
                         href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-                          [
-                            `🏛️ CONSUMER TRUST GRIEVANCE CASE UPDATE`,
-                            `━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-                            `📋 Tracking ID: ${c.complaintId}`,
-                            `👤 Citizen: ${c.name || user?.name || "Citizen"}`,
-                            `📊 Status: ${c.status || "Pending"}`,
-                            `📌 Subject: ${c.subject}`,
-                            `🔗 Track Live Milestones & Evidence:`,
-                            `${window.location.origin}/track?id=${c.complaintId}`,
-                            `━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-                          ].join("\n")
+                          `🏛️ CONSUMER TRUST CASE UPDATE\nDocket: #${c.complaintId}\nStatus: ${c.status}\nSubject: ${c.subject}\nTrack: ${window.location.origin}/track?id=${c.complaintId}`
                         )}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="action-btn wa-share-btn"
-                        title="Share tracking docket on WhatsApp"
+                        className="card-btn whatsapp"
+                        title="Share on WhatsApp"
                       >
                         <FaWhatsapp /> Share
                       </a>
-
-                      {/* Rate Resolution Button */}
-                      {c.status === "Resolved" && !c.feedback?.rating && (
-                        <Link to={`/track?id=${c.complaintId}`} className="action-btn rate-btn">
-                          <FaStar /> Rate Resolution
-                        </Link>
-                      )}
                     </div>
 
-                    <div className="actions-right-group">
-                      {/* Delete Grievance Button */}
-                      <button
-                        onClick={() => openDeleteModal(c)}
-                        className="action-btn delete-btn"
-                        title="Withdraw or delete this grievance"
-                      >
-                        <FaTrashAlt /> Delete
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => openDeleteModal(c)}
+                      className="card-delete-btn"
+                      title="Delete / withdraw grievance"
+                    >
+                      <FaTrashAlt />
+                    </button>
                   </div>
-
                 </div>
               );
             })}
           </div>
         )}
-
       </div>
 
-      {/* 5. Delete Confirmation Modal */}
+      {/* Delete Confirmation Modal */}
       {deleteModalOpen && complaintToDelete && (
-        <div className="delete-modal-overlay" onClick={() => !isDeleting && setDeleteModalOpen(false)}>
-          <div className="delete-modal-box" onClick={(e) => e.stopPropagation()}>
-            <div className="delete-modal-icon">
+        <div className="modal-overlay" onClick={() => !isDeleting && setDeleteModalOpen(false)}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-icon-wrap">
               <FaTrashAlt />
             </div>
             <h3>Delete Grievance Docket?</h3>
-            <p className="delete-modal-desc">
-              Are you sure you want to delete grievance docket{" "}
-              <strong>#{complaintToDelete.complaintId}</strong> against{" "}
-              <strong>{complaintToDelete.companyName || "Enterprise"}</strong>?
+            <p>
+              Are you sure you want to withdraw and delete grievance docket <strong>#{complaintToDelete.complaintId}</strong> against <strong>{complaintToDelete.companyName || "Enterprise"}</strong>?
             </p>
-            <div className="delete-modal-warning">
+            <div className="modal-warning">
               <FaExclamationCircle />
-              <span>
-                This will permanently remove the complaint, associated evidence documents, and tracking history from the system.
-              </span>
+              <span>This action will permanently delete all case records, attached evidence documents, and tracking history.</span>
             </div>
-
-            <div className="delete-modal-actions">
+            <div className="modal-actions">
               <button
                 type="button"
-                className="cancel-delete-btn"
+                className="modal-cancel-btn"
                 onClick={() => setDeleteModalOpen(false)}
                 disabled={isDeleting}
               >
@@ -593,7 +530,7 @@ function MyComplaints() {
               </button>
               <button
                 type="button"
-                className="confirm-delete-btn"
+                className="modal-delete-btn"
                 onClick={handleConfirmDelete}
                 disabled={isDeleting}
               >
@@ -603,9 +540,6 @@ function MyComplaints() {
           </div>
         </div>
       )}
-
     </div>
   );
 }
-
-export default MyComplaints;

@@ -19,21 +19,25 @@ function check(title, condition, detail = "") {
   }
 }
 
-// 1. Check frontend Login.jsx for test credentials / auto-fill removal & Real Google OAuth
+// 1. Check frontend Login.jsx & AuthCard.jsx for test credentials / auto-fill removal & Real Google OAuth
 const loginPath = path.join(__dirname, "../frontend/src/pages/Login.jsx");
+const authCardPath = path.join(__dirname, "../frontend/src/components/AuthCard.jsx");
 const loginContent = fs.readFileSync(loginPath, "utf8");
+const authCardContent = fs.existsSync(authCardPath) ? fs.readFileSync(authCardPath, "utf8") : "";
+const combinedAuthContent = loginContent + "\n" + authCardContent;
+
 check(
   "Login Page: Auto-Fill & Test Credentials Helper Removed",
-  !loginContent.includes("Auto-Fill") &&
-  !loginContent.includes("Admin@123") &&
-  !loginContent.includes("User@123") &&
-  !loginContent.includes("admin@consumertrust.gov")
+  !combinedAuthContent.includes("Auto-Fill") &&
+  !combinedAuthContent.includes("Admin@123") &&
+  !combinedAuthContent.includes("User@123") &&
+  !combinedAuthContent.includes("admin@consumertrust.gov")
 );
 check(
   "Login Page: Real Google OAuth Component Integrated (@react-oauth/google)",
-  loginContent.includes("GoogleLogin") &&
-  loginContent.includes("handleGoogleSuccess") &&
-  loginContent.includes("/auth/google")
+  combinedAuthContent.includes("GoogleLogin") &&
+  combinedAuthContent.includes("handleGoogleSuccess") &&
+  combinedAuthContent.includes("/auth/google")
 );
 
 // 2. Check TrackComplaint.jsx for mock case autoloading removal & OTP Verification flow

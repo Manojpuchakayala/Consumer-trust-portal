@@ -12,11 +12,13 @@ import {
   FaSun,
   FaGlobe,
   FaBuilding,
+  FaSearch,
+  FaFileAlt,
 } from "react-icons/fa";
 import { LANGUAGES, t } from "../utils/translations";
 import "./Navbar.css";
 
-function Navbar() {
+export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [user, setUser] = useState(null);
@@ -52,7 +54,7 @@ function Navbar() {
       if (storedUser) {
         try {
           setUser(JSON.parse(storedUser));
-        } catch (e) {
+        } catch {
           setUser(null);
         }
       } else {
@@ -82,45 +84,46 @@ function Navbar() {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <nav className="navbar">
+    <header className="navbar-header">
       <div className="navbar-container">
-        <Link to="/" className="logo" onClick={() => setMenuOpen(false)}>
-          <div className="logo-badge">
-            <FaShieldAlt className="logo-icon" />
+        {/* Logo */}
+        <Link to="/" className="navbar-logo" onClick={() => setMenuOpen(false)}>
+          <div className="logo-icon-wrap">
+            <FaShieldAlt className="logo-shield" />
           </div>
           <div className="logo-text">
-            <span className="brand-name">Consumer Trust</span>
-            <span className="tagline">Independent Consumer Support & Mediation</span>
+            <span className="logo-title">Consumer Trust</span>
+            <span className="logo-sub">Independent Dispute Desk</span>
           </div>
         </Link>
 
-        {/* Mobile Controls Wrap */}
-        <div className="mobile-controls-wrap">
+        {/* Mobile Action Controls */}
+        <div className="mobile-actions">
           <button
             type="button"
-            className="theme-toggle-btn mobile-only"
+            className="theme-btn mobile"
             onClick={() => setDarkMode(!darkMode)}
-            title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            aria-label="Toggle Theme"
           >
-            {darkMode ? <FaSun className="sun-icon" /> : <FaMoon className="moon-icon" />}
+            {darkMode ? <FaSun className="icon-sun" /> : <FaMoon className="icon-moon" />}
           </button>
 
           <button
-            className={`menu-toggle ${menuOpen ? "open" : ""}`}
+            className="mobile-menu-btn"
             onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle navigation menu"
+            aria-label="Toggle navigation"
           >
             {menuOpen ? <FaTimes /> : <FaBars />}
           </button>
         </div>
 
-        {/* Navigation & Actions */}
-        <div className={`nav-menu ${menuOpen ? "open" : ""}`}>
-          <ul className="nav-links">
+        {/* Navigation Menu */}
+        <nav className={`nav-links-wrap ${menuOpen ? "open" : ""}`}>
+          <ul className="nav-menu-list">
             <li>
               <Link
                 to="/"
-                className={isActive("/") ? "active" : ""}
+                className={`nav-link ${isActive("/") ? "active" : ""}`}
                 onClick={() => setMenuOpen(false)}
               >
                 {t("nav_home", currentLang)}
@@ -129,28 +132,30 @@ function Navbar() {
             <li>
               <Link
                 to="/register"
-                className={isActive("/register") ? "active" : ""}
+                className={`nav-link ${isActive("/register") ? "active" : ""}`}
                 onClick={() => setMenuOpen(false)}
               >
+                <FaFileAlt className="nav-icon" />
                 {t("nav_register", currentLang)}
               </Link>
             </li>
             <li>
               <Link
                 to="/track"
-                className={isActive("/track") ? "active" : ""}
+                className={`nav-link ${isActive("/track") ? "active" : ""}`}
                 onClick={() => setMenuOpen(false)}
               >
+                <FaSearch className="nav-icon" />
                 {t("nav_track", currentLang)}
               </Link>
             </li>
             <li>
               <Link
                 to="/brands"
-                className={`brands-nav-link ${isActive("/brands") ? "active" : ""}`}
+                className={`nav-link ${isActive("/brands") ? "active" : ""}`}
                 onClick={() => setMenuOpen(false)}
               >
-                <FaBuilding style={{ marginRight: 6 }} />
+                <FaBuilding className="nav-icon" />
                 {t("nav_brands", currentLang)}
               </Link>
             </li>
@@ -158,10 +163,10 @@ function Navbar() {
               <li>
                 <Link
                   to="/my-complaints"
-                  className={isActive("/my-complaints") ? "active" : ""}
+                  className={`nav-link dashboard ${isActive("/my-complaints") ? "active" : ""}`}
                   onClick={() => setMenuOpen(false)}
                 >
-                  <FaClipboardList style={{ marginRight: 6 }} />
+                  <FaClipboardList className="nav-icon" />
                   {t("nav_my_complaints", currentLang)}
                 </Link>
               </li>
@@ -170,39 +175,40 @@ function Navbar() {
               <li>
                 <Link
                   to="/admin"
-                  className={`admin-link ${isActive("/admin") ? "active" : ""}`}
+                  className={`nav-link admin ${isActive("/admin") ? "active" : ""}`}
                   onClick={() => setMenuOpen(false)}
                 >
-                  <FaUserShield style={{ marginRight: 6 }} />
+                  <FaUserShield className="nav-icon" />
                   {t("nav_admin", currentLang)}
                 </Link>
               </li>
             )}
           </ul>
 
-          <div className="nav-extra-controls">
+          {/* Right Action Controls */}
+          <div className="nav-actions">
             {/* Language Selector */}
-            <div className="lang-selector-wrap">
+            <div className="lang-menu-wrapper">
               <button
                 type="button"
-                className="lang-btn"
+                className="lang-toggle-btn"
                 onClick={() => setLangMenuOpen(!langMenuOpen)}
-                title="Select Language"
+                title="Select language"
               >
                 <FaGlobe className="globe-icon" />
                 <span>{LANGUAGES.find((l) => l.code === currentLang)?.label.split(" ")[0]}</span>
               </button>
 
               {langMenuOpen && (
-                <div className="lang-dropdown">
+                <div className="lang-dropdown-menu">
                   {LANGUAGES.map((lang) => (
                     <button
                       key={lang.code}
                       type="button"
-                      className={`lang-option ${currentLang === lang.code ? "selected" : ""}`}
+                      className={`lang-dropdown-item ${currentLang === lang.code ? "selected" : ""}`}
                       onClick={() => handleLangChange(lang.code)}
                     >
-                      <span className="flag">{lang.flag}</span>
+                      <span className="lang-flag">{lang.flag}</span>
                       <span>{lang.label}</span>
                     </button>
                   ))}
@@ -213,59 +219,44 @@ function Navbar() {
             {/* Dark Mode Toggle */}
             <button
               type="button"
-              className="theme-toggle-btn desktop-only"
+              className="theme-btn desktop"
               onClick={() => setDarkMode(!darkMode)}
               title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
             >
-              {darkMode ? <FaSun className="sun-icon" /> : <FaMoon className="moon-icon" />}
+              {darkMode ? <FaSun className="icon-sun" /> : <FaMoon className="icon-moon" />}
             </button>
-          </div>
 
-          <div className="auth-section">
+            {/* Auth Section */}
             {user ? (
-              <div className="user-profile">
-                <div className="user-info">
-                  {user.avatar ? (
-                    <img
-                      src={user.avatar}
-                      alt={user.name}
-                      className="user-avatar-img"
-                      referrerPolicy="no-referrer"
-                    />
-                  ) : (
-                    <FaUserCircle className="user-avatar" />
-                  )}
-                  <div className="user-meta">
-                    <span className="user-name">{user.name}</span>
-                    <span className={`user-role ${user.role}`}>
-                      {user.role === "admin" ? "Admin" : "Consumer"}
-                    </span>
-                  </div>
-                </div>
+              <div className="user-profile-pill">
+                {user.avatar ? (
+                  <img
+                    src={user.avatar}
+                    alt={user.name}
+                    className="user-pill-avatar"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  <FaUserCircle className="user-pill-icon" />
+                )}
+                <span className="user-pill-name">{user.name ? user.name.split(" ")[0] : "Citizen"}</span>
                 <button
-                  className="logout-btn"
+                  type="button"
+                  className="user-pill-logout"
                   onClick={handleLogout}
-                  title="Logout"
+                  title="Sign out"
                 >
                   <FaSignOutAlt />
-                  <span>{t("nav_logout", currentLang)}</span>
                 </button>
               </div>
             ) : (
-              <Link
-                to="/login"
-                className="login-btn"
-                onClick={() => setMenuOpen(false)}
-              >
-                <FaUserCircle />
-                <span>{t("nav_login", currentLang)}</span>
+              <Link to="/login" className="nav-signin-btn" onClick={() => setMenuOpen(false)}>
+                Sign In
               </Link>
             )}
           </div>
-        </div>
+        </nav>
       </div>
-    </nav>
+    </header>
   );
 }
-
-export default Navbar;

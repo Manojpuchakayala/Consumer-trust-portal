@@ -9,7 +9,11 @@ import {
   FaStar,
   FaEnvelope,
   FaInfoCircle,
+  FaArrowRight,
   FaExternalLinkAlt,
+  FaTimes,
+  FaChartLine,
+  FaBolt,
 } from "react-icons/fa";
 import "./BrandLeaderboard.css";
 
@@ -26,7 +30,8 @@ const BRAND_DATA = [
     authority: "E-Commerce Rules / Voluntary Nodal Desk",
     sla: "48h Ack / 7 Days Target",
     badge: "Top Performer",
-    badgeColor: "#15803d",
+    badgeColor: "#059669",
+    color: "#ff9900",
   },
   {
     id: "flipkart",
@@ -41,6 +46,7 @@ const BRAND_DATA = [
     sla: "48h Ack / 7 Days Target",
     badge: "Fast Responder",
     badgeColor: "#2563eb",
+    color: "#2874f0",
   },
   {
     id: "meesho",
@@ -55,6 +61,7 @@ const BRAND_DATA = [
     sla: "48h Ack / 7 Days Target",
     badge: "Value Retail",
     badgeColor: "#d97706",
+    color: "#831843",
   },
   {
     id: "myntra",
@@ -69,6 +76,7 @@ const BRAND_DATA = [
     sla: "48h Ack / 7 Days Target",
     badge: "Fashion Leader",
     badgeColor: "#db2777",
+    color: "#e11d48",
   },
   {
     id: "phonepe",
@@ -83,6 +91,7 @@ const BRAND_DATA = [
     sla: "24h Ack / 5 Days Target",
     badge: "Quick Settlement",
     badgeColor: "#7c3aed",
+    color: "#6739b7",
   },
   {
     id: "paytm",
@@ -97,6 +106,7 @@ const BRAND_DATA = [
     sla: "24h Ack / 5 Days Target",
     badge: "Verified Fintech",
     badgeColor: "#0284c7",
+    color: "#00baf2",
   },
   {
     id: "sbi",
@@ -111,6 +121,7 @@ const BRAND_DATA = [
     sla: "48h Ack / 7 Days Target",
     badge: "High Volume",
     badgeColor: "#0284c7",
+    color: "#1e3a8a",
   },
   {
     id: "hdfc",
@@ -124,7 +135,8 @@ const BRAND_DATA = [
     authority: "RBI Customer Protection Guidelines",
     sla: "48h Ack / 7 Days Target",
     badge: "Verified Desk",
-    badgeColor: "#15803d",
+    badgeColor: "#059669",
+    color: "#004c8f",
   },
   {
     id: "icici",
@@ -139,6 +151,7 @@ const BRAND_DATA = [
     sla: "48h Ack / 7 Days Target",
     badge: "Fast Settlement",
     badgeColor: "#b91c1c",
+    color: "#f37021",
   },
   {
     id: "zomato",
@@ -153,6 +166,7 @@ const BRAND_DATA = [
     sla: "24h Ack / 3 Days Target",
     badge: "Rapid Redressal",
     badgeColor: "#dc2626",
+    color: "#cb202d",
   },
   {
     id: "swiggy",
@@ -167,6 +181,7 @@ const BRAND_DATA = [
     sla: "24h Ack / 3 Days Target",
     badge: "Instant Support",
     badgeColor: "#ea580c",
+    color: "#fc8019",
   },
   {
     id: "blinkit",
@@ -181,6 +196,7 @@ const BRAND_DATA = [
     sla: "24h Ack / 3 Days Target",
     badge: "10-Min Redressal",
     badgeColor: "#eab308",
+    color: "#f8cb46",
   },
   {
     id: "zepto",
@@ -195,6 +211,7 @@ const BRAND_DATA = [
     sla: "24h Ack / 3 Days Target",
     badge: "Quick Settlement",
     badgeColor: "#9333ea",
+    color: "#881337",
   },
   {
     id: "jio",
@@ -209,6 +226,7 @@ const BRAND_DATA = [
     sla: "48h Ack / 7 Days Target",
     badge: "Telecom Desk",
     badgeColor: "#0b2545",
+    color: "#0a2885",
   },
   {
     id: "airtel",
@@ -223,6 +241,7 @@ const BRAND_DATA = [
     sla: "48h Ack / 7 Days Target",
     badge: "Telecom Desk",
     badgeColor: "#b91c1c",
+    color: "#ed1c24",
   },
   {
     id: "makemytrip",
@@ -237,6 +256,7 @@ const BRAND_DATA = [
     sla: "24h Ack / 7 Days Target",
     badge: "Verified Nodal",
     badgeColor: "#2563eb",
+    color: "#d62828",
   },
   {
     id: "irctc",
@@ -251,6 +271,7 @@ const BRAND_DATA = [
     sla: "24h Ack / 5 Days Target",
     badge: "Rail Madad Link",
     badgeColor: "#047857",
+    color: "#283593",
   },
   {
     id: "uber",
@@ -265,6 +286,7 @@ const BRAND_DATA = [
     sla: "24h Ack / 5 Days Target",
     badge: "Ride Redressal",
     badgeColor: "#0f172a",
+    color: "#000000",
   },
   {
     id: "samsung",
@@ -279,6 +301,7 @@ const BRAND_DATA = [
     sla: "48h Ack / 7 Days Target",
     badge: "Electronics Nodal",
     badgeColor: "#1d4ed8",
+    color: "#1428a0",
   },
   {
     id: "apple",
@@ -293,6 +316,7 @@ const BRAND_DATA = [
     sla: "48h Ack / 7 Days Target",
     badge: "Premium Support",
     badgeColor: "#475569",
+    color: "#333333",
   },
 ];
 
@@ -305,7 +329,8 @@ export default function BrandLeaderboard() {
   const filteredBrands = BRAND_DATA.filter((brand) => {
     const matchesSearch =
       brand.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      brand.nodalEmail.toLowerCase().includes(searchTerm.toLowerCase());
+      brand.nodalEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      brand.category.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === "All" || brand.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
@@ -313,145 +338,203 @@ export default function BrandLeaderboard() {
   return (
     <div className="brand-leaderboard-page">
       <div className="leaderboard-container">
+        {/* Page Header */}
         <div className="leaderboard-header">
           <div className="header-badge">
-            <FaShieldAlt style={{ marginRight: 6 }} /> COMMUNITY BENCHMARK & PUBLIC SCORECARD
+            <FaShieldAlt /> COMMUNITY BENCHMARK & REDRESSAL SCORECARD
           </div>
-          <h1>🏢 Enterprise Redressal & Brand Trust Index</h1>
+          <h1>Enterprise Redressal & Brand Trust Index</h1>
           <p className="leaderboard-subtitle">
-            Community benchmarks, voluntary resolution response metrics, and public grievance officer contacts across India's leading enterprises.
+            Community benchmarks, voluntary resolution response metrics, and verified grievance officer contact desks across India's leading digital platforms.
           </p>
 
           {/* Methodology Callout Strip */}
-          <div style={{
-            background: "#eff6ff",
-            border: "1px solid #bfdbfe",
-            borderRadius: 12,
-            padding: "12px 18px",
-            fontSize: 13,
-            color: "#1e40af",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 8,
-            maxWidth: 800,
-            margin: "0 auto 20px"
-          }}>
-            <FaInfoCircle style={{ flexShrink: 0 }} />
+          <div className="methodology-banner">
+            <FaInfoCircle className="methodology-icon" />
             <span>
-              Ratings are community benchmarks computed from verified user reports and public nodal responses. Learn more or request data correction in our <Link to="/methodology" style={{ fontWeight: 700, color: "#1d4ed8", textDecoration: "underline" }}>Brand Methodology & Takedown Policy</Link>. Enterprise officers can resolve disputes via the <Link to="/partner/resolve" style={{ fontWeight: 700, color: "#1d4ed8", textDecoration: "underline" }}>1-Click Resolution Desk</Link>.
+              Ratings are community benchmarks computed from verified user reports and public nodal responses. Learn more or request data correction in our <Link to="/methodology" className="methodology-link">Brand Methodology & Takedown Policy</Link>. Enterprise grievance officers can resolve disputes via the <Link to="/partner/resolve" className="methodology-link">1-Click Resolution Desk</Link>.
             </span>
           </div>
 
+          {/* Top Metric Cards */}
           <div className="leaderboard-stat-cards">
-            <div className="summary-stat-card">
-              <span className="stat-label">Average Portal Redressal Rate</span>
-              <strong className="stat-value text-green">94.7%</strong>
+            <div className="summary-stat-card green">
+              <span className="stat-label">Average Redressal Rate</span>
+              <strong className="stat-value">94.7%</strong>
               <span className="stat-hint">Across 11,000+ facilitated disputes</span>
             </div>
-            <div className="summary-stat-card">
-              <span className="stat-label">Average Resolution Turnaround</span>
-              <strong className="stat-value text-blue">3.1 Days</strong>
-              <span className="stat-hint">Standard 7-day target window</span>
+            <div className="summary-stat-card blue">
+              <span className="stat-label">Avg. Turnaround Speed</span>
+              <strong className="stat-value">3.1 Days</strong>
+              <span className="stat-hint">Standard 7-day target SLA</span>
             </div>
-            <div className="summary-stat-card">
-              <span className="stat-label">Listed Corporate Desks</span>
-              <strong className="stat-value text-purple">25+ Verified</strong>
+            <div className="summary-stat-card purple">
+              <span className="stat-label">Verified Corporate Desks</span>
+              <strong className="stat-value">25+ Listed</strong>
               <span className="stat-hint">Direct 1-click tokenized desk</span>
+            </div>
+            <div className="summary-stat-card amber">
+              <span className="stat-label">Average Citizen Rating</span>
+              <strong className="stat-value">4.6 / 5.0</strong>
+              <span className="stat-hint">Verified post-resolution reviews</span>
             </div>
           </div>
         </div>
 
-        {/* Filter & Search Bar */}
+        {/* Controls: Search & Category Pills */}
         <div className="leaderboard-controls">
-          <div className="search-box">
-            <FaSearch className="search-icon" />
+          <div className="search-bar-wrap">
+            <FaSearch className="search-bar-icon" />
             <input
               type="text"
-              placeholder="Search by enterprise name (e.g. Amazon, SBI, Swiggy)..."
+              placeholder="Search by enterprise or nodal desk (e.g. Amazon, PhonePe, SBI, Zomato)..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
+            {searchTerm && (
+              <button
+                type="button"
+                className="search-clear-btn"
+                onClick={() => setSearchTerm("")}
+                title="Clear search"
+              >
+                <FaTimes />
+              </button>
+            )}
           </div>
 
-          <div className="category-pills">
+          <div className="category-pills-row">
             {categories.map((cat) => (
               <button
                 key={cat}
                 type="button"
-                className={"pill-btn " + (selectedCategory === cat ? "active" : "")}
+                className={`category-pill-btn ${selectedCategory === cat ? "active" : ""}`}
                 onClick={() => setSelectedCategory(cat)}
               >
                 {cat}
               </button>
             ))}
           </div>
+
+          <div className="filter-summary-row">
+            <span>Showing <strong>{filteredBrands.length}</strong> enterprise{filteredBrands.length === 1 ? "" : "s"}</span>
+            {selectedCategory !== "All" && (
+              <span className="filter-active-tag">
+                Category: <strong>{selectedCategory}</strong>
+              </span>
+            )}
+          </div>
         </div>
 
-        {/* Brand Grid */}
+        {/* Brand Scorecard Grid */}
         <div className="brands-grid">
           {filteredBrands.map((brand) => (
-            <div key={brand.id} className="brand-card">
+            <div key={brand.id} className="brand-scorecard">
               <div className="brand-card-top">
-                <div>
-                  <span className="brand-cat-tag">{brand.category}</span>
-                  <h3 className="brand-name">{brand.name}</h3>
+                <div className="brand-identity">
+                  <div
+                    className="brand-avatar"
+                    style={{ backgroundColor: brand.color ? `${brand.color}15` : "#eff6ff", color: brand.color || "#1e40af" }}
+                  >
+                    {brand.name.charAt(0)}
+                  </div>
+                  <div>
+                    <span className="brand-category-pill">{brand.category}</span>
+                    <h3 className="brand-title">{brand.name}</h3>
+                  </div>
                 </div>
-                <span className="brand-badge" style={{ background: brand.badgeColor + "20", color: brand.badgeColor }}>
+                <span
+                  className="brand-status-tag"
+                  style={{ background: `${brand.badgeColor}15`, color: brand.badgeColor, borderColor: `${brand.badgeColor}30` }}
+                >
                   {brand.badge}
                 </span>
               </div>
 
-              <div className="brand-metrics-row">
-                <div className="metric-item">
-                  <span className="m-label">Redressal Rate</span>
-                  <strong className="m-val text-green">{brand.resolutionRate}</strong>
+              {/* Redressal Progress Bar */}
+              <div className="rate-progress-wrap">
+                <div className="rate-progress-header">
+                  <span>Redressal Success</span>
+                  <strong>{brand.resolutionRate}</strong>
                 </div>
-                <div className="metric-item">
-                  <span className="m-label">Avg. Speed</span>
-                  <strong className="m-val text-blue">{brand.avgDays}</strong>
+                <div className="rate-progress-track">
+                  <div
+                    className="rate-progress-fill"
+                    style={{ width: brand.resolutionRate }}
+                  />
                 </div>
-                <div className="metric-item">
-                  <span className="m-label">User Rating</span>
-                  <strong className="m-val text-gold">
-                    <FaStar style={{ fontSize: 12, marginRight: 3, verticalAlign: "middle" }} />
-                    {brand.rating} / 5.0
+              </div>
+
+              {/* Metrics Grid */}
+              <div className="brand-kpis-grid">
+                <div className="kpi-box">
+                  <span className="kpi-label">Avg. Speed</span>
+                  <strong className="kpi-val blue">{brand.avgDays}</strong>
+                </div>
+                <div className="kpi-box">
+                  <span className="kpi-label">Volume</span>
+                  <strong className="kpi-val">{brand.totalCases} cases</strong>
+                </div>
+                <div className="kpi-box">
+                  <span className="kpi-label">Rating</span>
+                  <strong className="kpi-val gold">
+                    <FaStar style={{ fontSize: 11, marginRight: 2 }} /> {brand.rating}
                   </strong>
                 </div>
               </div>
 
-              <div className="brand-details-box">
-                <div className="detail-line">
-                  <FaEnvelope className="d-icon" />
-                  <span><strong>Nodal Desk:</strong> {brand.nodalEmail}</span>
+              {/* Nodal Desk Info */}
+              <div className="brand-officer-box">
+                <div className="officer-line">
+                  <FaEnvelope className="officer-icon" />
+                  <span className="officer-email" title={brand.nodalEmail}>
+                    {brand.nodalEmail}
+                  </span>
                 </div>
-                <div className="detail-line">
-                  <FaClock className="d-icon" />
-                  <span><strong>Target SLA:</strong> {brand.sla}</span>
+                <div className="officer-line">
+                  <FaClock className="officer-icon" />
+                  <span>SLA: <strong>{brand.sla}</strong></span>
                 </div>
-                <div className="detail-line">
-                  <FaShieldAlt className="d-icon" />
-                  <span><strong>Framework:</strong> {brand.authority}</span>
+                <div className="officer-line">
+                  <FaShieldAlt className="officer-icon" />
+                  <span>{brand.authority}</span>
                 </div>
               </div>
 
-              <div className="brand-card-footer">
+              {/* Card Action */}
+              <div className="brand-card-action">
                 <Link
-                  to={"/register?company=" + encodeURIComponent(brand.name)}
-                  className="file-dispute-btn"
+                  to={`/register?company=${encodeURIComponent(brand.name)}`}
+                  className="btn-dispute-enterprise"
                 >
-                  File Grievance Against {brand.name} →
+                  File Grievance Against {brand.name} <FaArrowRight style={{ fontSize: 11 }} />
                 </Link>
               </div>
             </div>
           ))}
         </div>
 
+        {/* Empty State */}
         {filteredBrands.length === 0 && (
-          <div className="no-brands-found">
-            <p>No enterprises found matching your search. You can still file a grievance against any custom company.</p>
-            <Link to="/register" className="file-dispute-btn" style={{ display: "inline-block", marginTop: 12 }}>
-              File Custom Enterprise Grievance →
-            </Link>
+          <div className="no-brands-card">
+            <FaBuilding className="empty-icon" />
+            <h3>No enterprise found matching "{searchTerm}"</h3>
+            <p>You can still file a dispute against any unlisted merchant or organization through our custom enterprise desk.</p>
+            <div className="empty-actions">
+              <button
+                type="button"
+                className="btn-reset-search"
+                onClick={() => {
+                  setSearchTerm("");
+                  setSelectedCategory("All");
+                }}
+              >
+                Clear Filters
+              </button>
+              <Link to="/register" className="btn-file-custom">
+                File Custom Grievance <FaArrowRight />
+              </Link>
+            </div>
           </div>
         )}
       </div>
