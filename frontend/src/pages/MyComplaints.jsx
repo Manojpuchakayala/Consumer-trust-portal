@@ -23,10 +23,12 @@ import {
   FaTimes,
   FaReceipt,
   FaWhatsapp,
+  FaGavel,
 } from "react-icons/fa";
 import api from "../services/api";
 import { generateGrievanceNoticePdf } from "../utils/pdfGenerator";
 import { getWhatsAppShareUrl } from "../utils/whatsappShare";
+import EDaakhilExportModal from "../components/EDaakhilExportModal";
 import "./MyComplaints.css";
 
 export default function MyComplaints() {
@@ -39,6 +41,9 @@ export default function MyComplaints() {
   const [selectedStatus, setSelectedStatus] = useState("All");
   const [selectedBrand, setSelectedBrand] = useState("All");
   const [copiedId, setCopiedId] = useState(null);
+
+  // e-Daakhil court export modal state
+  const [eDaakhilComplaint, setEDaakhilComplaint] = useState(null);
 
   // Delete modal state
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -453,6 +458,15 @@ export default function MyComplaints() {
 
                       <button
                         type="button"
+                        className="btn-edaakhil-mini"
+                        onClick={() => setEDaakhilComplaint(c)}
+                        title="Export formal e-Daakhil court petition"
+                      >
+                        <FaGavel /> e-Daakhil
+                      </button>
+
+                      <button
+                        type="button"
                         className="btn-pdf-mini"
                         onClick={() => generateGrievanceNoticePdf(c)}
                         title="Download PDF claim summary"
@@ -514,6 +528,14 @@ export default function MyComplaints() {
               </div>
             </div>
           </div>
+        )}
+
+        {/* 6. e-Daakhil Statutory Petition Export Modal */}
+        {eDaakhilComplaint && (
+          <EDaakhilExportModal
+            complaint={eDaakhilComplaint}
+            onClose={() => setEDaakhilComplaint(null)}
+          />
         )}
       </div>
     </div>

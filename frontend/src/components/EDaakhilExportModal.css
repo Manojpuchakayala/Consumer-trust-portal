@@ -1,0 +1,338 @@
+/* ==========================================================================
+   E-DAAKHIL STATUTORY COURT EXPORT MODAL & PRINT STYLES
+   ========================================================================== */
+
+.edaakhil-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(6px);
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.edaakhil-modal-container {
+  background: #ffffff;
+  color: #1e293b;
+  width: 860px;
+  max-width: 100%;
+  max-height: 92vh;
+  border-radius: 12px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalPop 0.25s ease-out;
+}
+
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Toolbar (Screen Only) */
+.edaakhil-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 24px;
+  background: #0f172a;
+  color: #ffffff;
+  border-bottom: 1px solid #334155;
+}
+
+.toolbar-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 15px;
+  color: #60a5fa;
+}
+
+.toolbar-sub {
+  font-size: 11.5px;
+  color: #94a3b8;
+  display: block;
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-print-petition {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-print-petition:hover {
+  background: #1d4ed8;
+}
+
+.btn-close-petition {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+
+.btn-close-petition:hover {
+  color: #ffffff;
+}
+
+/* Legal Petition Sheet */
+.edaakhil-petition-sheet {
+  padding: 40px 48px;
+  overflow-y: auto;
+  font-family: "Times New Roman", Times, serif;
+  line-height: 1.6;
+  font-size: 14.5px;
+  background: #ffffff;
+  color: #111827;
+}
+
+.petition-header-seal {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.seal-emblem {
+  font-size: 32px;
+  margin-bottom: 4px;
+}
+
+.petition-header-seal h3 {
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  margin: 0 0 6px;
+  color: #0f172a;
+}
+
+.forum-sub {
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  margin: 0;
+  color: #334155;
+}
+
+.petition-meta-strip {
+  display: flex;
+  justify-content: space-between;
+  background: #f8fafc;
+  padding: 8px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: system-ui, -apple-system, sans-serif;
+  margin-bottom: 14px;
+}
+
+.petition-divider {
+  border: none;
+  border-top: 1.5px solid #0f172a;
+  margin: 16px 0;
+}
+
+/* Memo of Parties */
+.memo-of-parties {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.party-block h4 {
+  font-size: 13.5px;
+  font-weight: 900;
+  margin: 0 0 4px;
+  color: #0f172a;
+}
+
+.party-name {
+  font-size: 15px;
+  margin: 0 0 2px;
+}
+
+.party-block p {
+  margin: 0 0 2px;
+  color: #334155;
+}
+
+.party-role {
+  display: inline-block;
+  margin-top: 4px;
+  font-weight: 800;
+  font-size: 12.5px;
+  color: #1e3a8a;
+  letter-spacing: 0.5px;
+}
+
+.versus-badge {
+  text-align: center;
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: #b91c1c;
+  margin: 4px 0;
+}
+
+/* Petition Sections */
+.petition-body-section h4 {
+  font-size: 14.5px;
+  font-weight: 900;
+  margin: 16px 0 6px;
+  color: #0f172a;
+  border-bottom: 1px solid #cbd5e1;
+  padding-bottom: 3px;
+}
+
+.petition-body-section p {
+  margin: 0 0 10px;
+  text-align: justify;
+}
+
+.narrative-box {
+  background: #f8fafc;
+  border-left: 3px solid #2563eb;
+  padding: 10px 14px;
+  margin: 8px 0 14px;
+  font-style: italic;
+  white-space: pre-wrap;
+}
+
+.petition-body-section ul,
+.petition-body-section ol {
+  margin: 8px 0 14px 20px;
+  padding: 0;
+}
+
+.petition-body-section li {
+  margin-bottom: 6px;
+  text-align: justify;
+}
+
+.prayer-list li {
+  font-weight: 600;
+}
+
+/* Verification */
+.petition-verification {
+  margin-top: 20px;
+}
+
+.petition-verification h4 {
+  font-size: 14.5px;
+  font-weight: 900;
+  margin: 0 0 8px;
+  text-align: center;
+}
+
+.verification-signatures {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: 24px;
+}
+
+.sig-line {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12.5px;
+  color: #475569;
+}
+
+.sig-box {
+  text-align: center;
+}
+
+.sig-space {
+  height: 40px;
+  border-bottom: 1px solid #0f172a;
+  margin-bottom: 4px;
+  width: 200px;
+}
+
+/* Stamp Footer */
+.petition-seal-footer {
+  margin-top: 24px;
+  padding-top: 14px;
+  border-top: 1px dashed #cbd5e1;
+  display: flex;
+  justify-content: center;
+}
+
+.digital-verification-stamp {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  border: 2px solid #059669;
+  border-radius: 6px;
+  color: #059669;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 11.5px;
+}
+
+.stamp-icon {
+  font-size: 24px;
+}
+
+/* Print Styles */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .edaakhil-modal-backdrop {
+    position: static;
+    background: none;
+    padding: 0;
+    width: 100%;
+    height: auto;
+  }
+  .edaakhil-modal-container {
+    box-shadow: none;
+    max-height: none;
+    width: 100%;
+    border-radius: 0;
+  }
+  .edaakhil-petition-sheet,
+  .edaakhil-petition-sheet * {
+    visibility: visible;
+  }
+  .edaakhil-petition-sheet {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 20mm;
+  }
+}

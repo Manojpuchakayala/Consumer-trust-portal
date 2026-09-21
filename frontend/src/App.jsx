@@ -4,6 +4,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import NotificationToast from "./components/NotificationToast";
 import InstallAppBanner from "./components/InstallAppBanner";
+import AiLegalAssistant from "./components/AiLegalAssistant";
 
 import Home from "./pages/Home";
 import RegisterComplaint from "./pages/RegisterComplaint";
@@ -94,6 +95,7 @@ function App() {
           </Routes>
         </main>
         <InstallAppBanner />
+        <AiLegalAssistant />
         <Footer />
       </div>
     </BrowserRouter>

@@ -246,6 +246,22 @@ export default function RegisterComplaint() {
     } else if (storedUser) {
       setFormData((prev) => ({ ...prev, ...initialUser }));
     }
+
+    // Check for AI Assistant prefilled draft
+    const aiDraft = localStorage.getItem("ctp_prefill_draft");
+    if (aiDraft) {
+      try {
+        const parsedAi = JSON.parse(aiDraft);
+        setFormData((prev) => ({
+          ...prev,
+          subject: parsedAi.subject || prev.subject,
+          description: parsedAi.description || prev.description,
+          companyName: parsedAi.companyName || prev.companyName,
+          category: parsedAi.category || prev.category,
+        }));
+        localStorage.removeItem("ctp_prefill_draft");
+      } catch {}
+    }
   }, []);
 
   // Auto-save draft on form change (excluding files)

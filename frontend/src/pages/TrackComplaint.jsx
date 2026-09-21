@@ -38,6 +38,7 @@ import {
 } from "../utils/pdfGenerator";
 import { getWhatsAppShareUrl } from "../utils/whatsappShare";
 import CourtFeeCalculator from "../components/CourtFeeCalculator";
+import EDaakhilExportModal from "../components/EDaakhilExportModal";
 import "./TrackComplaint.css";
 
 export default function TrackComplaint() {
@@ -51,6 +52,7 @@ export default function TrackComplaint() {
   const [copiedId, setCopiedId] = useState(false);
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState("");
   const [showCourtCalculator, setShowCourtCalculator] = useState(false);
+  const [showEDaakhilModal, setShowEDaakhilModal] = useState(false);
   const [speedPostNo, setSpeedPostNo] = useState("");
 
   // Resolution Rating State
@@ -755,6 +757,13 @@ export default function TrackComplaint() {
                 <div className="escalation-action-row">
                   <button
                     type="button"
+                    className="btn-edaakhil-export"
+                    onClick={() => setShowEDaakhilModal(true)}
+                  >
+                    <FaGavel /> 1-Click e-Daakhil Court Petition (PDF)
+                  </button>
+                  <button
+                    type="button"
                     className="btn-statutory-download"
                     onClick={() => generateStatutoryEscalationPdf(complaint)}
                   >
@@ -778,6 +787,27 @@ export default function TrackComplaint() {
               </div>
             </div>
 
+            {/* Digital Verification QR Authentication Card */}
+            {qrCodeDataUrl && (
+              <div className="digital-qr-card">
+                <div className="qr-image-wrap">
+                  <img src={qrCodeDataUrl} alt="Digital Verification QR" className="docket-qr-img" />
+                </div>
+                <div className="qr-info-wrap">
+                  <div className="qr-secure-tag">
+                    <FaShieldAlt /> 100% Tamper-Proof Digital Verification
+                  </div>
+                  <h4>Statutory Docket Authentication Seal</h4>
+                  <p>
+                    Scan this QR code with any smartphone camera to instantly verify live case milestones, nodal dispatch logs, and statutory notices on the official Consumer Trust Registry.
+                  </p>
+                  <code className="qr-target-url">
+                    {window.location.origin}/track?id={complaint.complaintId}
+                  </code>
+                </div>
+              </div>
+            )}
+
             {/* Action Buttons */}
             <div className="case-actions-bar">
               <a
@@ -789,6 +819,13 @@ export default function TrackComplaint() {
               >
                 <FaWhatsapp className="btn-icon-wa" /> Share Case via WhatsApp
               </a>
+              <button
+                type="button"
+                className="btn-action-edaakhil"
+                onClick={() => setShowEDaakhilModal(true)}
+              >
+                <FaGavel /> e-Daakhil Court Petition
+              </button>
               <button
                 type="button"
                 className="btn-action-primary"
@@ -812,6 +849,14 @@ export default function TrackComplaint() {
           <CourtFeeCalculator
             initialAmount={complaint?.claimAmount || 15000}
             onClose={() => setShowCourtCalculator(false)}
+          />
+        )}
+
+        {/* Modal: 1-Click e-Daakhil Statutory Petition Export */}
+        {showEDaakhilModal && complaint && (
+          <EDaakhilExportModal
+            complaint={complaint}
+            onClose={() => setShowEDaakhilModal(false)}
           />
         )}
       </div>
