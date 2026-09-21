@@ -226,20 +226,26 @@
   position: relative;
   display: flex;
   align-items: center;
+  width: 100%;
 }
 
 .auth-card .box-icon {
   position: absolute;
-  left: 13px;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: 14px;
   pointer-events: none;
   z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .auth-card .input-box input {
   width: 100%;
-  padding: 9px 36px 9px 38px !important;
+  padding: 10px 38px 10px 42px !important;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   font-size: 13.5px;

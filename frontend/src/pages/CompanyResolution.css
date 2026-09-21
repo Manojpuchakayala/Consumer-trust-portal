@@ -353,17 +353,25 @@
   position: relative;
   display: flex;
   align-items: center;
+  width: 100%;
 }
 
 .input-with-icon .input-icon {
   position: absolute;
   left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
   color: #64748b;
-  font-size: 15px;
+  font-size: 14px;
+  pointer-events: none;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .input-with-icon input {
-  padding-left: 40px !important;
+  padding-left: 42px !important;
 }
 
 .form-group input,

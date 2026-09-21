@@ -348,3 +348,49 @@ button, input, select, textarea {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-faint);
 }
+
+/* ==========================================================================
+   UNIVERSAL FORM INPUT ICON SPACING PROTECTION
+   ========================================================================== */
+
+.input-box,
+.input-with-icon,
+.track-search-input-wrap,
+.dash-search-input-box,
+.hub-search-box,
+.search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.input-box .input-icon,
+.input-box .box-icon,
+.input-with-icon .input-icon,
+.track-search-input-wrap .input-search-icon,
+.dash-search-input-box .search-icon,
+.hub-search-box .search-icon,
+.search-wrap .search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 2;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.input-box input,
+.input-box select,
+.input-with-icon input,
+.track-search-input-wrap input,
+.dash-search-input-box input,
+.hub-search-box input,
+.search-wrap input {
+  padding-left: 42px !important;
+}
+
