@@ -148,10 +148,10 @@
 .footer-contact-box {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 7px 11px;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 8px 12px;
   border-radius: var(--radius-sm);
   width: 100%;
   box-sizing: border-box;
@@ -159,7 +159,7 @@
 
 .contact-icon {
   color: #60a5fa;
-  font-size: 13px;
+  font-size: 14px;
   margin-top: 3px;
   flex-shrink: 0;
 }
@@ -167,26 +167,28 @@
 .contact-box-content {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 2px;
 }
 
 .contact-type {
   font-size: 10.5px;
-  color: #94a3b8;
-  font-weight: 600;
+  color: #cbd5e1;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
 .footer-contact-box a {
-  font-size: 12.5px;
-  font-weight: 600;
-  color: #e2e8f0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #93c5fd !important;
   word-break: break-all;
+  text-decoration: none;
 }
 
 .footer-contact-box a:hover {
-  color: #60a5fa;
+  color: #ffffff !important;
+  text-decoration: underline;
 }
 
 .statutory-links-box {
