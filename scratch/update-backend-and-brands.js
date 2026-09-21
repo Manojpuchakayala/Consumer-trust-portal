@@ -1,4 +1,108 @@
-/**
+const fs = require("fs");
+const path = require("path");
+
+const root = path.resolve(__dirname, "..");
+
+console.log("Updating Backend Routes & Controller...");
+
+// 1. Update backend/routes/complaintRoutes.js
+const routesPath = path.join(root, "backend", "routes", "complaintRoutes.js");
+let routesContent = fs.readFileSync(routesPath, "utf8");
+
+// Change router.delete("/:id", authMiddleware, adminMiddleware, deleteComplaint);
+// to router.delete("/:id", authMiddleware, deleteComplaint);
+routesContent = routesContent.replace(
+  'router.delete("/:id", authMiddleware, adminMiddleware, deleteComplaint);',
+  'router.delete("/:id", authMiddleware, deleteComplaint);'
+);
+fs.writeFileSync(routesPath, routesContent, "utf8");
+console.log("Updated backend/routes/complaintRoutes.js");
+
+// 2. Update backend/controllers/complaintController.js
+const controllerPath = path.join(root, "backend", "controllers", "complaintController.js");
+let controllerContent = fs.readFileSync(controllerPath, "utf8");
+
+const oldDeleteComplaint = `// Delete Complaint (Admin)
+const deleteComplaint = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const complaint = await Complaint.findByIdAndDelete(id);
+
+    if (!complaint) {
+      return res.status(404).json({
+        success: false,
+        message: "Complaint not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Complaint deleted successfully",
+    });
+  } catch (error) {
+    console.error("Delete Complaint Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Failed to delete complaint",
+    });
+  }
+};`;
+
+const newDeleteComplaint = `// Delete Complaint (Admin OR Citizen Owner)
+const deleteComplaint = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const complaint = await Complaint.findById(id);
+
+    if (!complaint) {
+      return res.status(404).json({
+        success: false,
+        message: "Complaint not found",
+      });
+    }
+
+    // Check authorization: Admin or complaint owner
+    const isAdmin = req.user && req.user.role === "admin";
+    const isOwner =
+      req.user &&
+      ((complaint.user && complaint.user.toString() === req.user._id.toString()) ||
+       (complaint.email && req.user.email && complaint.email.toLowerCase() === req.user.email.toLowerCase()));
+
+    if (!isAdmin && !isOwner) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized to delete this complaint",
+      });
+    }
+
+    await Complaint.findByIdAndDelete(id);
+
+    return res.status(200).json({
+      success: true,
+      message: "Complaint deleted successfully",
+    });
+  } catch (error) {
+    console.error("Delete Complaint Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Failed to delete complaint",
+    });
+  }
+};`;
+
+if (controllerContent.includes(oldDeleteComplaint)) {
+  controllerContent = controllerContent.replace(oldDeleteComplaint, newDeleteComplaint);
+  fs.writeFileSync(controllerPath, controllerContent, "utf8");
+  console.log("Updated backend/controllers/complaintController.js deleteComplaint logic");
+} else {
+  console.log("oldDeleteComplaint not matched exactly, checking substring...");
+}
+
+// 3. Expand Brand Directory in backend/utils/companyDirectory.js
+const compDirFile = path.join(root, "backend", "utils", "companyDirectory.js");
+const expandedCompanyDirectory = `/**
  * National Enterprise & Nodal Officer Directory
  * Stores pre-configured official grievance nodal emails, ombudsman categories, and resolution SLAs.
  */
@@ -129,7 +233,7 @@ const COMPANY_DIRECTORY = [
   },
   {
     id: "dominos",
-    name: "Domino\'s Pizza India",
+    name: "Domino\\'s Pizza India",
     category: "Food",
     nodalEmail: "guestcare@jublfood.com",
     supportEmail: "guestcare@jublfood.com",
@@ -434,3 +538,6 @@ module.exports = {
   COMPANY_DIRECTORY,
   findCompany,
 };
+`;
+fs.writeFileSync(compDirFile, expandedCompanyDirectory, "utf8");
+console.log("Updated backend/utils/companyDirectory.js with 30+ brands");

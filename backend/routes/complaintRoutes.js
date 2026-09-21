@@ -29,6 +29,6 @@ router.put("/:id/feedback", optionalAuthMiddleware, submitFeedback);
 router.get("/stats", authMiddleware, adminMiddleware, getAdminStats);
 router.get("/", authMiddleware, adminMiddleware, getAllComplaints);
 router.put("/:id/status", authMiddleware, adminMiddleware, updateComplaintStatus);
-router.delete("/:id", authMiddleware, adminMiddleware, deleteComplaint);
+router.delete("/:id", authMiddleware, deleteComplaint);
 
 module.exports = router;

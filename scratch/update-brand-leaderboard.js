@@ -1,17 +1,11 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import {
-  FaBuilding,
-  FaShieldAlt,
-  FaCheckCircle,
-  FaClock,
-  FaSearch,
-  FaStar,
-  FaEnvelope,
-} from "react-icons/fa";
-import "./BrandLeaderboard.css";
+const fs = require("fs");
+const path = require("path");
 
-const BRAND_DATA = [
+const root = path.resolve(__dirname, "..");
+const brandLeaderboardPath = path.join(root, "frontend", "src", "pages", "BrandLeaderboard.jsx");
+let content = fs.readFileSync(brandLeaderboardPath, "utf8");
+
+const expandedBrandData = `const BRAND_DATA = [
   {
     id: "amazon",
     name: "Amazon India",
@@ -292,147 +286,15 @@ const BRAND_DATA = [
     badge: "Premium Support",
     badgeColor: "#475569",
   },
-];
+];`;
 
-export default function BrandLeaderboard() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
+const startIdx = content.indexOf("const BRAND_DATA = [");
+const endIdx = content.indexOf("];", startIdx) + 2;
 
-  const categories = ["All", "E-Commerce", "Banking & UPI", "Food Delivery", "Telecom", "Travel"];
-
-  const filteredBrands = BRAND_DATA.filter((brand) => {
-    const matchesSearch =
-      brand.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      brand.nodalEmail.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === "All" || brand.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
-
-  return (
-    <div className="brand-leaderboard-page">
-      <div className="leaderboard-container">
-        <div className="leaderboard-header">
-          <div className="header-badge">
-            <FaShieldAlt style={{ marginRight: 6 }} /> PUBLIC TRANSPARENCY SCORECARD
-          </div>
-          <h1>🏢 Enterprise Redressal & Brand Trust Index</h1>
-          <p className="leaderboard-subtitle">
-            Real-time grievance redressal performance metrics, verified statutory nodal desks, and average resolution turnaround times across India's leading enterprises.
-          </p>
-
-          <div className="leaderboard-stat-cards">
-            <div className="summary-stat-card">
-              <span className="stat-label">Average Portal Redressal Rate</span>
-              <strong className="stat-value text-green">94.7%</strong>
-              <span className="stat-hint">Across 11,000+ filed disputes</span>
-            </div>
-            <div className="summary-stat-card">
-              <span className="stat-label">Average Resolution Turnaround</span>
-              <strong className="stat-value text-blue">3.1 Days</strong>
-              <span className="stat-hint">Strict 7-day statutory maximum</span>
-            </div>
-            <div className="summary-stat-card">
-              <span className="stat-label">Connected Nodal Desks</span>
-              <strong className="stat-value text-purple">25+ Official</strong>
-              <span className="stat-hint">Direct tokenized 1-click portal</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Filter & Search Bar */}
-        <div className="leaderboard-controls">
-          <div className="search-box">
-            <FaSearch className="search-icon" />
-            <input
-              type="text"
-              placeholder="Search by enterprise name (e.g. Amazon, SBI, Swiggy)..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-
-          <div className="category-pills">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                type="button"
-                className={"pill-btn " + (selectedCategory === cat ? "active" : "")}
-                onClick={() => setSelectedCategory(cat)}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Brand Grid */}
-        <div className="brands-grid">
-          {filteredBrands.map((brand) => (
-            <div key={brand.id} className="brand-card">
-              <div className="brand-card-top">
-                <div>
-                  <span className="brand-cat-tag">{brand.category}</span>
-                  <h3 className="brand-name">{brand.name}</h3>
-                </div>
-                <span className="brand-badge" style={{ background: brand.badgeColor + "20", color: brand.badgeColor }}>
-                  {brand.badge}
-                </span>
-              </div>
-
-              <div className="brand-metrics-row">
-                <div className="metric-item">
-                  <span className="m-label">Redressal Rate</span>
-                  <strong className="m-val text-green">{brand.resolutionRate}</strong>
-                </div>
-                <div className="metric-item">
-                  <span className="m-label">Avg. Speed</span>
-                  <strong className="m-val text-blue">{brand.avgDays}</strong>
-                </div>
-                <div className="metric-item">
-                  <span className="m-label">User Rating</span>
-                  <strong className="m-val text-gold">
-                    <FaStar style={{ fontSize: 12, marginRight: 3, verticalAlign: "middle" }} />
-                    {brand.rating} / 5.0
-                  </strong>
-                </div>
-              </div>
-
-              <div className="brand-details-box">
-                <div className="detail-line">
-                  <FaEnvelope className="d-icon" />
-                  <span><strong>Nodal Desk:</strong> {brand.nodalEmail}</span>
-                </div>
-                <div className="detail-line">
-                  <FaClock className="d-icon" />
-                  <span><strong>Mandated SLA:</strong> {brand.sla}</span>
-                </div>
-                <div className="detail-line">
-                  <FaShieldAlt className="d-icon" />
-                  <span><strong>Regulator:</strong> {brand.authority}</span>
-                </div>
-              </div>
-
-              <div className="brand-card-footer">
-                <Link
-                  to={"/register?company=" + encodeURIComponent(brand.name)}
-                  className="file-dispute-btn"
-                >
-                  File Grievance Against {brand.name} →
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {filteredBrands.length === 0 && (
-          <div className="no-brands-found">
-            <p>No enterprises found matching your search. You can still file a grievance against any custom company.</p>
-            <Link to="/register" className="file-dispute-btn" style={{ display: "inline-block", marginTop: 12 }}>
-              File Custom Enterprise Grievance →
-            </Link>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+if (startIdx !== -1 && endIdx !== -1) {
+  content = content.substring(0, startIdx) + expandedBrandData + content.substring(endIdx);
+  fs.writeFileSync(brandLeaderboardPath, content, "utf8");
+  console.log("Updated BrandLeaderboard.jsx with expanded BRAND_DATA");
+} else {
+  console.log("Could not find BRAND_DATA in BrandLeaderboard.jsx");
 }

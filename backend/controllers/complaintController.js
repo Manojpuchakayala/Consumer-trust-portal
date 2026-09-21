@@ -433,12 +433,12 @@ const updateComplaintStatus = async (req, res) => {
   }
 };
 
-// Delete Complaint (Admin)
+// Delete Complaint (Admin OR Citizen Owner)
 const deleteComplaint = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const complaint = await Complaint.findByIdAndDelete(id);
+    const complaint = await Complaint.findById(id);
 
     if (!complaint) {
       return res.status(404).json({
@@ -446,6 +446,22 @@ const deleteComplaint = async (req, res) => {
         message: "Complaint not found",
       });
     }
+
+    // Check authorization: Admin or complaint owner
+    const isAdmin = req.user && req.user.role === "admin";
+    const isOwner =
+      req.user &&
+      ((complaint.user && complaint.user.toString() === req.user._id.toString()) ||
+       (complaint.email && req.user.email && complaint.email.toLowerCase() === req.user.email.toLowerCase()));
+
+    if (!isAdmin && !isOwner) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized to delete this complaint",
+      });
+    }
+
+    await Complaint.findByIdAndDelete(id);
 
     return res.status(200).json({
       success: true,
