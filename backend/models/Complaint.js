@@ -8,10 +8,24 @@ const complaintSchema = new mongoose.Schema(
       unique: true,
       index: true,
     },
+    docketNumber: {
+      type: String,
+      index: true,
+      default: function () {
+        return this.complaintId;
+      },
+    },
     name: {
       type: String,
       required: [true, "Name is required"],
       trim: true,
+    },
+    citizenName: {
+      type: String,
+      trim: true,
+      default: function () {
+        return this.name;
+      },
     },
     email: {
       type: String,
@@ -19,15 +33,46 @@ const complaintSchema = new mongoose.Schema(
       trim: true,
       lowercase: true,
     },
+    citizenEmail: {
+      type: String,
+      trim: true,
+      lowercase: true,
+      default: function () {
+        return this.email;
+      },
+    },
     phone: {
       type: String,
       required: [true, "Phone number is required"],
       trim: true,
     },
+    citizenPhone: {
+      type: String,
+      trim: true,
+      default: function () {
+        return this.phone;
+      },
+    },
     category: {
       type: String,
       required: [true, "Category is required"],
-      enum: ["Product", "Service", "Food", "Banking", "Telecom", "Travel", "Other"],
+      enum: [
+        "Product",
+        "Service",
+        "Food",
+        "Banking",
+        "Telecom",
+        "Travel",
+        "Electronics",
+        "Automotive",
+        "E-Commerce",
+        "Real Estate",
+        "Healthcare",
+        "Education",
+        "Insurance",
+        "Utilities",
+        "Other",
+      ],
       default: "Product",
     },
     companyName: {
@@ -41,6 +86,20 @@ const complaintSchema = new mongoose.Schema(
       default: "",
       trim: true,
       lowercase: true,
+    },
+    productName: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    reliefRequested: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    transactionValue: {
+      type: Number,
+      default: 0,
     },
     orderOrTransactionId: {
       type: String,
@@ -57,6 +116,19 @@ const complaintSchema = new mongoose.Schema(
       default: false,
     },
     companyNoticeSentAt: {
+      type: Date,
+      default: null,
+    },
+    speedPostTrackingNumber: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    speedPostBookedAt: {
+      type: Date,
+      default: null,
+    },
+    noticeDispatchedAt: {
       type: Date,
       default: null,
     },
@@ -88,7 +160,15 @@ const complaintSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["Pending", "In Progress", "Resolved", "Rejected"],
+      enum: [
+        "Pending",
+        "Under Review",
+        "Notice Dispatched",
+        "In Progress",
+        "Statutory Escalation",
+        "Resolved",
+        "Rejected",
+      ],
       default: "Pending",
       index: true,
     },
@@ -101,6 +181,13 @@ const complaintSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       default: null,
+    },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: function () {
+        return this.user;
+      },
     },
     adminRemarks: {
       type: String,

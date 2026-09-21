@@ -28,12 +28,12 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["user", "admin"],
-      default: "user",
+      enum: ["user", "admin", "citizen", "officer"],
+      default: "citizen",
     },
     authProvider: {
       type: String,
-      enum: ["local", "google"],
+      enum: ["local", "google", "otp"],
       default: "local",
     },
     googleId: {
@@ -44,9 +44,21 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    isEmailVerified: {
+      type: Boolean,
+      default: true,
+    },
     isTwoFactorEnabled: {
       type: Boolean,
       default: true,
+    },
+    otp: {
+      type: String,
+      default: null,
+    },
+    otpExpiry: {
+      type: Date,
+      default: null,
     },
     otpCode: {
       type: String,
