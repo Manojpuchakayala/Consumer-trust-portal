@@ -16,37 +16,37 @@ async function capture() {
   try {
     const page = await browser.newPage();
 
-    // 1. Desktop Light Mode
+    // 1. Desktop Light Mode Full Page
     await page.setViewport({ width: 1440, height: 900, deviceScaleFactor: 2 });
     await page.goto('http://localhost:4173/', { waitUntil: 'networkidle0' });
-    await page.waitForTimeout ? page.waitForTimeout(1000) : new Promise((r) => setTimeout(r, 1000));
+    await new Promise((r) => setTimeout(r, 1000));
     
     const desktopLightPath = path.join(ARTIFACT_DIR, 'desktop_homepage_refined.png');
-    await page.screenshot({ path: desktopLightPath, fullPage: false });
+    await page.screenshot({ path: desktopLightPath, fullPage: true });
     console.log(`Saved: ${desktopLightPath}`);
 
-    // 2. Mobile Light Mode
+    // 2. Mobile Light Mode Full Page
     await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
     await page.goto('http://localhost:4173/', { waitUntil: 'networkidle0' });
     await new Promise((r) => setTimeout(r, 1000));
     
     const mobileLightPath = path.join(ARTIFACT_DIR, 'mobile_homepage_refined.png');
-    await page.screenshot({ path: mobileLightPath, fullPage: false });
+    await page.screenshot({ path: mobileLightPath, fullPage: true });
     console.log(`Saved: ${mobileLightPath}`);
 
-    // 3. Desktop Dark Mode
+    // 3. Desktop Dark Mode Full Page
     await page.setViewport({ width: 1440, height: 900, deviceScaleFactor: 2 });
     await page.click('.theme-btn:not(.mobile)');
     await new Promise((r) => setTimeout(r, 600));
     const desktopDarkPath = path.join(ARTIFACT_DIR, 'desktop_homepage_dark.png');
-    await page.screenshot({ path: desktopDarkPath, fullPage: false });
+    await page.screenshot({ path: desktopDarkPath, fullPage: true });
     console.log(`Saved: ${desktopDarkPath}`);
 
-    // 4. Mobile Dark Mode
+    // 4. Mobile Dark Mode Full Page
     await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
     await new Promise((r) => setTimeout(r, 600));
     const mobileDarkPath = path.join(ARTIFACT_DIR, 'mobile_homepage_dark.png');
-    await page.screenshot({ path: mobileDarkPath, fullPage: false });
+    await page.screenshot({ path: mobileDarkPath, fullPage: true });
     console.log(`Saved: ${mobileDarkPath}`);
 
     // Reset theme back to light

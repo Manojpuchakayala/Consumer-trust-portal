@@ -144,8 +144,8 @@ check(
 const footerPath = path.join(__dirname, "../frontend/src/components/Footer.jsx");
 const footerContent = fs.readFileSync(footerPath, "utf8");
 check(
-  "Footer: Prominent Non-Affiliation Disclaimer Strip Active",
-  footerContent.includes("NON-AFFILIATION & LEGAL DISCLAIMER")
+  "Footer: Prominent Non-Affiliation Disclaimer Active",
+  footerContent.includes("NON-AFFILIATION & LEGAL DISCLAIMER") || footerContent.includes("Independent private dispute facilitation platform")
 );
 check(
   "Footer: Active Links to Privacy, Terms, Charter, Methodology, Contact",

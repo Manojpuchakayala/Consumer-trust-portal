@@ -104,10 +104,10 @@
 }
 
 /* ==========================================================================
-   1. HERO SECTION (Uncluttered, Confident & Focused)
+   1. HERO SECTION (Conversion-Focused, Clean & Spacious)
    ========================================================================== */
 .home-hero-section {
-  padding: var(--space-20) 0 var(--space-20);
+  padding: var(--space-20) 0 var(--space-16);
   position: relative;
   z-index: 1;
   background: var(--bg-gradient-hero);
@@ -174,13 +174,13 @@
   margin-bottom: var(--space-8);
 }
 
-/* Hero CTA Group (3 Buttons) */
+/* Hero CTA Group (2 Primary Actions) */
 .hero-cta-group {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  gap: var(--space-3);
+  gap: var(--space-4);
   width: 100%;
 }
 
@@ -193,7 +193,7 @@
   color: #ffffff !important;
   font-size: 15px;
   font-weight: 700;
-  padding: 13px 28px;
+  padding: 13px 30px;
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-glow-cta);
   transition: all var(--transition-fast);
@@ -226,7 +226,7 @@
   color: var(--text-heading) !important;
   font-size: 14.5px;
   font-weight: 600;
-  padding: 13px 24px;
+  padding: 13px 26px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
   box-shadow: var(--shadow-sm);
@@ -243,33 +243,37 @@
   box-shadow: var(--shadow-md);
 }
 
-[data-theme="dark"] .hero-btn-secondary:hover {
-  border-color: var(--brand-primary);
-  color: var(--brand-primary) !important;
+[data-theme="dark"] .hero-btn-secondary {
+  background: rgba(15, 32, 56, 0.82);
+  border: 1px solid rgba(129, 140, 248, 0.35);
+  color: #F8FAFC !important;
 }
 
-.hero-btn-tertiary {
-  display: inline-flex;
+[data-theme="dark"] .hero-btn-secondary:hover {
+  background: rgba(70, 86, 200, 0.25);
+  border-color: #818cf8;
+  color: #ffffff !important;
+}
+
+/* Hero Trust Line */
+.hero-trust-line {
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  background: transparent;
-  color: var(--text-secondary) !important;
-  font-size: 14px;
-  font-weight: 600;
-  padding: 13px 20px;
-  border-radius: var(--radius-md);
-  transition: all var(--transition-fast);
-  text-decoration: none;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: var(--space-6);
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 500;
 }
 
-.hero-btn-tertiary:hover {
-  color: var(--text-heading) !important;
-  background: rgba(16, 42, 76, 0.05);
+.trust-dot {
+  color: var(--border-color);
 }
 
-[data-theme="dark"] .hero-btn-tertiary:hover {
-  background: rgba(255, 255, 255, 0.06);
+[data-theme="dark"] .trust-dot {
+  color: rgba(148, 163, 184, 0.3);
 }
 
 /* ==========================================================================
@@ -585,7 +589,7 @@
    5. BOTTOM LEGAL INFORMATION SECTION (Polished Pre-Footer Area)
    ========================================================================== */
 .home-legal-info-section {
-  padding: var(--space-8) 0 var(--space-16);
+  padding: var(--space-8) 0 var(--space-14);
   background: var(--bg-gradient-legal);
   position: relative;
   z-index: 1;
@@ -746,10 +750,20 @@
   font-size: 10px;
 }
 
-/* Responsive adjustments */
+/* ==========================================================================
+   6. MOBILE STICKY ACTION BAR
+   ========================================================================== */
+.mobile-sticky-action-bar {
+  display: none;
+}
+
 @media (max-width: 640px) {
+  .home-root {
+    padding-bottom: 70px;
+  }
+
   .home-hero-section {
-    padding: var(--space-14) 0 var(--space-12);
+    padding: var(--space-14) 0 var(--space-10);
   }
   
   .hero-cta-group,
@@ -760,7 +774,6 @@
 
   .hero-btn-primary,
   .hero-btn-secondary,
-  .hero-btn-tertiary,
   .final-btn-primary,
   .final-btn-secondary {
     width: 100%;
@@ -769,5 +782,65 @@
 
   .final-cta-card {
     padding: var(--space-10) var(--space-5);
+  }
+
+  .mobile-sticky-action-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 990;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(14px);
+    border-top: 1px solid var(--border-color);
+    padding: 10px 16px;
+    box-shadow: 0 -4px 16px rgba(11, 31, 58, 0.08);
+  }
+
+  [data-theme="dark"] .mobile-sticky-action-bar {
+    background: rgba(7, 21, 37, 0.94);
+    border-color: rgba(148, 163, 184, 0.18);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+  }
+
+  .mobile-bar-btn-primary {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: var(--brand-cta);
+    color: #ffffff !important;
+    font-size: 13.5px;
+    font-weight: 700;
+    padding: 11px 12px;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(234, 88, 12, 0.35);
+  }
+
+  .mobile-bar-btn-secondary {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: var(--card-bg);
+    color: var(--text-heading) !important;
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 11px 12px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    text-decoration: none;
+  }
+
+  [data-theme="dark"] .mobile-bar-btn-secondary {
+    background: rgba(15, 32, 56, 0.9);
+    border-color: rgba(129, 140, 248, 0.35);
+    color: #F8FAFC !important;
   }
 }

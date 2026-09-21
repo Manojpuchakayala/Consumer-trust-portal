@@ -3,7 +3,6 @@ import {
   FaShieldAlt,
   FaEnvelope,
   FaCheckCircle,
-  FaInfoCircle,
   FaExternalLinkAlt,
 } from "react-icons/fa";
 import "./Footer.css";
@@ -11,16 +10,6 @@ import "./Footer.css";
 export default function Footer() {
   return (
     <footer className="footer-wrap">
-      {/* Slim Statutory Disclaimer Strip */}
-      <div className="footer-disclaimer-strip">
-        <div className="footer-disclaimer-container">
-          <FaInfoCircle className="disclaimer-strip-icon" />
-          <p>
-            <strong>NON-AFFILIATION & LEGAL DISCLAIMER:</strong> Consumer Trust is an independent private dispute facilitation platform. We are not affiliated with, endorsed by, or operating on behalf of the Government of India, the National Consumer Disputes Redressal Commission (NCDRC), Department of Consumer Affairs (DoCA), or any consumer court. For statutory judicial filings, visit <a href="https://consumerhelpline.gov.in" target="_blank" rel="noopener noreferrer">consumerhelpline.gov.in (National Consumer Helpline 1915) <FaExternalLinkAlt style={{ fontSize: 9 }} /></a> or <a href="https://edaakhil.nic.in" target="_blank" rel="noopener noreferrer">edaakhil.nic.in <FaExternalLinkAlt style={{ fontSize: 9 }} /></a>.
-          </p>
-        </div>
-      </div>
-
       <div className="footer-main-content">
         <div className="footer-grid-container">
           {/* Column 1: Brand & Purpose */}
@@ -93,9 +82,16 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Bottom Bar */}
+        {/* Bottom Bar with One-Line Disclaimer */}
         <div className="footer-bottom-bar">
-          <p>© {new Date().getFullYear()} Consumer Trust. All rights reserved. Independent private dispute facilitation platform.</p>
+          <div className="footer-bottom-info">
+            <p className="footer-disclaimer-oneline">
+              <strong>NON-AFFILIATION & LEGAL DISCLAIMER:</strong> Consumer Trust is an independent private dispute facilitation platform. Not affiliated with the Government of India, NCDRC, or any consumer court.
+            </p>
+            <p className="footer-copyright">
+              © {new Date().getFullYear()} Consumer Trust. All rights reserved.
+            </p>
+          </div>
           <div className="footer-bottom-links">
             <Link to="/privacy">Privacy</Link>
             <span>•</span>

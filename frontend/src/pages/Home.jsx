@@ -10,20 +10,11 @@ import {
   FaPaperclip,
   FaEnvelopeOpenText,
   FaInfoCircle,
-  FaQuestionCircle,
   FaBalanceScale,
 } from "react-icons/fa";
 import "./Home.css";
 
 export default function Home() {
-  const scrollToHowItWorks = (e) => {
-    e.preventDefault();
-    const elem = document.getElementById("how-it-works");
-    if (elem) {
-      elem.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
   return (
     <div className="home-root">
       {/* Decorative ambient background elements */}
@@ -31,12 +22,12 @@ export default function Home() {
       <div className="home-ambient-glow top-right" aria-hidden="true" />
 
       {/* =========================================================================
-          1. HERO SECTION (Uncluttered, Confident & Focused)
+          1. HERO SECTION (Conversion-Focused, Clean & Spacious)
           ========================================================================= */}
       <section className="home-hero-section">
         <div className="hero-container">
           <div className="hero-content">
-            {/* Small Independent Platform Badge */}
+            {/* Tag Pill */}
             <div className="hero-tag-pill">
               <span className="pill-dot" />
               <span>Independent Dispute Facilitation</span>
@@ -47,12 +38,12 @@ export default function Home() {
               A clearer path to consumer resolution.
             </h1>
 
-            {/* Short Platform Description */}
+            {/* Short Supporting Text */}
             <p className="hero-lead-text">
               Consumer Trust helps you prepare a structured grievance, organize supporting evidence, and communicate directly with enterprise grievance desks for voluntary resolution.
             </p>
 
-            {/* 3 Focused Actions */}
+            {/* Two Primary CTAs */}
             <div className="hero-cta-group">
               <Link to="/register" className="hero-btn-primary">
                 <FaFileAlt />
@@ -64,22 +55,22 @@ export default function Home() {
                 <FaSearch />
                 <span>Track an Existing Case</span>
               </Link>
+            </div>
 
-              <a
-                href="#how-it-works"
-                onClick={scrollToHowItWorks}
-                className="hero-btn-tertiary"
-              >
-                <FaQuestionCircle />
-                <span>How It Works</span>
-              </a>
+            {/* Short Hero Trust Line */}
+            <div className="hero-trust-line">
+              <span>Private case access</span>
+              <span className="trust-dot">•</span>
+              <span>Independent platform</span>
+              <span className="trust-dot">•</span>
+              <span>Voluntary facilitation</span>
             </div>
           </div>
         </div>
       </section>
 
       {/* =========================================================================
-          2. HOW IT WORKS — MAIN EDUCATIONAL SECTION (Focused on Process)
+          2. HOW IT WORKS — SINGLE 4-STEP WORKFLOW SECTION
           ========================================================================= */}
       <section className="how-it-works-section" id="how-it-works">
         <div className="section-container">
@@ -152,7 +143,7 @@ export default function Home() {
       </section>
 
       {/* =========================================================================
-          3. TRUST HIGHLIGHTS SECTION
+          3. TRUST HIGHLIGHTS SECTION (Platform Pillars)
           ========================================================================= */}
       <section className="trust-highlights-section">
         <div className="section-container">
@@ -232,7 +223,7 @@ export default function Home() {
       </section>
 
       {/* =========================================================================
-          5. BOTTOM LEGAL INFORMATION SECTION (Discreet, Refined Pre-Footer Area)
+          5. BOTTOM LEGAL INFORMATION SECTION (Discreet, Concise Pre-Footer Area)
           ========================================================================= */}
       <section className="home-legal-info-section" aria-label="Legal information and statutory notices">
         <div className="section-container">
@@ -244,7 +235,7 @@ export default function Home() {
             </div>
 
             <div className="legal-info-grid">
-              {/* Column 1: Non-Affiliation Notice */}
+              {/* Card 1: Independent Platform Notice */}
               <div className="legal-info-card">
                 <div className="legal-card-title-row">
                   <div className="legal-card-icon">
@@ -253,7 +244,7 @@ export default function Home() {
                   <h4>Independent Platform Notice</h4>
                 </div>
                 <p className="legal-card-body">
-                  Consumer Trust is an independent private dispute facilitation platform. It is not affiliated with, endorsed by, or operated by the Government of India, the National Consumer Disputes Redressal Commission (NCDRC), Department of Consumer Affairs (DoCA), or any consumer court.
+                  Consumer Trust is an independent private dispute facilitation platform. It is not affiliated with the Government of India, National Consumer Helpline, NCDRC, or any consumer court.
                 </p>
                 <div className="legal-statutory-links">
                   <span className="legal-statutory-label">Official statutory portals:</span>
@@ -279,7 +270,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Column 2: Legal Scope & Voluntary Redressal */}
+              {/* Card 2: Voluntary Facilitation Scope */}
               <div className="legal-info-card">
                 <div className="legal-card-title-row">
                   <div className="legal-card-icon">
@@ -288,7 +279,7 @@ export default function Home() {
                   <h4>Voluntary Facilitation Scope</h4>
                 </div>
                 <p className="legal-card-body">
-                  Consumer Trust cannot issue legal orders, compel a company, impose statutory fines, or replace consumer-court remedies. Participation in voluntary dispute facilitation is optional and does not limit your statutory rights to file before consumer commissions.
+                  Consumer Trust cannot issue legal orders, compel a company, impose statutory fines, or replace consumer-court remedies. Voluntary dispute resolution does not restrict your statutory filing rights.
                 </p>
                 <div className="legal-statutory-links">
                   <span className="legal-statutory-label">Platform governance:</span>
@@ -311,6 +302,18 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* =========================================================================
+          6. STICKY MOBILE ACTION BAR (Only visible on mobile devices)
+          ========================================================================= */}
+      <div className="mobile-sticky-action-bar" aria-label="Quick actions">
+        <Link to="/register" className="mobile-bar-btn-primary">
+          <FaFileAlt /> Prepare Grievance
+        </Link>
+        <Link to="/track" className="mobile-bar-btn-secondary">
+          <FaSearch /> Track Case
+        </Link>
+      </div>
     </div>
   );
 }
