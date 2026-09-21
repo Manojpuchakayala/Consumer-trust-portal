@@ -254,12 +254,35 @@ export default function RegisterComplaint() {
   const [redactingFile, setRedactingFile] = useState(null);
 
   const handleApplyOcr = (extracted) => {
-    setFormData((prev) => ({
-      ...prev,
-      companyName: extracted.merchantName || prev.companyName,
-      orderOrTransactionId: extracted.orderId || prev.orderOrTransactionId,
-      category: extracted.category || prev.category,
-    }));
+    if (!extracted) return;
+    setFormData((prev) => {
+      const isKnown = ENTERPRISE_OPTIONS.some((o) => o.name.toLowerCase() === (extracted.merchantName || "").toLowerCase());
+      const companyName = isKnown ? extracted.merchantName : (extracted.merchantName ? "Other / Custom Enterprise" : prev.companyName);
+      const customCompanyName = !isKnown && extracted.merchantName ? extracted.merchantName : prev.customCompanyName;
+      
+      const suggestedSubject = prev.subject.trim() 
+        ? prev.subject 
+        : (extracted.merchantName && extracted.amount 
+            ? `Dispute regarding ${extracted.merchantName} - ₹${extracted.amount.toLocaleString("en-IN")}`
+            : (extracted.merchantName ? `Dispute regarding ${extracted.merchantName} transaction` : prev.subject));
+
+      const suggestedDesc = prev.description.trim()
+        ? prev.description
+        : (extracted.amount || extracted.orderId
+            ? `I made a transaction with ${extracted.merchantName || "the enterprise"}${extracted.orderId ? ` (Ref / Order #${extracted.orderId})` : ""}${extracted.date ? ` on ${extracted.date}` : ""}${extracted.amount ? ` for an amount of ₹${extracted.amount.toLocaleString("en-IN")}` : ""}. I am raising this formal grievance due to deficiency in service / non-resolution of my request.`
+            : prev.description);
+
+      return {
+        ...prev,
+        companyName: companyName || prev.companyName,
+        customCompanyName: customCompanyName || prev.customCompanyName,
+        orderOrTransactionId: extracted.orderId || prev.orderOrTransactionId,
+        category: extracted.category || prev.category,
+        subject: suggestedSubject,
+        description: suggestedDesc,
+      };
+    });
+    setStepError("");
   };
 
   const handleSaveRedacted = (sanitizedFile) => {

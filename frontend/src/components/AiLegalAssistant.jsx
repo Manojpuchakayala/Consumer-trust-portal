@@ -13,8 +13,18 @@ import {
   FaShieldAlt,
   FaMicrophone,
   FaMicrophoneSlash,
+  FaGlobe,
 } from "react-icons/fa";
 import "./AiLegalAssistant.css";
+
+const VERNACULAR_LANGUAGES = [
+  { code: "en-IN", label: "English", placeholder: "Describe what happened (e.g. refund delayed, defective item)..." },
+  { code: "hi-IN", label: "हिंदी (Hindi)", placeholder: "अपनी शिकायत बोलें या लिखें (जैसे रिफंड नहीं मिला, खराब सामान)..." },
+  { code: "te-IN", label: "తెలుగు (Telugu)", placeholder: "మీ సమస్యను చెప్పండి లేదా వ్రాయండి (రీఫండ్ రాలేదు, పాడైన వస్తువు)..." },
+  { code: "ta-IN", label: "தமிழ் (Tamil)", placeholder: "உங்கள் புகாரைப் பேசுங்கள் அல்லது எழுதுங்கள் (பணம் திரும்ப வரவில்லை)..." },
+  { code: "mr-IN", label: "मराठी (Marathi)", placeholder: "तुमची तक्रार बोला किंवा लिहा (रिफंड मिळाला नाही, खराब वस्तू)..." },
+  { code: "bn-IN", label: "বাংলা (Bengali)", placeholder: "আপনার অভিযোগ বলুন বা লিখুন (রিফান্ড মেলেনি, খারাপ পণ্য)..." },
+];
 
 const QUICK_PROMPTS = [
   { label: "Delayed E-Commerce Refund", category: "E-Commerce", text: "I ordered an item online 3 weeks ago. The merchant cancelled the order but has not refunded my ₹4,500 despite multiple follow-ups." },
@@ -27,11 +37,12 @@ const QUICK_PROMPTS = [
 export default function AiLegalAssistant() {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const [selectedLang, setSelectedLang] = useState("en-IN");
   const [messages, setMessages] = useState([
     {
       id: "welcome",
       sender: "ai",
-      text: "Hello! I am your AI Legal Assistant under the Consumer Protection Act, 2019 (CPA 2019).\n\nDescribe your dispute in plain English, and I will structure your legal claims, identify statutory violations, calculate compensation, and draft your grievance.",
+      text: "Hello! I am your AI Legal Assistant under the Consumer Protection Act, 2019 (CPA 2019).\n\nSpeak or type your grievance in English, Hindi, Telugu, Tamil, Marathi, or Bengali. I will structure your statutory legal claims, cite CPA sections, calculate compensation, and draft your petition.",
     },
   ]);
   const [inputText, setInputText] = useState("");
@@ -46,11 +57,11 @@ export default function AiLegalAssistant() {
     }
   }, [messages, isOpen]);
 
-  // Voice Dictation
+  // Voice Dictation with selected vernacular language
   const toggleVoice = () => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      alert("Voice recognition is not supported in this browser. Please use Chrome or Edge.");
+      alert("Voice recognition is not supported in this browser. Please use Google Chrome or Microsoft Edge.");
       return;
     }
 
@@ -61,7 +72,7 @@ export default function AiLegalAssistant() {
 
     try {
       const recognition = new SpeechRecognition();
-      recognition.lang = "en-IN";
+      recognition.lang = selectedLang;
       recognition.continuous = false;
       recognition.interimResults = false;
 
@@ -80,6 +91,8 @@ export default function AiLegalAssistant() {
     }
   };
 
+  const currentLangConfig = VERNACULAR_LANGUAGES.find((l) => l.code === selectedLang) || VERNACULAR_LANGUAGES[0];
+
   const handleSendMessage = (textToSend) => {
     const query = (textToSend || inputText).trim();
     if (!query) return;
@@ -97,22 +110,22 @@ export default function AiLegalAssistant() {
       let sections = ["Section 2(11) - Deficiency in Service", "Section 2(47) - Unfair Trade Practice"];
       let claimEst = "₹5,000 - ₹25,000";
 
-      if (lower.includes("mobile") || lower.includes("phone") || lower.includes("laptop") || lower.includes("tv") || lower.includes("warranty")) {
+      if (lower.includes("mobile") || lower.includes("phone") || lower.includes("laptop") || lower.includes("tv") || lower.includes("warranty") || lower.includes("screen") || lower.includes("kharab")) {
         category = "Electronics & Appliances";
         company = "Manufacturer / Authorized Service Desk";
         sections.push("Section 84 - Product Liability Action against Manufacturer");
         claimEst = "Product Replacement / Full Refund + ₹10,000 Compensation";
-      } else if (lower.includes("flight") || lower.includes("airline") || lower.includes("ticket") || lower.includes("train")) {
+      } else if (lower.includes("flight") || lower.includes("airline") || lower.includes("ticket") || lower.includes("train") || lower.includes("cancel")) {
         category = "Airlines & Travel";
         company = "Airline / Travel Aggregator";
-        sections.push("Section 2(6) - Unfair Contract Terms");
+        sections.push("Section 2(6) - Unfair Contract Terms & DGCA Passenger Charter");
         claimEst = "100% Ticket Refund + ₹15,000 Inconvenience Damages";
-      } else if (lower.includes("bank") || lower.includes("emi") || lower.includes("loan") || lower.includes("charge")) {
+      } else if (lower.includes("bank") || lower.includes("emi") || lower.includes("loan") || lower.includes("charge") || lower.includes("paisa") || lower.includes("khata")) {
         category = "Banking & Financial Services";
         company = "Scheduled Commercial Bank / NBFC";
-        sections.push("RBI Master Circular on Customer Service");
+        sections.push("RBI Master Circular on Customer Service & Digital Ombudsman");
         claimEst = "Reversal of Charges + Statutory Interest @ 18% p.a.";
-      } else if (lower.includes("flat") || lower.includes("builder") || lower.includes("possession")) {
+      } else if (lower.includes("flat") || lower.includes("builder") || lower.includes("possession") || lower.includes("ghar")) {
         category = "Real Estate & Housing";
         company = "Developer / Builder";
         sections.push("RERA Sec 18 & CPA 2019 Deficiency in Housing Construction");
@@ -123,7 +136,7 @@ export default function AiLegalAssistant() {
         category,
         companyName: company,
         subject: `Deficiency in Service & Statutory Claim under CPA 2019: ${query.slice(0, 70)}...`,
-        description: `1. FACTUAL MATRIX:\nThe complainant entered into a valid consumer transaction with the respondent. Despite receipt of consideration, the respondent failed to fulfill contractual and statutory obligations.\n\n2. PARTICULARS OF GRIEVANCE:\n${query}\n\n3. STATUTORY INFRINGEMENTS:\n- ${sections.join("\n- ")}\n\n4. PRAYER FOR RELIEF:\n- Direct replacement/reversal of amount in full.\n- Award compensation towards mental agony, harassment, and litigation expenses.`,
+        description: `1. FACTUAL MATRIX:\nThe complainant entered into a valid consumer transaction with the respondent. Despite receipt of consideration, the respondent failed to fulfill contractual and statutory obligations.\n\n2. PARTICULARS OF GRIEVANCE:\n${query}\n\n3. STATUTORY INFRINGEMENTS:\n- ${sections.join("\n- ")}\n\n4. PRAYER FOR RELIEF:\n- Direct replacement/reversal of amount in full.\n- Award compensation towards mental agony, harassment, and litigation expenses under Section 39(1) of CPA 2019.`,
         sections,
         claimEst,
       };
@@ -133,13 +146,13 @@ export default function AiLegalAssistant() {
       const aiResponse = {
         id: `ai_${Date.now()}`,
         sender: "ai",
-        text: `⚖️ **Legal Analysis Complete**\n\n**Dispute Category:** ${category}\n**Statutory Violations:**\n${sections.map((s) => `• ${s}`).join("\n")}\n\n**Recommended Prayer for Relief:**\n${claimEst}\n\nI have generated a structured formal complaint for you. Click **"Autofill Grievance Form"** below to transfer these legal details directly into your official filing!`,
+        text: `⚖️ **Legal Analysis & CPA 2019 Formulation Complete**\n\n**Dispute Category:** ${category}\n**Statutory Violations Identified:**\n${sections.map((s) => `• ${s}`).join("\n")}\n\n**Recommended Claim for Relief:**\n${claimEst}\n\nI have generated a court-ready legal grievance description. Click **"Autofill Grievance Form"** below to transfer these statutory details directly into your official filing!`,
         hasDraft: true,
       };
 
       setMessages((prev) => [...prev, aiResponse]);
       setIsTyping(false);
-    }, 1000);
+    }, 900);
   };
 
   const handleTransferToForm = () => {
@@ -180,14 +193,31 @@ export default function AiLegalAssistant() {
                 <span className="ai-subtitle">Consumer Protection Act, 2019 Engine</span>
               </div>
             </div>
-            <button
-              type="button"
-              className="ai-close-btn"
-              onClick={() => setIsOpen(false)}
-              aria-label="Close"
-            >
-              <FaTimes />
-            </button>
+            <div className="header-actions">
+              <div className="ai-lang-select-wrap">
+                <FaGlobe className="lang-globe-icon" />
+                <select
+                  value={selectedLang}
+                  onChange={(e) => setSelectedLang(e.target.value)}
+                  className="ai-lang-select"
+                  title="Select Voice & Text Language"
+                >
+                  {VERNACULAR_LANGUAGES.map((l) => (
+                    <option key={l.code} value={l.code}>
+                      {l.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <button
+                type="button"
+                className="ai-close-btn"
+                onClick={() => setIsOpen(false)}
+                aria-label="Close"
+              >
+                <FaTimes />
+              </button>
+            </div>
           </div>
 
           {/* Quick Issue Chips */}
@@ -264,13 +294,13 @@ export default function AiLegalAssistant() {
               type="button"
               className={`btn-voice-dictation ${isListening ? "listening" : ""}`}
               onClick={toggleVoice}
-              title={isListening ? "Listening... Click to stop" : "Speak your dispute"}
+              title={isListening ? "Listening... Click to stop" : `Speak in ${currentLangConfig.label}`}
             >
               {isListening ? <FaMicrophoneSlash /> : <FaMicrophone />}
             </button>
             <input
               type="text"
-              placeholder={isListening ? "Listening... speak now" : "Describe what happened (e.g. refund delayed, broken item)..."}
+              placeholder={isListening ? `Listening in ${currentLangConfig.label}... speak now` : currentLangConfig.placeholder}
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               autoFocus

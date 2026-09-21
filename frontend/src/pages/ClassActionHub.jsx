@@ -13,6 +13,11 @@ import {
   FaHandshake,
   FaRupeeSign,
   FaFire,
+  FaWhatsapp,
+  FaTwitter,
+  FaShareAlt,
+  FaCopy,
+  FaCheck,
 } from "react-icons/fa";
 import "./ClassActionHub.css";
 
@@ -100,6 +105,7 @@ const CLASS_ACTION_CLUSTERS = [
 export default function ClassActionHub() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [copiedClusterId, setCopiedClusterId] = useState(null);
   const navigate = useNavigate();
 
   const filteredClusters = CLASS_ACTION_CLUSTERS.filter((cluster) => {
@@ -116,6 +122,24 @@ export default function ClassActionHub() {
 
   const handleJoinClass = (cluster) => {
     navigate(`/register?brand=${encodeURIComponent(cluster.brand)}&category=${encodeURIComponent(cluster.category)}&subject=${encodeURIComponent(cluster.issueTitle)}`);
+  };
+
+  const handleShareWhatsApp = (cluster) => {
+    const text = `🚨 Calling all affected ${cluster.brand} consumers!\n\nWe are building a collective statutory grievance cluster under CPA 2019 Sec 35(1)(c) regarding:\n"${cluster.issueTitle}"\n\n${cluster.affectedCount}+ citizens already grouped seeking ${cluster.totalClaimAmount} restitution.\n\n👉 Join or support this collective petition here:\n${window.location.origin}/class-action?id=${cluster.id}`;
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
+  };
+
+  const handleShareTwitter = (cluster) => {
+    const text = `Are you affected by ${cluster.brand}'s "${cluster.issueTitle}"? Join ${cluster.affectedCount}+ consumers in a collective CPA 2019 legal grievance petition:`;
+    const url = `${window.location.origin}/class-action?id=${cluster.id}`;
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, "_blank");
+  };
+
+  const handleCopyLink = (cluster) => {
+    const link = `${window.location.origin}/class-action?id=${cluster.id}`;
+    navigator.clipboard.writeText(link);
+    setCopiedClusterId(cluster.id);
+    setTimeout(() => setCopiedClusterId(null), 2500);
   };
 
   return (
@@ -224,6 +248,37 @@ export default function ClassActionHub() {
                 >
                   Join This Class Petition <FaArrowRight />
                 </button>
+                
+                {/* Viral Advocate & Share Row */}
+                <div className="cluster-share-row">
+                  <span className="share-row-label"><FaShareAlt /> Advocate & Share:</span>
+                  <div className="share-buttons-group">
+                    <button
+                      type="button"
+                      className="btn-share-icon wa"
+                      title="Share to WhatsApp groups"
+                      onClick={() => handleShareWhatsApp(cluster)}
+                    >
+                      <FaWhatsapp />
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-share-icon tw"
+                      title="Post on X (Twitter)"
+                      onClick={() => handleShareTwitter(cluster)}
+                    >
+                      <FaTwitter />
+                    </button>
+                    <button
+                      type="button"
+                      className="btn-share-icon copy"
+                      title="Copy direct invite link"
+                      onClick={() => handleCopyLink(cluster)}
+                    >
+                      {copiedClusterId === cluster.id ? <FaCheck className="text-green" /> : <FaCopy />}
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           ))}

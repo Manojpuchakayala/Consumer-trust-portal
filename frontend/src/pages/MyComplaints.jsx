@@ -26,7 +26,7 @@ import {
   FaGavel,
 } from "react-icons/fa";
 import api from "../services/api";
-import { generateGrievanceNoticePdf } from "../utils/pdfGenerator";
+import { generateGrievanceNoticePdf, generateResolutionCertificatePdf } from "../utils/pdfGenerator";
 import { getWhatsAppShareUrl } from "../utils/whatsappShare";
 import EDaakhilExportModal from "../components/EDaakhilExportModal";
 import "./MyComplaints.css";
@@ -464,6 +464,17 @@ export default function MyComplaints() {
                       >
                         <FaGavel /> e-Daakhil
                       </button>
+
+                      {c.status === "Resolved" && (
+                        <button
+                          type="button"
+                          className="btn-cert-mini"
+                          onClick={() => generateResolutionCertificatePdf(c)}
+                          title="Download Official Settlement Certificate"
+                        >
+                          <FaCheckCircle /> Certificate
+                        </button>
+                      )}
 
                       <button
                         type="button"

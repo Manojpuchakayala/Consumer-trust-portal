@@ -63,3 +63,9 @@ self.addEventListener("fetch", (event) => {
     })
   );
 });
+
+// Periodic background keepalive to keep Render backend warm
+setInterval(() => {
+  fetch("https://consumer-trust-api.onrender.com/api/health", { method: "GET", mode: "cors" }).catch(() => {});
+}, 9 * 60 * 1000);
+

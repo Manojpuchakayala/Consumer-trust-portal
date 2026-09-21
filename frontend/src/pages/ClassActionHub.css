@@ -336,6 +336,63 @@
   transform: translateY(-1px);
 }
 
+.cluster-share-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border-color, #e2e8f0);
+}
+
+.share-row-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-secondary, #475569);
+}
+
+.share-buttons-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-share-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color, #cbd5e1);
+  background: var(--card-bg, #ffffff);
+  color: var(--text-primary, #1e293b);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-share-icon.wa:hover {
+  background: #25d366;
+  color: #ffffff;
+  border-color: #25d366;
+}
+
+.btn-share-icon.tw:hover {
+  background: #000000;
+  color: #ffffff;
+  border-color: #000000;
+}
+
+.btn-share-icon.copy:hover {
+  background: var(--brand-electric, #2563eb);
+  color: #ffffff;
+  border-color: var(--brand-electric, #2563eb);
+}
+
 /* Start New Banner — Ultra High Contrast */
 .start-class-banner {
   background: linear-gradient(135deg, #0f2b5c 0%, #1e3a8a 100%);

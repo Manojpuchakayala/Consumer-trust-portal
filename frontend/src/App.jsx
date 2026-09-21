@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
@@ -50,6 +51,16 @@ function AdminRoute({ children }) {
 }
 
 function App() {
+  useEffect(() => {
+    // Proactive background keepalive ping to eliminate Render backend cold starts
+    const pingBackend = () => {
+      fetch("https://consumer-trust-api.onrender.com/api/health", { method: "GET", mode: "cors" }).catch(() => {});
+    };
+    pingBackend();
+    const interval = setInterval(pingBackend, 9 * 60 * 1000); // 9 minutes interval
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <BrowserRouter>
       <div className="app-layout">

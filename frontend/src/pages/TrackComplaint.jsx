@@ -452,38 +452,54 @@ export default function TrackComplaint() {
               </div>
             </div>
 
-            {/* 15-Day Statutory SLA Conciliation Window Card */}
+            {/* 30-Day Statutory Pre-Litigation SLA Window Card (CPA 2019 Section 35) */}
             {complaint.status !== "Resolved" && complaint.status !== "Rejected" && (() => {
               const createdDate = new Date(complaint.createdAt || Date.now());
-              const daysElapsed = Math.min(15, Math.max(1, Math.floor((new Date() - createdDate) / (1000 * 60 * 60 * 24))));
-              const daysLeft = Math.max(0, 15 - daysElapsed);
-              const progressPct = Math.min(100, Math.round((daysElapsed / 15) * 100));
+              const daysElapsed = Math.max(1, Math.floor((new Date() - createdDate) / (1000 * 60 * 60 * 24)));
+              const daysLeft = Math.max(0, 30 - daysElapsed);
+              const progressPct = Math.min(100, Math.round((daysElapsed / 30) * 100));
+              const isExpired = daysElapsed >= 30;
 
               return (
-                <div className="sla-countdown-card">
+                <div className={`sla-countdown-card ${isExpired ? "sla-expired-box" : ""}`}>
                   <div className="sla-countdown-header">
                     <div className="sla-title-row">
-                      <FaHourglassHalf className={`sla-timer-icon ${daysLeft <= 3 ? "urgent" : ""}`} />
+                      <FaHourglassHalf className={`sla-timer-icon ${isExpired ? "expired" : daysLeft <= 7 ? "urgent" : ""}`} />
                       <div>
-                        <strong>Statutory 15-Day Voluntary Conciliation Window</strong>
+                        <strong>Statutory 30-Day Pre-Litigation Legal Notice Window (CPA 2019 Sec 35)</strong>
                         <span>
-                          {daysLeft > 0
-                            ? `${daysLeft} Day${daysLeft !== 1 ? "s" : ""} remaining before automatic government legal escalation unlocks`
-                            : "15-Day Conciliation Period Expired — Recommended for e-Daakhil filing"}
+                          {!isExpired
+                            ? `${daysLeft} Day${daysLeft !== 1 ? "s" : ""} remaining for voluntary enterprise resolution before formal court filing`
+                            : "30-Day Notice Period Expired Without Settlement — Fully Eligible for Direct e-Daakhil Consumer Court Adjudication"}
                         </span>
                       </div>
                     </div>
-                    <span className={`sla-badge ${daysLeft <= 3 ? "badge-urgent" : "badge-normal"}`}>
-                      Day {daysElapsed} / 15
+                    <span className={`sla-badge ${isExpired ? "badge-court-ready" : daysLeft <= 7 ? "badge-urgent" : "badge-normal"}`}>
+                      {isExpired ? "⚠️ Notice Expired" : `Day ${daysElapsed} / 30`}
                     </span>
                   </div>
 
                   <div className="sla-progress-track">
                     <div
-                      className={`sla-progress-bar ${daysLeft <= 3 ? "bar-urgent" : ""}`}
+                      className={`sla-progress-bar ${isExpired ? "bar-expired" : daysLeft <= 7 ? "bar-urgent" : ""}`}
                       style={{ width: `${progressPct}%` }}
                     />
                   </div>
+
+                  {isExpired && (
+                    <div className="statutory-expired-action-strip">
+                      <div className="expired-note">
+                        <FaExclamationTriangle /> Enterprise has exceeded the statutory 30-day period under Section 35. You may now file directly before the District Consumer Commission with 18% p.a. interest.
+                      </div>
+                      <button
+                        type="button"
+                        className="btn-auto-escalate-edaakhil"
+                        onClick={() => setShowEDaakhilModal(true)}
+                      >
+                        <FaGavel /> Auto-Escalate to Consumer Court (e-Daakhil) →
+                      </button>
+                    </div>
+                  )}
                 </div>
               );
             })()}
@@ -820,6 +836,15 @@ export default function TrackComplaint() {
               >
                 <FaWhatsapp className="btn-icon-wa" /> Share Case via WhatsApp
               </a>
+              {complaint.status === "Resolved" && (
+                <button
+                  type="button"
+                  className="btn-action-certificate"
+                  onClick={() => generateResolutionCertificatePdf(complaint)}
+                >
+                  <FaCheckCircle /> Download Settlement Certificate (PDF)
+                </button>
+              )}
               <button
                 type="button"
                 className="btn-action-edaakhil"
