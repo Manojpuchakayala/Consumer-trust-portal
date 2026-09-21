@@ -27,6 +27,12 @@ import {
   FaEdit,
   FaCheck,
   FaClock,
+  FaShoppingBag,
+  FaUtensils,
+  FaUniversity,
+  FaMobileAlt,
+  FaPlane,
+  FaLaptop,
 } from "react-icons/fa";
 import api from "../services/api";
 import { enhanceGrievanceDescription, COMMON_RELIEFS, AI_ASSISTANT_DISCLAIMER } from "../utils/aiLegalAssistant";
@@ -91,13 +97,13 @@ const ENTERPRISE_OPTIONS = [
 ];
 
 const CATEGORIES = [
-  { id: "Product", label: "Product & Electronics", icon: "📦" },
-  { id: "Service", label: "E-Commerce & Services", icon: "🛍️" },
-  { id: "Food", label: "Food & Quick Commerce", icon: "🍔" },
-  { id: "Banking", label: "Banking & UPI Payments", icon: "🏦" },
-  { id: "Telecom", label: "Telecom & Internet", icon: "📱" },
-  { id: "Travel", label: "Travel, Flights & Cabs", icon: "✈️" },
-  { id: "Other", label: "Other Grievances", icon: "🏢" },
+  { id: "Product", label: "Product & Hardware", icon: FaLaptop },
+  { id: "Service", label: "E-Commerce & Retail", icon: FaShoppingBag },
+  { id: "Food", label: "Food & Quick Delivery", icon: FaUtensils },
+  { id: "Banking", label: "Banking & Payments", icon: FaUniversity },
+  { id: "Telecom", label: "Telecom & Internet", icon: FaMobileAlt },
+  { id: "Travel", label: "Travel & Transport", icon: FaPlane },
+  { id: "Other", label: "Other Organization", icon: FaBuilding },
 ];
 
 const DRAFT_KEY = "ctp_grievance_draft_v2";
@@ -148,8 +154,8 @@ export default function RegisterComplaint() {
   const steps = [
     { num: 1, title: "Complainant", desc: "Contact details" },
     { num: 2, title: "Enterprise", desc: "Company & order ref" },
-    { num: 3, title: "Narrative", desc: "Dispute facts & AI" },
-    { num: 4, title: "Evidence", desc: "Invoices & receipts" },
+    { num: 3, title: "Narrative", desc: "Facts & requested relief" },
+    { num: 4, title: "Evidence", desc: "Supporting documents" },
     { num: 5, title: "Review", desc: "Verification & submit" },
   ];
 
@@ -266,7 +272,7 @@ export default function RegisterComplaint() {
       selectedReliefs,
     });
     setFormData((prev) => ({ ...prev, description: enhanced }));
-    setTimeout(() => setIsAiEnhancing(false), 350);
+    setTimeout(() => setIsAiEnhancing(false), 300);
   };
 
   const handleChange = (e) => {
@@ -308,11 +314,11 @@ export default function RegisterComplaint() {
     const validFiles = [];
     for (const file of selectedFiles) {
       if (!allowedTypes.includes(file.type)) {
-        setFileError(`"${file.name}" is not a supported format. Please upload JPG, PNG, WEBP, or PDF.`);
+        setFileError(`"${file.name}" is not supported. Please upload JPG, PNG, WEBP, or PDF.`);
         return;
       }
       if (file.size > 10 * 1024 * 1024) {
-        setFileError(`"${file.name}" exceeds the 10MB size limit.`);
+        setFileError(`"${file.name}" exceeds the 10MB limit.`);
         return;
       }
       validFiles.push(file);
@@ -383,11 +389,11 @@ export default function RegisterComplaint() {
         return false;
       }
       if (formData.companyName === "Other / Custom Enterprise" && !formData.customCompanyName.trim()) {
-        setStepError("Please enter the name of the custom company/merchant.");
+        setStepError("Please enter the name of the custom company or merchant.");
         return false;
       }
       if (!formData.subject.trim()) {
-        setStepError("Please provide a brief subject/title for your grievance.");
+        setStepError("Please provide a brief subject for your grievance.");
         return false;
       }
       return true;
@@ -496,7 +502,7 @@ export default function RegisterComplaint() {
     if (submittedData?.complaintId) {
       navigator.clipboard.writeText(submittedData.complaintId);
       setCopied(true);
-      setTimeout(() => setCopied(false), 3000);
+      setTimeout(() => setCopied(false), 2500);
     }
   };
 
@@ -504,7 +510,7 @@ export default function RegisterComplaint() {
     if (submittedData?.complaintId) {
       navigator.clipboard.writeText(`${window.location.origin}/track?id=${submittedData.complaintId}`);
       setCopiedLink(true);
-      setTimeout(() => setCopiedLink(false), 3000);
+      setTimeout(() => setCopiedLink(false), 2500);
     }
   };
 
@@ -551,16 +557,16 @@ export default function RegisterComplaint() {
               <div className="success-icon-badge">
                 <FaCheckCircle className="success-check-icon" />
               </div>
-              <h2 className="success-title">Grievance Registered Successfully!</h2>
+              <h2 className="success-title">Grievance Docket Created</h2>
               <p className="success-lead">
-                Your dispute docket against <strong>{submittedData.companyName}</strong> has been created and prepared for mediation notice dispatch.
+                Your dispute regarding <strong>{submittedData.companyName}</strong> has been docketed and prepared for corporate grievance notice dispatch.
               </p>
             </div>
 
             {/* Tracking ID Hero Box */}
             <div className="tracking-hero-card">
               <div className="tracking-hero-label">
-                <FaShieldAlt style={{ color: "#0d9488" }} /> OFFICIAL DOCKET TRACKING ID
+                <FaShieldAlt style={{ color: "var(--brand-teal)" }} /> DOCKET TRACKING ID
               </div>
               <div className="tracking-hero-row">
                 <span className="tracking-hero-code">{submittedData.complaintId}</span>
@@ -570,11 +576,11 @@ export default function RegisterComplaint() {
                   onClick={handleCopyId}
                   title="Copy Tracking ID"
                 >
-                  <FaCopy /> {copied ? "Copied!" : "Copy ID"}
+                  <FaCopy /> {copied ? "Copied" : "Copy ID"}
                 </button>
               </div>
               <p className="tracking-hero-note">
-                Keep this ID safe. You can track real-time resolution progress and status updates anytime.
+                Save this Docket ID. You can verify real-time redressal progress and nodal responses anytime.
               </p>
             </div>
 
@@ -587,7 +593,7 @@ export default function RegisterComplaint() {
                   className="direct-link-copy-btn"
                   onClick={handleCopyDirectLink}
                 >
-                  <FaCopy /> {copiedLink ? "Link Copied!" : "Copy Link"}
+                  <FaCopy /> {copiedLink ? "Copied" : "Copy Link"}
                 </button>
               </div>
               <div className="direct-link-url">
@@ -596,7 +602,7 @@ export default function RegisterComplaint() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {window.location.origin}/track?id={submittedData.complaintId} <FaExternalLinkAlt style={{ fontSize: 11 }} />
+                  {window.location.origin}/track?id={submittedData.complaintId} <FaExternalLinkAlt style={{ fontSize: 10 }} />
                 </a>
               </div>
             </div>
@@ -643,13 +649,13 @@ export default function RegisterComplaint() {
               </div>
             </div>
 
-            {/* Statutory Notice Banner */}
+            {/* Statutory SLA Strip */}
             <div className="statutory-sla-strip">
               <div className="sla-badge-icon">
-                <FaShieldAlt />
+                <FaClock />
               </div>
               <div className="sla-badge-text">
-                <strong>Next Step: </strong> Formal grievance summary and tokenized 1-click resolution link prepared for {submittedData.companyName} grievance desk. Target acknowledgment within 24–48 hours.
+                <strong>Next Step: </strong> A structured dispute summary and tokenized resolution link have been queued for the {submittedData.companyName} grievance desk. Target acknowledgment within standard 24–48 hours.
               </div>
             </div>
 
@@ -660,13 +666,13 @@ export default function RegisterComplaint() {
                 className="btn-pdf-download"
                 onClick={() => generateGrievanceNoticePdf(submittedData)}
               >
-                <FaFilePdf /> Download Grievance Summary (PDF)
+                <FaFilePdf /> Download Case Summary (PDF)
               </button>
               <Link
                 to={`/track?id=${submittedData.complaintId}`}
                 className="btn-track-live"
               >
-                Track Live Status <FaArrowRight />
+                Track Case Progress <FaArrowRight />
               </Link>
               <button
                 type="button"
@@ -735,16 +741,16 @@ export default function RegisterComplaint() {
           <>
             <div className="wizard-page-header">
               <div className="header-pill">
-                <FaShieldAlt /> 100% FREE & INDEPENDENT GRIEVANCE FACILITATION
+                <FaShieldAlt /> Independent Dispute Facilitation
               </div>
-              <h1 className="wizard-main-title">Submit a Consumer Grievance</h1>
+              <h1 className="wizard-main-title">File a Consumer Grievance</h1>
               <p className="wizard-main-subtitle">
-                Complete the 5-step guided form to structure your claim facts, enhance your narrative with AI, and dispatch a formal resolution notice to the enterprise grievance desk.
+                Complete the step-by-step form to organize your claim details, share proof documents, and dispatch a formal facilitation notice to the enterprise grievance desk.
               </p>
 
               {hasRestoredDraft && (
                 <div className="draft-restored-pill">
-                  <span>✨ Draft automatically restored</span>
+                  <span>Draft automatically restored</span>
                   <button type="button" onClick={clearDraft} title="Discard draft and start fresh">
                     Discard Draft
                   </button>
@@ -797,8 +803,8 @@ export default function RegisterComplaint() {
                 <div className="step-pane">
                   <div className="step-pane-header">
                     <span className="step-badge">Step 1 of 5</span>
-                    <h2>Complainant & Contact Information</h2>
-                    <p>Enter your contact information for live milestone updates and case tracking alerts.</p>
+                    <h2>Complainant Information</h2>
+                    <p>Enter your contact details so the enterprise nodal desk can verify your transaction and communicate updates.</p>
                   </div>
 
                   <div className="form-grid-2">
@@ -850,7 +856,7 @@ export default function RegisterComplaint() {
                           required
                         />
                       </div>
-                      <span className="input-hint">Used for 2-Factor OTP verification on case lookup.</span>
+                      <span className="input-hint">Used for 2-factor OTP verification on case lookup.</span>
                     </div>
 
                     <div className="form-group">
@@ -879,24 +885,27 @@ export default function RegisterComplaint() {
                 <div className="step-pane">
                   <div className="step-pane-header">
                     <span className="step-badge">Step 2 of 5</span>
-                    <h2>Disputed Enterprise & Transaction Details</h2>
-                    <p>Select the merchant, bank, or platform and provide transaction reference codes.</p>
+                    <h2>Enterprise & Transaction Details</h2>
+                    <p>Select the merchant or financial platform and provide relevant order or reference codes.</p>
                   </div>
 
                   <div className="category-chips-row">
                     <label className="field-label">Dispute Category *</label>
                     <div className="category-chips-grid">
-                      {CATEGORIES.map((cat) => (
-                        <button
-                          key={cat.id}
-                          type="button"
-                          className={`cat-chip-btn ${formData.category === cat.id ? "active" : ""}`}
-                          onClick={() => setFormData((prev) => ({ ...prev, category: cat.id }))}
-                        >
-                          <span className="cat-chip-icon">{cat.icon}</span>
-                          <span className="cat-chip-text">{cat.label}</span>
-                        </button>
-                      ))}
+                      {CATEGORIES.map((cat) => {
+                        const IconComponent = cat.icon;
+                        return (
+                          <button
+                            key={cat.id}
+                            type="button"
+                            className={`cat-chip-btn ${formData.category === cat.id ? "active" : ""}`}
+                            onClick={() => setFormData((prev) => ({ ...prev, category: cat.id }))}
+                          >
+                            <IconComponent className="cat-chip-svg" />
+                            <span className="cat-chip-text">{cat.label}</span>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 
@@ -912,7 +921,7 @@ export default function RegisterComplaint() {
                           onChange={handleChange}
                           required
                         >
-                          <optgroup label="🛍️ E-Commerce & Retail">
+                          <optgroup label="E-Commerce & Retail">
                             <option value="Amazon India">Amazon India</option>
                             <option value="Flipkart">Flipkart</option>
                             <option value="Myntra">Myntra</option>
@@ -921,7 +930,7 @@ export default function RegisterComplaint() {
                             <option value="Nykaa">Nykaa</option>
                             <option value="Tata CLiQ">Tata CLiQ</option>
                           </optgroup>
-                          <optgroup label="🍔 Quick Commerce & Food">
+                          <optgroup label="Food & Quick Delivery">
                             <option value="Zomato">Zomato</option>
                             <option value="Swiggy">Swiggy</option>
                             <option value="Blinkit">Blinkit</option>
@@ -929,7 +938,7 @@ export default function RegisterComplaint() {
                             <option value="BigBasket">BigBasket</option>
                             <option value="Domino's Pizza India">Domino's Pizza India</option>
                           </optgroup>
-                          <optgroup label="🏦 Banking, FinTech & UPI">
+                          <optgroup label="Banking, FinTech & UPI">
                             <option value="State Bank of India (SBI)">State Bank of India (SBI)</option>
                             <option value="HDFC Bank">HDFC Bank</option>
                             <option value="ICICI Bank">ICICI Bank</option>
@@ -940,24 +949,24 @@ export default function RegisterComplaint() {
                             <option value="Google Pay India">Google Pay India</option>
                             <option value="CRED">CRED</option>
                           </optgroup>
-                          <optgroup label="📱 Telecom & Internet">
+                          <optgroup label="Telecom & Internet">
                             <option value="Reliance Jio Infocomm">Reliance Jio Infocomm</option>
                             <option value="Bharti Airtel">Bharti Airtel</option>
                             <option value="Vodafone Idea (Vi)">Vodafone Idea (Vi)</option>
                           </optgroup>
-                          <optgroup label="✈️ Travel & Transport">
+                          <optgroup label="Travel & Transport">
                             <option value="MakeMyTrip">MakeMyTrip</option>
                             <option value="IRCTC (Indian Railways)">IRCTC (Indian Railways)</option>
                             <option value="IndiGo Airlines">IndiGo Airlines</option>
                             <option value="Uber India">Uber India</option>
                             <option value="Ola Cabs">Ola Cabs</option>
                           </optgroup>
-                          <optgroup label="💻 Electronics & Hardware">
+                          <optgroup label="Hardware & Electronics">
                             <option value="Samsung Electronics India">Samsung Electronics India</option>
                             <option value="Apple India">Apple India</option>
                             <option value="Xiaomi / Redmi India">Xiaomi / Redmi India</option>
                           </optgroup>
-                          <optgroup label="🏢 Other Custom Organization">
+                          <optgroup label="Other Organization">
                             <option value="Other / Custom Enterprise">Other / Custom Enterprise</option>
                           </optgroup>
                         </select>
@@ -973,7 +982,7 @@ export default function RegisterComplaint() {
                             id="customCompanyName"
                             type="text"
                             name="customCompanyName"
-                            placeholder="e.g. Local Appliance Store / Merchant"
+                            placeholder="e.g. Regional Retailer / Merchant"
                             value={formData.customCompanyName}
                             onChange={handleChange}
                             required
@@ -982,7 +991,7 @@ export default function RegisterComplaint() {
                       </div>
                     ) : (
                       <div className="form-group">
-                        <label htmlFor="orderOrTransactionId">Order # / Transaction ID / PNR (Optional)</label>
+                        <label htmlFor="orderOrTransactionId">Order / Transaction Ref # (Optional)</label>
                         <div className="input-box">
                           <FaReceipt className="input-icon" />
                           <input
@@ -1006,7 +1015,7 @@ export default function RegisterComplaint() {
                         id="subject"
                         type="text"
                         name="subject"
-                        placeholder="e.g. Defective phone delivered without refund or replacement"
+                        placeholder="e.g. Defective appliance delivered without refund or replacement"
                         value={formData.subject}
                         onChange={handleChange}
                         required
@@ -1025,8 +1034,8 @@ export default function RegisterComplaint() {
                           <span>{selectedEnterprise.nodal}</span>
                         </div>
                         <div className="desk-card-meta">
-                          <span>⚡ Target SLA: <strong>{selectedEnterprise.sla}</strong></span>
-                          <span>• Tokenized 1-click settlement dispatch ready</span>
+                          <span>Target SLA: <strong>{selectedEnterprise.sla}</strong></span>
+                          <span>• Structured resolution link ready</span>
                         </div>
                       </div>
                     </div>
@@ -1035,19 +1044,19 @@ export default function RegisterComplaint() {
               )}
 
               {/* -------------------------------------------------------------
-                  STEP 3: GRIEVANCE STATEMENT & AI ASSISTANT
+                  STEP 3: GRIEVANCE STATEMENT & NARRATIVE FORMATTER
                   ------------------------------------------------------------- */}
               {currentStep === 3 && (
                 <div className="step-pane">
                   <div className="step-pane-header">
                     <span className="step-badge">Step 3 of 5</span>
-                    <h2>Dispute Narrative & AI Drafting Assistant</h2>
-                    <p>Describe what went wrong and use the AI assistant to structure formal chronologies & legal relief requests.</p>
+                    <h2>Dispute Narrative & Desired Remedies</h2>
+                    <p>Describe what went wrong and use the drafting assistant to organize facts and specific relief requests.</p>
                   </div>
 
                   {/* Relief Selection Chips */}
                   <div className="reliefs-section">
-                    <span className="reliefs-title">Select Desired Reliefs (The AI Assistant will integrate these):</span>
+                    <span className="reliefs-title">Select Desired Reliefs (Included in structured narrative):</span>
                     <div className="relief-chips-container">
                       {COMMON_RELIEFS.map((relief) => {
                         const isSelected = selectedReliefs.includes(relief);
@@ -1071,8 +1080,8 @@ export default function RegisterComplaint() {
                     <div className="ai-assistant-left">
                       <FaMagic className="ai-wand-icon" />
                       <div>
-                        <strong>AI Grievance Structuring Assistant</strong>
-                        <span>Auto-formats dates, facts, CPA 2019 legal contexts, and requested remedies.</span>
+                        <strong>Grievance Narrative Assistant</strong>
+                        <span>Formats chronology, facts, and relief requests under CPA 2019 / RBI / TRAI norms.</span>
                       </div>
                     </div>
                     <button
@@ -1081,7 +1090,7 @@ export default function RegisterComplaint() {
                       onClick={handleAiEnhance}
                       disabled={isAiEnhancing}
                     >
-                      <FaMagic /> {isAiEnhancing ? "Structuring..." : "✨ Format Narrative"}
+                      <FaMagic /> {isAiEnhancing ? "Formatting..." : "Structure Narrative"}
                     </button>
                   </div>
 
@@ -1096,14 +1105,14 @@ export default function RegisterComplaint() {
                       id="description"
                       name="description"
                       rows="7"
-                      placeholder="Detail the timeline of events: purchase date, defect or failure, previous customer support tickets, and unmet promises. Click '✨ Format Narrative' above to structure your claim formally..."
+                      placeholder="Detail the timeline of events: purchase date, product/service failure, previous customer support attempts, and unmet commitments. Click 'Structure Narrative' above to organize your claim formally..."
                       value={formData.description}
                       onChange={handleChange}
                       required
                     />
                     <div className="textarea-footer">
                       <span className="char-count">{formData.description.length} characters (min 20)</span>
-                      <span className="tip-text">Tip: Mention dates and amounts clearly for faster settlement.</span>
+                      <span className="tip-text">Clear dates and order references help expedite enterprise redressal.</span>
                     </div>
                   </div>
                 </div>
@@ -1116,8 +1125,8 @@ export default function RegisterComplaint() {
                 <div className="step-pane">
                   <div className="step-pane-header">
                     <span className="step-badge">Step 4 of 5</span>
-                    <h2>Attach Supporting Proof & Documents</h2>
-                    <p>Upload invoices, receipts, photos of defects, or customer chat transcripts (Optional, up to 5 files, 10MB each).</p>
+                    <h2>Attach Supporting Evidence</h2>
+                    <p>Upload invoices, receipts, defect photographs, or support chat logs (Optional, up to 5 files, 10MB each).</p>
                   </div>
 
                   {/* Drag & Drop Area */}
@@ -1132,7 +1141,7 @@ export default function RegisterComplaint() {
                       <FaPaperclip />
                     </div>
                     <div className="dropzone-copy">
-                      <strong>Click to upload or drag & drop files here</strong>
+                      <strong>Click to upload or drag and drop files here</strong>
                       <span>Supports JPG, PNG, WEBP, and PDF files up to 10MB each</span>
                     </div>
                     <input
@@ -1154,7 +1163,7 @@ export default function RegisterComplaint() {
                   {/* Attached Files List */}
                   {files.length > 0 && (
                     <div className="attached-files-list">
-                      <h4 className="attached-heading">Attached Proof Files ({files.length}/5)</h4>
+                      <h4 className="attached-heading">Attached Files ({files.length}/5)</h4>
                       <div className="files-grid">
                         {files.map((file, idx) => (
                           <div key={idx} className="file-chip">
@@ -1188,7 +1197,7 @@ export default function RegisterComplaint() {
                   {files.length === 0 && (
                     <div className="no-files-card">
                       <FaInfoCircle />
-                      <span>No files attached yet. Attaching receipts or screenshots significantly speeds up enterprise redressal, but you can continue if you do not have files on hand.</span>
+                      <span>No files attached yet. Invoices or defect photos help substantiate claims, but you may proceed if you do not have files at hand.</span>
                     </div>
                   )}
                 </div>
@@ -1202,13 +1211,13 @@ export default function RegisterComplaint() {
                   <div className="step-pane-header">
                     <span className="step-badge">Step 5 of 5</span>
                     <h2>Review & Pre-Submission Certification</h2>
-                    <p>Verify your details and provide explicit consent before submitting the grievance docket.</p>
+                    <p>Review your information carefully and confirm certifications before submitting the grievance docket.</p>
                   </div>
 
                   {/* Review Summary Card */}
                   <div className="review-summary-card">
                     <div className="review-card-header">
-                      <h3>📋 Grievance Summary</h3>
+                      <h3>Grievance Summary</h3>
                       <button
                         type="button"
                         className="btn-edit-step"
@@ -1274,7 +1283,7 @@ export default function RegisterComplaint() {
                         required
                       />
                       <label htmlFor="consent-accuracy">
-                        <strong>Accuracy Certification: *</strong> I solemnly certify that the information and documents provided herein are authentic, genuine, and relate to a bona fide consumer transaction.
+                        <strong>Accuracy Certification: *</strong> I certify that the information and documents provided herein are authentic, genuine, and relate to a bona fide consumer transaction.
                       </label>
                     </div>
 
@@ -1287,7 +1296,7 @@ export default function RegisterComplaint() {
                         required
                       />
                       <label htmlFor="consent-terms">
-                        <strong>Platform Terms & Independent Status Agreement: *</strong> I have read and agree to the <Link to="/terms" target="_blank" rel="noopener noreferrer">Terms of Service</Link> and <Link to="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</Link>, and understand that Consumer Trust is an independent private mediation facilitator and not a court, statutory tribunal, or government agency.
+                        <strong>Platform Terms & Independent Status Agreement: *</strong> I have read and agree to the <Link to="/terms" target="_blank" rel="noopener noreferrer">Terms of Service</Link> and <Link to="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</Link>, and understand that Consumer Trust is an independent private dispute facilitation service and not a court, statutory tribunal, or government body.
                       </label>
                     </div>
 
@@ -1299,8 +1308,8 @@ export default function RegisterComplaint() {
                         onChange={(e) => setWhatsappAlertsEnabled(e.target.checked)}
                       />
                       <label htmlFor="consent-wa">
-                        <FaWhatsapp style={{ color: "#22c55e", marginRight: 4 }} />
-                        <strong>Optional Instant Updates:</strong> Send me transactional milestone alerts and live redressal updates via WhatsApp / SMS.
+                        <FaWhatsapp style={{ color: "var(--status-success)", marginRight: 4 }} />
+                        <strong>Optional Milestone Notifications:</strong> Send me transactional milestone alerts and redressal updates via WhatsApp / SMS.
                       </label>
                     </div>
                   </div>
@@ -1326,7 +1335,7 @@ export default function RegisterComplaint() {
                     className="btn-wizard-next"
                     onClick={handleNextStep}
                   >
-                    Continue to Next Step <FaArrowRight />
+                    Continue <FaArrowRight />
                   </button>
                 ) : (
                   <button

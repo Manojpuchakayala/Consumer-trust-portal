@@ -1,110 +1,100 @@
 /* ==========================================================================
-   AUTHCARD - MODERN 2026 SAAS AUTHENTICATION COMPONENT
+   AUTH CARD — INTEGRATED COMPACT ACCOUNT ACCESS PANEL
    ========================================================================== */
 
 .auth-card {
-  background: var(--bg-card, #ffffff);
-  border: 1px solid var(--border-color, #e2e8f0);
-  border-radius: var(--radius-lg, 16px);
-  padding: 28px 24px;
-  box-shadow: var(--shadow-lg, 0 10px 28px -4px rgba(15, 23, 42, 0.08));
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-md);
   width: 100%;
-  max-width: 420px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  position: relative;
-  transition: box-shadow 0.3s ease;
 }
 
-.auth-card:hover {
-  box-shadow: var(--shadow-xl, 0 20px 40px -8px rgba(15, 23, 42, 0.12));
-}
-
+/* Portal Pill Toggle (Citizen vs Officer) */
 .portal-pill-toggle {
-  display: flex;
-  background: var(--bg-subtle, #f1f5f9);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-1);
+  background: var(--bg-secondary);
   padding: 3px;
-  border-radius: var(--radius-full, 9999px);
-  margin-bottom: 18px;
-  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-4);
 }
 
 .portal-pill {
-  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
   background: transparent;
   border: none;
-  padding: 6px 12px;
-  border-radius: var(--radius-full, 9999px);
+  padding: 6px 10px;
+  border-radius: var(--radius-xs);
   font-size: 12px;
-  font-weight: 700;
-  color: var(--text-muted, #64748b);
+  font-weight: 600;
+  color: var(--text-muted);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-fast);
 }
 
 .portal-pill.active {
-  background: var(--bg-surface, #ffffff);
-  color: var(--primary, #1e40af);
-  box-shadow: var(--shadow-xs, 0 1px 2px 0 rgba(0, 0, 0, 0.05));
+  background: var(--card-bg);
+  color: var(--text-heading);
+  box-shadow: var(--shadow-xs);
 }
 
+/* Card Header */
 .auth-card-header {
-  margin-bottom: 18px;
-  text-align: left;
+  margin-bottom: var(--space-4);
 }
 
 .auth-card-header h3 {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 800;
-  color: var(--text-heading, #0f172a);
+  color: var(--text-heading);
   margin: 0 0 4px;
-  letter-spacing: -0.3px;
 }
 
 .auth-card-header p {
   font-size: 13px;
-  color: var(--text-muted, #64748b);
-  margin: 0;
+  color: var(--text-secondary);
   line-height: 1.45;
+  margin: 0;
 }
 
-/* Mode Switch Tabs */
+/* Tabbed Mode Switch (Sign in / Create account) */
 .auth-mode-switch {
-  display: flex;
-  border-bottom: 1.5px solid var(--border-color, #e2e8f0);
-  margin-bottom: 18px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: var(--space-4);
 }
 
 .auth-mode-tab {
-  flex: 1;
   background: transparent;
   border: none;
-  padding: 8px 0;
+  border-bottom: 2px solid transparent;
+  padding: var(--space-2) 0;
   font-size: 13.5px;
-  font-weight: 700;
-  color: var(--text-muted, #64748b);
+  font-weight: 600;
+  color: var(--text-muted);
   cursor: pointer;
-  position: relative;
-  transition: color 0.2s;
+  text-align: center;
+  transition: all var(--transition-fast);
+}
+
+.auth-mode-tab:hover {
+  color: var(--text-heading);
 }
 
 .auth-mode-tab.active {
-  color: var(--primary, #1e40af);
-}
-
-.auth-mode-tab.active::after {
-  content: "";
-  position: absolute;
-  bottom: -1.5px;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: var(--primary, #1e40af);
+  color: var(--brand-electric);
+  border-bottom-color: var(--brand-electric);
+  font-weight: 700;
 }
 
 /* Alerts */
@@ -113,38 +103,36 @@
   align-items: flex-start;
   gap: 8px;
   padding: 10px 12px;
-  border-radius: var(--radius-sm, 8px);
+  border-radius: var(--radius-sm);
   font-size: 12.5px;
-  font-weight: 600;
-  margin-bottom: 14px;
   line-height: 1.4;
-  text-align: left;
+  margin-bottom: var(--space-4);
 }
 
 .auth-alert.error {
-  background: var(--status-rejected-bg, #fef2f2);
-  color: var(--status-rejected, #dc2626);
-  border: 1px solid var(--status-rejected-border, #fecdd3);
+  background: var(--status-error-bg);
+  border: 1px solid var(--status-error-border);
+  color: var(--status-error);
 }
 
 .auth-alert.success {
-  background: var(--status-resolved-bg, #f0fdf4);
-  color: var(--status-resolved, #16a34a);
-  border: 1px solid var(--status-resolved-border, #bbf7d0);
+  background: var(--status-success-bg);
+  border: 1px solid var(--status-success-border);
+  color: var(--status-success);
 }
 
 .alert-icon {
-  font-size: 14px;
+  margin-top: 1px;
   flex-shrink: 0;
-  margin-top: 2px;
+  font-size: 14px;
 }
 
 /* Google Auth Section */
 .google-auth-section {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 14px;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
 }
 
 .google-login-container {
@@ -157,76 +145,65 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
-  padding: 10px 16px;
-  background: var(--bg-surface, #ffffff);
-  color: var(--text-body, #374151);
-  border: 1px solid var(--border-color, #cbd5e1);
-  border-radius: var(--radius-full, 9999px);
+  padding: 9px 14px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
   font-size: 13.5px;
   font-weight: 600;
+  color: var(--text-primary);
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: var(--shadow-xs, 0 1px 2px 0 rgba(0, 0, 0, 0.05));
+  transition: all var(--transition-fast);
 }
 
 .google-btn-custom:hover {
-  background: var(--bg-subtle, #f8fafc);
-  border-color: var(--text-muted, #94a3b8);
-  box-shadow: var(--shadow-sm);
+  background: var(--bg-secondary);
+  border-color: var(--card-border-hover);
 }
 
 .google-icon {
   color: #ea4335;
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .auth-divider {
-  position: relative;
+  display: flex;
+  align-items: center;
   text-align: center;
-  margin: 6px 0;
+  color: var(--text-muted);
+  font-size: 11.5px;
 }
 
-.auth-divider::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 0;
-  width: 100%;
-  height: 1px;
-  background: var(--border-color, #e2e8f0);
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .auth-divider span {
-  position: relative;
-  background: var(--bg-card, #ffffff);
   padding: 0 10px;
-  font-size: 11px;
-  color: var(--text-muted, #94a3b8);
-  text-transform: uppercase;
-  font-weight: 700;
-  letter-spacing: 0.5px;
 }
 
-/* Form Styles */
+/* Auth Form */
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  text-align: left;
 }
 
 .form-group label {
   font-size: 12.5px;
   font-weight: 600;
-  color: var(--text-body, #334155);
+  color: var(--text-heading);
 }
 
 .label-row {
@@ -237,9 +214,8 @@
 
 .forgot-link {
   font-size: 11.5px;
-  color: var(--primary, #1e40af);
+  color: var(--brand-electric);
   cursor: pointer;
-  font-weight: 600;
 }
 
 .forgot-link:hover {
@@ -255,26 +231,27 @@
 .box-icon {
   position: absolute;
   left: 12px;
-  color: var(--text-muted, #64748b);
-  font-size: 14px;
+  color: var(--text-muted);
+  font-size: 13px;
   pointer-events: none;
 }
 
 .input-box input {
   width: 100%;
-  padding: 10px 12px 10px 36px;
-  border: 1px solid var(--border-color, #cbd5e1);
-  border-radius: var(--radius-sm, 8px);
+  padding: 9px 12px 9px 36px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
   font-size: 13.5px;
-  background: var(--bg-surface, #ffffff);
-  color: var(--text-heading, #0f172a);
+  background: var(--card-bg);
+  color: var(--text-primary);
   outline: none;
-  transition: all 0.2s ease;
+  transition: all var(--transition-fast);
+  box-sizing: border-box;
 }
 
 .input-box input:focus {
-  border-color: var(--border-focus, #3b82f6);
-  box-shadow: 0 0 0 3px var(--primary-light, #eff6ff);
+  border-color: var(--brand-electric);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
 .pwd-toggle {
@@ -282,35 +259,33 @@
   right: 10px;
   background: transparent;
   border: none;
-  color: var(--text-muted, #94a3b8);
+  color: var(--text-muted);
   cursor: pointer;
-  font-size: 13px;
   padding: 4px;
   display: flex;
   align-items: center;
 }
 
 .pwd-toggle:hover {
-  color: var(--text-body, #334155);
+  color: var(--text-heading);
 }
 
 .auth-submit-btn {
-  background: var(--accent, #ea580c);
-  color: #ffffff;
+  margin-top: var(--space-2);
+  width: 100%;
+  padding: 10px 16px;
+  background: var(--brand-primary);
   border: none;
-  padding: 11px 18px;
-  border-radius: var(--radius-sm, 8px);
+  border-radius: var(--radius-sm);
+  color: #ffffff;
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
-  margin-top: 4px;
-  box-shadow: 0 4px 12px var(--accent-glow, rgba(234, 88, 12, 0.25));
-  transition: all 0.2s ease;
+  transition: background var(--transition-fast);
 }
 
 .auth-submit-btn:hover:not(:disabled) {
-  background: var(--accent-hover, #c2410c);
-  transform: translateY(-1px);
+  background: var(--brand-primary-hover);
 }
 
 .auth-submit-btn:disabled {
@@ -318,58 +293,60 @@
   cursor: not-allowed;
 }
 
-.auth-card-footer {
-  margin-top: 14px;
+/* Trust Statements Strip */
+.auth-trust-strip {
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.trust-item {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
+  gap: 8px;
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.trust-icon {
   font-size: 11px;
-  color: var(--text-muted, #94a3b8);
-  font-weight: 600;
+  color: var(--brand-teal);
+  flex-shrink: 0;
 }
 
-.auth-card-footer .shield-icon {
-  color: var(--secondary, #0d9488);
-  font-size: 12px;
-}
-
-/* ==========================================================================
-   ACTIVE SESSION OVERVIEW CARD
-   ========================================================================== */
+/* Active Logged-In View */
 .auth-card.active-session {
-  padding: 24px;
-  background: var(--bg-card, #ffffff);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
 }
 
 .session-header {
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin-bottom: 20px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  gap: var(--space-3);
 }
 
 .session-avatar-wrap {
   position: relative;
-  flex-shrink: 0;
 }
 
 .session-avatar-img {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius-full, 9999px);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--primary, #1e40af);
 }
 
 .session-avatar-initials {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius-full, 9999px);
-  background: var(--primary, #1e40af);
-  color: #ffffff;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--brand-primary-subtle);
+  color: var(--brand-electric);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -381,84 +358,72 @@
   position: absolute;
   bottom: 0;
   right: 0;
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background: var(--status-resolved, #16a34a);
-  border: 2px solid var(--bg-card, #ffffff);
+  background: var(--status-success);
+  border: 2px solid var(--card-bg);
 }
 
 .session-user-info {
   display: flex;
   flex-direction: column;
-  text-align: left;
-  overflow: hidden;
 }
 
 .session-label {
   font-size: 11px;
-  color: var(--text-muted, #64748b);
+  color: var(--text-muted);
   text-transform: uppercase;
   font-weight: 700;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.04em;
 }
 
 .session-user-name {
   font-size: 16px;
   font-weight: 800;
-  color: var(--text-heading, #0f172a);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: var(--text-heading);
 }
 
 .session-user-email {
   font-size: 12.5px;
-  color: var(--text-muted, #64748b);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: var(--text-secondary);
 }
 
 .session-actions-grid {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 16px;
+  gap: var(--space-2);
 }
 
 .session-btn {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 11px 16px;
-  border-radius: var(--radius-sm, 8px);
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
   font-size: 13.5px;
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: all var(--transition-fast);
 }
 
 .session-btn.primary {
-  background: var(--primary, #1e40af);
+  background: var(--brand-primary);
   color: #ffffff;
-  box-shadow: var(--shadow-sm);
 }
 
 .session-btn.primary:hover {
-  background: var(--primary-hover, #1d4ed8);
-  transform: translateY(-1px);
+  background: var(--brand-primary-hover);
 }
 
 .session-btn.secondary {
-  background: var(--bg-subtle, #f1f5f9);
-  color: var(--text-body, #334155);
-  border: 1px solid var(--border-color, #cbd5e1);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
 }
 
 .session-btn.secondary:hover {
-  background: var(--bg-section, #f0f4f8);
-  color: var(--text-heading, #0f172a);
+  background: var(--border-color);
 }
 
 .arrow-icon {
@@ -467,8 +432,8 @@
 }
 
 .session-footer {
-  border-top: 1px solid var(--border-color, #e2e8f0);
-  padding-top: 12px;
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--border-color);
 }
 
 .session-logout-btn {
@@ -477,13 +442,13 @@
   gap: 6px;
   background: transparent;
   border: none;
-  color: var(--text-muted, #94a3b8);
+  color: var(--text-muted);
   font-size: 12.5px;
   font-weight: 600;
   cursor: pointer;
-  transition: color 0.2s;
+  padding: 0;
 }
 
 .session-logout-btn:hover {
-  color: var(--status-rejected, #dc2626);
+  color: var(--status-error);
 }

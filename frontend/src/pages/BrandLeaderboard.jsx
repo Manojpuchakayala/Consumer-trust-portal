@@ -3,17 +3,13 @@ import { Link } from "react-router-dom";
 import {
   FaBuilding,
   FaShieldAlt,
-  FaCheckCircle,
   FaClock,
   FaSearch,
   FaStar,
   FaEnvelope,
   FaInfoCircle,
   FaArrowRight,
-  FaExternalLinkAlt,
   FaTimes,
-  FaChartLine,
-  FaBolt,
 } from "react-icons/fa";
 import "./BrandLeaderboard.css";
 
@@ -29,9 +25,9 @@ const BRAND_DATA = [
     rating: 4.8,
     authority: "E-Commerce Rules / Voluntary Nodal Desk",
     sla: "48h Ack / 7 Days Target",
-    badge: "Top Performer",
+    badge: "Active Nodal Desk",
     badgeColor: "#059669",
-    color: "#ff9900",
+    color: "#2563eb",
   },
   {
     id: "flipkart",
@@ -44,9 +40,9 @@ const BRAND_DATA = [
     rating: 4.6,
     authority: "E-Commerce Rules / Voluntary Nodal Desk",
     sla: "48h Ack / 7 Days Target",
-    badge: "Fast Responder",
+    badge: "Active Nodal Desk",
     badgeColor: "#2563eb",
-    color: "#2874f0",
+    color: "#2563eb",
   },
   {
     id: "meesho",
@@ -57,11 +53,11 @@ const BRAND_DATA = [
     totalCases: 760,
     nodalEmail: "grievance-officer@meesho.com",
     rating: 4.5,
-    authority: "Consumer Care Desk",
+    authority: "Consumer Care Nodal Desk",
     sla: "48h Ack / 7 Days Target",
-    badge: "Value Retail",
-    badgeColor: "#d97706",
-    color: "#831843",
+    badge: "Active Nodal Desk",
+    badgeColor: "#64748b",
+    color: "#64748b",
   },
   {
     id: "myntra",
@@ -74,13 +70,13 @@ const BRAND_DATA = [
     rating: 4.7,
     authority: "Fashion Grievance Desk",
     sla: "48h Ack / 7 Days Target",
-    badge: "Fashion Leader",
-    badgeColor: "#db2777",
-    color: "#e11d48",
+    badge: "Active Nodal Desk",
+    badgeColor: "#059669",
+    color: "#059669",
   },
   {
     id: "phonepe",
-    name: "PhonePe UPI & Payments",
+    name: "PhonePe Payments",
     category: "Banking & UPI",
     resolutionRate: "98.2%",
     avgDays: "1.9 Days",
@@ -89,9 +85,9 @@ const BRAND_DATA = [
     rating: 4.9,
     authority: "NPCI / RBI Ombudsman Scheme Guidelines",
     sla: "24h Ack / 5 Days Target",
-    badge: "Quick Settlement",
-    badgeColor: "#7c3aed",
-    color: "#6739b7",
+    badge: "RBI Ombudsman Desk",
+    badgeColor: "#0f766e",
+    color: "#0f766e",
   },
   {
     id: "paytm",
@@ -104,9 +100,9 @@ const BRAND_DATA = [
     rating: 4.4,
     authority: "NPCI / RBI Ombudsman Scheme Guidelines",
     sla: "24h Ack / 5 Days Target",
-    badge: "Verified Fintech",
+    badge: "RBI Ombudsman Desk",
     badgeColor: "#0284c7",
-    color: "#00baf2",
+    color: "#0284c7",
   },
   {
     id: "sbi",
@@ -119,9 +115,9 @@ const BRAND_DATA = [
     rating: 4.3,
     authority: "RBI Customer Protection Guidelines",
     sla: "48h Ack / 7 Days Target",
-    badge: "High Volume",
-    badgeColor: "#0284c7",
-    color: "#1e3a8a",
+    badge: "Statutory Banking Desk",
+    badgeColor: "#1e40af",
+    color: "#1e40af",
   },
   {
     id: "hdfc",
@@ -134,9 +130,9 @@ const BRAND_DATA = [
     rating: 4.6,
     authority: "RBI Customer Protection Guidelines",
     sla: "48h Ack / 7 Days Target",
-    badge: "Verified Desk",
+    badge: "Statutory Banking Desk",
     badgeColor: "#059669",
-    color: "#004c8f",
+    color: "#059669",
   },
   {
     id: "icici",
@@ -149,9 +145,9 @@ const BRAND_DATA = [
     rating: 4.7,
     authority: "RBI Customer Protection Guidelines",
     sla: "48h Ack / 7 Days Target",
-    badge: "Fast Settlement",
-    badgeColor: "#b91c1c",
-    color: "#f37021",
+    badge: "Statutory Banking Desk",
+    badgeColor: "#059669",
+    color: "#059669",
   },
   {
     id: "zomato",
@@ -164,9 +160,9 @@ const BRAND_DATA = [
     rating: 4.8,
     authority: "FSSAI Guidelines / Consumer Support",
     sla: "24h Ack / 3 Days Target",
-    badge: "Rapid Redressal",
-    badgeColor: "#dc2626",
-    color: "#cb202d",
+    badge: "Active Nodal Desk",
+    badgeColor: "#059669",
+    color: "#059669",
   },
   {
     id: "swiggy",
@@ -179,9 +175,9 @@ const BRAND_DATA = [
     rating: 4.7,
     authority: "FSSAI Guidelines / Consumer Support",
     sla: "24h Ack / 3 Days Target",
-    badge: "Instant Support",
-    badgeColor: "#ea580c",
-    color: "#fc8019",
+    badge: "Active Nodal Desk",
+    badgeColor: "#059669",
+    color: "#059669",
   },
   {
     id: "blinkit",
@@ -194,9 +190,9 @@ const BRAND_DATA = [
     rating: 4.8,
     authority: "Quick Commerce Support Desk",
     sla: "24h Ack / 3 Days Target",
-    badge: "10-Min Redressal",
-    badgeColor: "#eab308",
-    color: "#f8cb46",
+    badge: "Active Nodal Desk",
+    badgeColor: "#059669",
+    color: "#059669",
   },
   {
     id: "zepto",
@@ -209,9 +205,9 @@ const BRAND_DATA = [
     rating: 4.7,
     authority: "Quick Commerce Support Desk",
     sla: "24h Ack / 3 Days Target",
-    badge: "Quick Settlement",
-    badgeColor: "#9333ea",
-    color: "#881337",
+    badge: "Active Nodal Desk",
+    badgeColor: "#059669",
+    color: "#059669",
   },
   {
     id: "jio",
@@ -224,9 +220,9 @@ const BRAND_DATA = [
     rating: 4.5,
     authority: "TRAI Telecom Directives",
     sla: "48h Ack / 7 Days Target",
-    badge: "Telecom Desk",
-    badgeColor: "#0b2545",
-    color: "#0a2885",
+    badge: "TRAI Appellate Desk",
+    badgeColor: "#1e40af",
+    color: "#1e40af",
   },
   {
     id: "airtel",
@@ -239,9 +235,9 @@ const BRAND_DATA = [
     rating: 4.4,
     authority: "TRAI Telecom Directives",
     sla: "48h Ack / 7 Days Target",
-    badge: "Telecom Desk",
-    badgeColor: "#b91c1c",
-    color: "#ed1c24",
+    badge: "TRAI Appellate Desk",
+    badgeColor: "#1e40af",
+    color: "#1e40af",
   },
   {
     id: "makemytrip",
@@ -254,9 +250,9 @@ const BRAND_DATA = [
     rating: 4.6,
     authority: "Travel & Hospitality Nodal Desk",
     sla: "24h Ack / 7 Days Target",
-    badge: "Verified Nodal",
+    badge: "Active Nodal Desk",
     badgeColor: "#2563eb",
-    color: "#d62828",
+    color: "#2563eb",
   },
   {
     id: "irctc",
@@ -269,9 +265,9 @@ const BRAND_DATA = [
     rating: 4.3,
     authority: "Railways Redressal Channel",
     sla: "24h Ack / 5 Days Target",
-    badge: "Rail Madad Link",
-    badgeColor: "#047857",
-    color: "#283593",
+    badge: "Public Sector Desk",
+    badgeColor: "#0f766e",
+    color: "#0f766e",
   },
   {
     id: "uber",
@@ -284,9 +280,9 @@ const BRAND_DATA = [
     rating: 4.6,
     authority: "Mobility Grievance Desk",
     sla: "24h Ack / 5 Days Target",
-    badge: "Ride Redressal",
-    badgeColor: "#0f172a",
-    color: "#000000",
+    badge: "Active Nodal Desk",
+    badgeColor: "#64748b",
+    color: "#64748b",
   },
   {
     id: "samsung",
@@ -299,9 +295,9 @@ const BRAND_DATA = [
     rating: 4.7,
     authority: "Electronics Care Support",
     sla: "48h Ack / 7 Days Target",
-    badge: "Electronics Nodal",
-    badgeColor: "#1d4ed8",
-    color: "#1428a0",
+    badge: "Hardware Nodal Desk",
+    badgeColor: "#2563eb",
+    color: "#2563eb",
   },
   {
     id: "apple",
@@ -314,9 +310,9 @@ const BRAND_DATA = [
     rating: 4.9,
     authority: "Apple Customer Relations",
     sla: "48h Ack / 7 Days Target",
-    badge: "Premium Support",
-    badgeColor: "#475569",
-    color: "#333333",
+    badge: "Hardware Nodal Desk",
+    badgeColor: "#64748b",
+    color: "#64748b",
   },
 ];
 
@@ -341,18 +337,18 @@ export default function BrandLeaderboard() {
         {/* Page Header */}
         <div className="leaderboard-header">
           <div className="header-badge">
-            <FaShieldAlt /> COMMUNITY BENCHMARK & REDRESSAL SCORECARD
+            <FaShieldAlt /> Community Redressal Benchmarks
           </div>
-          <h1>Enterprise Redressal & Brand Trust Index</h1>
+          <h1>Enterprise Redressal & Trust Index</h1>
           <p className="leaderboard-subtitle">
-            Community benchmarks, voluntary resolution response metrics, and verified grievance officer contact desks across India's leading digital platforms.
+            Community resolution response metrics, turnaround benchmarks, and verified corporate grievance officer contact channels.
           </p>
 
-          {/* Methodology Callout Strip */}
+          {/* Methodology Banner */}
           <div className="methodology-banner">
             <FaInfoCircle className="methodology-icon" />
             <span>
-              Ratings are community benchmarks computed from verified user reports and public nodal responses. Learn more or request data correction in our <Link to="/methodology" className="methodology-link">Brand Methodology & Takedown Policy</Link>. Enterprise grievance officers can resolve disputes via the <Link to="/partner/resolve" className="methodology-link">1-Click Resolution Desk</Link>.
+              Metrics are community benchmarks computed from verified user submissions and public nodal responses. Review our <Link to="/methodology" className="methodology-link">Brand Methodology & Takedown Policy</Link>. Enterprise officers can review cases via the <Link to="/partner/resolve" className="methodology-link">Resolution Desk</Link>.
             </span>
           </div>
 
@@ -361,12 +357,12 @@ export default function BrandLeaderboard() {
             <div className="summary-stat-card green">
               <span className="stat-label">Average Redressal Rate</span>
               <strong className="stat-value">94.7%</strong>
-              <span className="stat-hint">Across 11,000+ facilitated disputes</span>
+              <span className="stat-hint">Across voluntary facilitated disputes</span>
             </div>
             <div className="summary-stat-card blue">
               <span className="stat-label">Avg. Turnaround Speed</span>
               <strong className="stat-value">3.1 Days</strong>
-              <span className="stat-hint">Standard 7-day target SLA</span>
+              <span className="stat-hint">Standard 7-day target window</span>
             </div>
             <div className="summary-stat-card purple">
               <span className="stat-label">Verified Corporate Desks</span>
@@ -376,7 +372,7 @@ export default function BrandLeaderboard() {
             <div className="summary-stat-card amber">
               <span className="stat-label">Average Citizen Rating</span>
               <strong className="stat-value">4.6 / 5.0</strong>
-              <span className="stat-hint">Verified post-resolution reviews</span>
+              <span className="stat-hint">Post-resolution community feedback</span>
             </div>
           </div>
         </div>
@@ -432,10 +428,7 @@ export default function BrandLeaderboard() {
             <div key={brand.id} className="brand-scorecard">
               <div className="brand-card-top">
                 <div className="brand-identity">
-                  <div
-                    className="brand-avatar"
-                    style={{ backgroundColor: brand.color ? `${brand.color}15` : "#eff6ff", color: brand.color || "#1e40af" }}
-                  >
+                  <div className="brand-avatar">
                     {brand.name.charAt(0)}
                   </div>
                   <div>
@@ -443,10 +436,7 @@ export default function BrandLeaderboard() {
                     <h3 className="brand-title">{brand.name}</h3>
                   </div>
                 </div>
-                <span
-                  className="brand-status-tag"
-                  style={{ background: `${brand.badgeColor}15`, color: brand.badgeColor, borderColor: `${brand.badgeColor}30` }}
-                >
+                <span className="brand-status-tag">
                   {brand.badge}
                 </span>
               </div>
@@ -454,7 +444,7 @@ export default function BrandLeaderboard() {
               {/* Redressal Progress Bar */}
               <div className="rate-progress-wrap">
                 <div className="rate-progress-header">
-                  <span>Redressal Success</span>
+                  <span>Resolution Rate</span>
                   <strong>{brand.resolutionRate}</strong>
                 </div>
                 <div className="rate-progress-track">
@@ -478,7 +468,7 @@ export default function BrandLeaderboard() {
                 <div className="kpi-box">
                   <span className="kpi-label">Rating</span>
                   <strong className="kpi-val gold">
-                    <FaStar style={{ fontSize: 11, marginRight: 2 }} /> {brand.rating}
+                    <FaStar style={{ fontSize: 10, marginRight: 2 }} /> {brand.rating}
                   </strong>
                 </div>
               </div>
@@ -507,7 +497,7 @@ export default function BrandLeaderboard() {
                   to={`/register?company=${encodeURIComponent(brand.name)}`}
                   className="btn-dispute-enterprise"
                 >
-                  File Grievance Against {brand.name} <FaArrowRight style={{ fontSize: 11 }} />
+                  File Grievance with {brand.name} <FaArrowRight style={{ fontSize: 10 }} />
                 </Link>
               </div>
             </div>
@@ -519,7 +509,7 @@ export default function BrandLeaderboard() {
           <div className="no-brands-card">
             <FaBuilding className="empty-icon" />
             <h3>No enterprise found matching "{searchTerm}"</h3>
-            <p>You can still file a dispute against any unlisted merchant or organization through our custom enterprise desk.</p>
+            <p>You can still file a dispute against any custom organization or retailer through our custom enterprise desk.</p>
             <div className="empty-actions">
               <button
                 type="button"

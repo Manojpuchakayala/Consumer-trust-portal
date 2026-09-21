@@ -1,19 +1,15 @@
 /* ==========================================================================
-   LOGIN PAGE - CLEAN SAAS LOGIN LAYOUT
+   LOGIN PAGE — CLEAN CENTRED ACCOUNT ACCESS LAYOUT
    ========================================================================== */
 
 .login-page-root {
   min-height: calc(100vh - 140px);
-  background: linear-gradient(180deg, #f0f4f8 0%, var(--bg-primary, #f8fafc) 100%);
+  background: var(--bg-primary);
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 40px 20px 80px;
+  padding: var(--space-10) var(--space-4) var(--space-16);
   box-sizing: border-box;
-}
-
-[data-theme="dark"] .login-page-root {
-  background: linear-gradient(180deg, #0d172e 0%, var(--bg-primary, #0b1329) 100%);
 }
 
 .login-page-container {
@@ -21,7 +17,7 @@
   max-width: 440px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--space-4);
 }
 
 .login-top-bar {
@@ -36,9 +32,9 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: var(--primary, #1e40af);
+  color: var(--brand-electric);
   text-decoration: none;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .login-back-home:hover {
@@ -50,7 +46,7 @@
   align-items: center;
   gap: 6px;
   font-size: 11.5px;
-  color: var(--text-muted, #64748b);
+  color: var(--text-muted);
   font-weight: 600;
 }
 

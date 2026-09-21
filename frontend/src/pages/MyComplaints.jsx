@@ -3,19 +3,15 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   FaClipboardList,
   FaSearch,
-  FaPlusCircle,
+  FaPlus,
   FaClock,
   FaCheckCircle,
   FaExclamationCircle,
   FaPaperclip,
-  FaWhatsapp,
-  FaStar,
   FaBuilding,
   FaTrashAlt,
   FaFilePdf,
-  FaReceipt,
   FaCopy,
-  FaTag,
   FaCalendarAlt,
   FaHourglassHalf,
   FaTimesCircle,
@@ -23,8 +19,9 @@ import {
   FaUserCheck,
   FaFilter,
   FaRedoAlt,
-  FaCompass,
   FaArrowRight,
+  FaTimes,
+  FaReceipt,
 } from "react-icons/fa";
 import api from "../services/api";
 import { generateGrievanceNoticePdf } from "../utils/pdfGenerator";
@@ -92,7 +89,7 @@ export default function MyComplaints() {
       const res = await api.delete(`/complaints/${complaintToDelete._id}`);
       if (res.data?.success || res.status === 200) {
         setComplaints((prev) => prev.filter((c) => c._id !== complaintToDelete._id));
-        setSuccessMessage(`Grievance docket #${complaintToDelete.complaintId} has been deleted.`);
+        setSuccessMessage(`Grievance docket #${complaintToDelete.complaintId} has been removed.`);
         setTimeout(() => setSuccessMessage(""), 5000);
       }
     } catch (err) {
@@ -143,29 +140,29 @@ export default function MyComplaints() {
   return (
     <div className="dashboard-page-root">
       <div className="dashboard-container">
-        {/* 1. Header Banner */}
+        {/* 1. Header Card */}
         <div className="dashboard-header-card">
           <div className="header-user-intro">
             <div className="header-badge-row">
               <span className="hub-badge">
-                <FaShieldAlt /> Citizen Redressal Hub
+                <FaShieldAlt /> Citizen Grievance Hub
               </span>
               <span className="user-email-chip">
                 <FaUserCheck /> {user?.name || user?.email}
               </span>
             </div>
-            <h1>My Grievance Dashboard</h1>
+            <h1>Citizen Grievance Dashboard</h1>
             <p>
-              Manage your dispute dockets, monitor chronological investigation milestones, download statutory legal summaries, or track live enterprise resolutions.
+              Manage your dispute dockets, monitor investigation milestones, download claim summaries, and view voluntary corporate resolutions.
             </p>
           </div>
 
           <div className="header-btn-actions">
             <Link to="/register" className="dash-primary-btn">
-              <FaPlusCircle /> Start New Grievance
+              <FaPlus /> File New Grievance
             </Link>
             <Link to="/track" className="dash-secondary-btn">
-              <FaCompass /> Track a Case
+              <FaSearch /> Track a Case
             </Link>
           </div>
         </div>
@@ -175,8 +172,8 @@ export default function MyComplaints() {
           <div className="dash-alert success">
             <FaCheckCircle className="alert-icon" />
             <span>{successMessage}</span>
-            <button className="alert-close-btn" onClick={() => setSuccessMessage("")}>
-              <FaTimesCircle />
+            <button className="alert-close-btn" onClick={() => setSuccessMessage("")} aria-label="Dismiss">
+              <FaTimes />
             </button>
           </div>
         )}
@@ -191,7 +188,7 @@ export default function MyComplaints() {
           </div>
         )}
 
-        {/* 2. Top Summary Metric Cards */}
+        {/* 2. Metric Cards */}
         <div className="dash-metrics-grid">
           <div
             className={`metric-card total ${selectedStatus === "All" ? "active" : ""}`}
@@ -234,7 +231,7 @@ export default function MyComplaints() {
             </div>
             <div className="metric-data">
               <span className="metric-num">{inProgressCount}</span>
-              <span className="metric-label">In Progress</span>
+              <span className="metric-label">In Review</span>
             </div>
           </div>
 
@@ -254,7 +251,7 @@ export default function MyComplaints() {
           </div>
         </div>
 
-        {/* 3. Filter Controls Box */}
+        {/* 3. Filters & Search */}
         <div className="dash-filter-card">
           <div className="filter-tabs-row">
             <div className="status-tabs-list">
@@ -292,7 +289,7 @@ export default function MyComplaints() {
                   className={`status-tab rejected ${selectedStatus === "Rejected" ? "active" : ""}`}
                   onClick={() => setSelectedStatus("Rejected")}
                 >
-                  Rejected ({rejectedCount})
+                  Closed ({rejectedCount})
                 </button>
               )}
             </div>
@@ -325,7 +322,7 @@ export default function MyComplaints() {
               />
               {searchTerm && (
                 <button className="clear-search-btn" onClick={() => setSearchTerm("")}>
-                  <FaTimesCircle />
+                  <FaTimes />
                 </button>
               )}
             </div>
@@ -349,197 +346,164 @@ export default function MyComplaints() {
             <div className="empty-icon-circle">
               <FaClipboardList />
             </div>
-            <h3>No Complaints Found</h3>
+            <h3>No grievances found</h3>
             <p>
               {searchTerm || selectedStatus !== "All" || selectedBrand !== "All"
-                ? "No dispute records match your search or selected filters."
-                : "You haven't filed any grievances yet. Lodge your first dispute now to initiate structured mediation with the enterprise."}
+                ? "No dispute dockets match your current search and filter criteria."
+                : "You have not registered any consumer grievances yet."}
             </p>
-            {searchTerm || selectedStatus !== "All" || selectedBrand !== "All" ? (
-              <button className="empty-action-btn" onClick={resetFilters}>
-                Clear All Filters
-              </button>
-            ) : (
-              <Link to="/register" className="empty-action-btn primary">
-                <FaPlusCircle /> File Your First Grievance
-              </Link>
-            )}
+            <div className="empty-btn-group">
+              {searchTerm || selectedStatus !== "All" || selectedBrand !== "All" ? (
+                <button className="dash-secondary-btn" onClick={resetFilters}>
+                  Clear Filters
+                </button>
+              ) : (
+                <Link to="/register" className="dash-primary-btn">
+                  <FaPlus /> File Your First Grievance
+                </Link>
+              )}
+            </div>
           </div>
         ) : (
-          <div className="dash-cases-grid">
+          <div className="complaints-cards-grid">
             {filteredComplaints.map((c) => {
-              const statusSlug = (c.status || "Pending").toLowerCase().replace(/\s+/g, "-");
-              const brandName = c.companyName || "Disputed Enterprise";
-              const dateStr = c.createdAt
-                ? new Date(c.createdAt).toLocaleDateString("en-IN", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                  })
-                : "Recent";
-
+              const statusSlug = c.status.toLowerCase().replace(/\s+/g, "-");
               return (
-                <div key={c._id} className={`case-card ${statusSlug}`}>
-                  {/* Card Header Bar */}
-                  <div className="case-card-header">
-                    <div className="header-left-badges">
-                      <span className="brand-chip">
-                        <FaBuilding /> {brandName}
-                      </span>
-                      <span className="category-chip">
-                        <FaTag /> {c.category || "Product"}
-                      </span>
+                <div key={c._id} className="complaint-card">
+                  {/* Top Bar */}
+                  <div className="complaint-card-top">
+                    <div className="docket-id-wrap">
+                      <span className="docket-label">Docket</span>
+                      <strong className="docket-code">#{c.complaintId}</strong>
                       <button
                         type="button"
-                        className="docket-chip"
+                        className="copy-docket-btn"
                         onClick={() => handleCopyId(c.complaintId)}
-                        title="Click to copy Docket ID"
+                        title="Copy Docket ID"
                       >
-                        <span>#{c.complaintId}</span>
-                        <FaCopy className="copy-icon" />
-                        {copiedId === c.complaintId && <span className="copied-pill">Copied!</span>}
+                        <FaCopy />
+                        <span>{copiedId === c.complaintId ? "Copied" : "Copy"}</span>
                       </button>
                     </div>
 
-                    <div className="header-right-badges">
-                      <span className={`status-badge ${statusSlug}`}>
-                        <span className="status-dot" />
-                        {c.status || "Pending"}
-                      </span>
-                      <span className="date-chip">
-                        <FaCalendarAlt /> {dateStr}
-                      </span>
-                    </div>
+                    <span className={`status-pill ${statusSlug}`}>
+                      {c.status}
+                    </span>
                   </div>
 
-                  {/* Card Body */}
-                  <div className="case-card-body">
-                    <h3 className="case-subject">{c.subject}</h3>
+                  {/* Body Content */}
+                  <div className="complaint-card-body">
+                    <div className="company-category-row">
+                      <span className="card-company">
+                        <FaBuilding /> {c.companyName}
+                      </span>
+                      <span className="card-category">{c.category}</span>
+                    </div>
+
+                    <h3 className="card-subject">{c.subject}</h3>
 
                     {c.orderOrTransactionId && (
-                      <div className="case-order-ref">
-                        <FaReceipt className="ref-icon" />
-                        <span>Order / Ref ID:</span>
-                        <strong>{c.orderOrTransactionId}</strong>
+                      <div className="card-order-id">
+                        <FaReceipt />
+                        <span>Ref: {c.orderOrTransactionId}</span>
                       </div>
                     )}
 
-                    <p className="case-description">{c.description}</p>
+                    <p className="card-desc-snippet">
+                      {c.description ? (
+                        c.description.length > 140
+                          ? `${c.description.substring(0, 140)}...`
+                          : c.description
+                      ) : (
+                        "No details provided."
+                      )}
+                    </p>
                   </div>
 
-                  {/* Badges Row */}
-                  <div className="case-badges-row">
-                    {c.attachments && c.attachments.length > 0 && (
-                      <span className="feature-badge evidence">
-                        <FaPaperclip /> {c.attachments.length} Evidence File{c.attachments.length > 1 ? "s" : ""}
+                  {/* Footer Meta & Actions */}
+                  <div className="complaint-card-footer">
+                    <div className="card-meta-left">
+                      <span className="card-date">
+                        <FaCalendarAlt />{" "}
+                        {new Date(c.createdAt).toLocaleDateString("en-IN", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })}
                       </span>
-                    )}
-                    {c.whatsappAlertsEnabled !== false && (
-                      <span className="feature-badge whatsapp">
-                        <FaWhatsapp /> WhatsApp Alerts Active
-                      </span>
-                    )}
-                    {c.companyNoticeSent && (
-                      <span className="feature-badge notice">
-                        <FaShieldAlt /> Nodal Notice Sent
-                      </span>
-                    )}
-                    {c.status === "Resolved" && c.feedback?.rating && (
-                      <span className="feature-badge rating">
-                        <FaStar /> Rated {c.feedback.rating}.0 / 5.0
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Remarks Box if present */}
-                  {c.adminRemarks && (
-                    <div className="case-remarks-box">
-                      <strong>Authority & Redressal Remarks:</strong>
-                      <p>{c.adminRemarks}</p>
+                      {c.attachments?.length > 0 && (
+                        <span className="card-attachments">
+                          <FaPaperclip /> {c.attachments.length} file{c.attachments.length === 1 ? "" : "s"}
+                        </span>
+                      )}
                     </div>
-                  )}
 
-                  {/* Card Actions Footer */}
-                  <div className="case-card-footer">
-                    <div className="footer-actions-left">
-                      <Link to={`/track?id=${c.complaintId}`} className="card-btn primary">
-                        <FaCompass /> Track Live Status
+                    <div className="card-actions-right">
+                      <button
+                        type="button"
+                        className="btn-pdf-mini"
+                        onClick={() => generateGrievanceNoticePdf(c)}
+                        title="Download PDF claim summary"
+                      >
+                        <FaFilePdf /> PDF
+                      </button>
+
+                      <Link
+                        to={`/track?id=${c.complaintId}`}
+                        className="btn-track-mini"
+                      >
+                        Track <FaArrowRight style={{ fontSize: 10 }} />
                       </Link>
 
                       <button
                         type="button"
-                        onClick={() => generateGrievanceNoticePdf(c)}
-                        className="card-btn secondary"
-                        title="Download official claim summary PDF"
+                        className="btn-delete-mini"
+                        onClick={() => openDeleteModal(c)}
+                        title="Remove grievance docket"
                       >
-                        <FaFilePdf /> Notice PDF
+                        <FaTrashAlt />
                       </button>
-
-                      <a
-                        href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-                          `🏛️ CONSUMER TRUST CASE UPDATE\nDocket: #${c.complaintId}\nStatus: ${c.status}\nSubject: ${c.subject}\nTrack: ${window.location.origin}/track?id=${c.complaintId}`
-                        )}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="card-btn whatsapp"
-                        title="Share on WhatsApp"
-                      >
-                        <FaWhatsapp /> Share
-                      </a>
                     </div>
-
-                    <button
-                      type="button"
-                      onClick={() => openDeleteModal(c)}
-                      className="card-delete-btn"
-                      title="Delete / withdraw grievance"
-                    >
-                      <FaTrashAlt />
-                    </button>
                   </div>
                 </div>
               );
             })}
           </div>
         )}
-      </div>
 
-      {/* Delete Confirmation Modal */}
-      {deleteModalOpen && complaintToDelete && (
-        <div className="modal-overlay" onClick={() => !isDeleting && setDeleteModalOpen(false)}>
-          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-icon-wrap">
-              <FaTrashAlt />
-            </div>
-            <h3>Delete Grievance Docket?</h3>
-            <p>
-              Are you sure you want to withdraw and delete grievance docket <strong>#{complaintToDelete.complaintId}</strong> against <strong>{complaintToDelete.companyName || "Enterprise"}</strong>?
-            </p>
-            <div className="modal-warning">
-              <FaExclamationCircle />
-              <span>This action will permanently delete all case records, attached evidence documents, and tracking history.</span>
-            </div>
-            <div className="modal-actions">
-              <button
-                type="button"
-                className="modal-cancel-btn"
-                onClick={() => setDeleteModalOpen(false)}
-                disabled={isDeleting}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                className="modal-delete-btn"
-                onClick={handleConfirmDelete}
-                disabled={isDeleting}
-              >
-                {isDeleting ? "Deleting..." : "Yes, Delete Grievance"}
-              </button>
+        {/* 5. Delete Confirmation Modal */}
+        {deleteModalOpen && (
+          <div className="modal-backdrop">
+            <div className="modal-card">
+              <div className="modal-header">
+                <FaTrashAlt className="modal-icon text-red" />
+                <h3>Remove Grievance Docket?</h3>
+              </div>
+              <p className="modal-text">
+                Are you sure you want to remove grievance docket <strong>#{complaintToDelete?.complaintId}</strong> regarding <strong>{complaintToDelete?.companyName}</strong>? This action cannot be undone.
+              </p>
+              <div className="modal-actions">
+                <button
+                  type="button"
+                  className="modal-cancel-btn"
+                  onClick={() => setDeleteModalOpen(false)}
+                  disabled={isDeleting}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="modal-delete-btn"
+                  onClick={handleConfirmDelete}
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? "Removing..." : "Confirm Removal"}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

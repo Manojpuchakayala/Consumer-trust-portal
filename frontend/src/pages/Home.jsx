@@ -1,68 +1,38 @@
-import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   FaFileAlt,
   FaSearch,
   FaShieldAlt,
   FaCheckCircle,
-  FaHeadset,
-  FaStar,
   FaLock,
-  FaBolt,
   FaBuilding,
   FaExternalLinkAlt,
   FaArrowRight,
   FaUserCheck,
-  FaCertificate,
+  FaClock,
+  FaBalanceScale,
+  FaEnvelopeOpenText,
 } from "react-icons/fa";
-import api from "../services/api";
 import AuthCard from "../components/AuthCard";
 import "./Home.css";
 
 export default function Home() {
-  const [stats, setStats] = useState({
-    total: "50K+",
-    resolved: "98%",
-    activeUsers: "25K+",
-    avgRating: "4.9",
-  });
-
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const response = await api.get("/complaints/public-stats");
-        if (response.data?.stats) {
-          const s = response.data.stats;
-          setStats({
-            total: s.total > 0 ? s.total.toLocaleString() : "100+",
-            resolved: s.resolved > 0 ? s.resolved.toLocaleString() : "98%",
-            activeUsers: s.activeUsers > 0 ? s.activeUsers.toLocaleString() : "50+",
-            avgRating: s.avgRating ? `${s.avgRating}` : "4.9",
-          });
-        }
-      } catch {
-        // Fallback gracefully to default stats
-      }
-    };
-    fetchStats();
-  }, []);
-
   return (
     <div className="home-root">
-      {/* 1. Top Independent Platform Notice Ribbon */}
+      {/* 1. Slim, Understated Platform Notice */}
       <div className="home-top-notice">
         <div className="home-notice-container">
           <FaShieldAlt className="notice-icon" />
           <span>
-            <strong>Independent Platform Notice:</strong> Consumer Trust is an independent private dispute facilitation service. We are not a government agency, court, or statutory commission. For formal court filings, visit <a href="https://consumerhelpline.gov.in" target="_blank" rel="noopener noreferrer">consumerhelpline.gov.in <FaExternalLinkAlt style={{ fontSize: 10 }} /></a>.
+            <strong>Independent Platform Notice:</strong> Consumer Trust is an independent private dispute facilitation service. We are not a government agency, court, or statutory commission. For statutory judicial filings, visit <a href="https://consumerhelpline.gov.in" target="_blank" rel="noopener noreferrer">consumerhelpline.gov.in <FaExternalLinkAlt style={{ fontSize: 9 }} /></a>.
           </span>
         </div>
       </div>
 
-      {/* 2. Hero Section (2-Column Grid with Embedded AuthCard) */}
+      {/* 2. Editorial-Style Hero Section */}
       <section className="home-hero-section">
         <div className="hero-container">
-          {/* Left Column: Hero Content */}
+          {/* Left Column: Calm, Confident Value Proposition */}
           <div className="hero-content-col">
             <div className="hero-tag-pill">
               <span className="pill-dot" />
@@ -70,11 +40,11 @@ export default function Home() {
             </div>
 
             <h1 className="hero-main-title">
-              Fair, Structured Resolution for Consumer Disputes
+              A clearer path to consumer resolution.
             </h1>
 
             <p className="hero-lead-text">
-              Empowering consumers with structured dispute notices, invoice evidence verification, milestone tracking, and corporate mediation to secure prompt refunds, replacements, and settlements.
+              Consumer Trust helps citizens structure dispute details, securely share evidence, and communicate with enterprise grievance desks for voluntary settlement.
             </p>
 
             <div className="hero-cta-group">
@@ -90,39 +60,48 @@ export default function Home() {
               </Link>
             </div>
 
-            {/* Quick Metrics Bar */}
-            <div className="hero-stats-row">
-              <div className="hero-stat-item">
-                <strong>{stats.total}</strong>
-                <span>Grievances Lodged</span>
+            {/* Platform Benchmarks / Highlights */}
+            <div className="hero-benchmarks-row">
+              <div className="benchmark-item">
+                <FaClock className="benchmark-icon" />
+                <div>
+                  <strong>7-Day Window</strong>
+                  <span>Standard target SLA</span>
+                </div>
               </div>
-              <div className="stat-separator" />
-              <div className="hero-stat-item">
-                <strong>{stats.resolved}</strong>
-                <span>Enterprise Redressal</span>
+              <div className="benchmark-divider" />
+              <div className="benchmark-item">
+                <FaLock className="benchmark-icon" />
+                <div>
+                  <strong>Protected Access</strong>
+                  <span>2FA OTP verification</span>
+                </div>
               </div>
-              <div className="stat-separator" />
-              <div className="hero-stat-item">
-                <strong>★ {stats.avgRating}</strong>
-                <span>Citizen Satisfaction</span>
+              <div className="benchmark-divider" />
+              <div className="benchmark-item">
+                <FaBuilding className="benchmark-icon" />
+                <div>
+                  <strong>25+ Desks</strong>
+                  <span>Direct corporate channels</span>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Right Column: Embedded AuthCard */}
+          {/* Right Column: Integrated Compact Account Panel */}
           <div className="hero-auth-col">
             <AuthCard />
           </div>
         </div>
       </section>
 
-      {/* 3. Three-Step "How It Works" Section */}
+      {/* 3. Three-Step Structured Workflow */}
       <section className="how-it-works-section" id="how-it-works">
         <div className="section-container">
           <div className="section-header-center">
-            <span className="section-badge">Streamlined Facilitation Workflow</span>
+            <span className="section-badge">Facilitation Process</span>
             <h2>How Consumer Trust Works</h2>
-            <p>From initial dispute drafting to corporate redressal settlement, here is how our structured facilitation process operates.</p>
+            <p>A structured, evidence-backed workflow connecting consumers with corporate grievance officers.</p>
           </div>
 
           <div className="steps-cards-grid">
@@ -131,44 +110,44 @@ export default function Home() {
               <div className="step-icon-box">
                 <FaFileAlt />
               </div>
-              <h3>Draft & Submit</h3>
+              <h3>Structure Your Dispute</h3>
               <p>
-                Provide seller details, attach invoice proof, structure your claim narrative with our AI assistant, and receive your unique Docket ID.
+                Organize transaction facts, attach invoice proof, format your narrative clearly, and generate a unique Docket ID.
               </p>
             </div>
 
             <div className="step-card">
               <div className="step-card-num">02</div>
-              <div className="step-icon-box" style={{ background: "var(--secondary-light, #f0fdfa)", color: "var(--secondary, #0d9488)" }}>
-                <FaBolt />
+              <div className="step-icon-box">
+                <FaEnvelopeOpenText />
               </div>
-              <h3>Nodal Dispatch & Review</h3>
+              <h3>Direct Nodal Communication</h3>
               <p>
-                Our platform dispatches the dispute summary to the enterprise nodal desk with a tokenized 1-click resolution link for prompt investigation.
+                A structured dispute notice and tokenized 1-click resolution link are prepared for the enterprise grievance desk.
               </p>
             </div>
 
             <div className="step-card">
               <div className="step-card-num">03</div>
-              <div className="step-icon-box" style={{ background: "var(--accent-light, #fff7ed)", color: "var(--accent, #ea580c)" }}>
-                <FaCertificate />
+              <div className="step-icon-box">
+                <FaCheckCircle />
               </div>
-              <h3>Settlement & Rating</h3>
+              <h3>Track Milestones & Resolution</h3>
               <p>
-                Receive settlement remarks, refund confirmation, download your official Resolution Certificate, and rate the redressal quality.
+                Monitor voluntary redressal progress in real time, review settlement remarks, and receive your Resolution Record.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 4. "Your Privacy Comes First" Trust Section */}
+      {/* 4. Privacy & Compliance Principles */}
       <section className="privacy-trust-section">
         <div className="section-container">
           <div className="section-header-center">
-            <span className="section-badge secondary">Security & Compliance</span>
-            <h2>Your Privacy Comes First</h2>
-            <p>We implement enterprise-grade privacy safeguards, zero public data leakage, and compliance with the Digital Personal Data Protection Act 2023.</p>
+            <span className="section-badge secondary">Data Protection</span>
+            <h2>Your privacy comes first.</h2>
+            <p>Designed in compliance with the Digital Personal Data Protection Act, 2023 with strict access safeguards.</p>
           </div>
 
           <div className="trust-pillars-grid">
@@ -178,7 +157,7 @@ export default function Home() {
               </div>
               <h3>Protected Case Records</h3>
               <p>
-                Case records and personal details are never exposed publicly. Unauthenticated access requires two-factor OTP verification sent to the verified contact on file.
+                Case records and personal details are never publicly visible. Unauthenticated tracking requires two-factor OTP verification sent to the complainant contact.
               </p>
             </div>
 
@@ -186,33 +165,33 @@ export default function Home() {
               <div className="pillar-icon-wrap">
                 <FaUserCheck />
               </div>
-              <h3>Tokenized Enterprise Mediation</h3>
+              <h3>Secure Enterprise Access</h3>
               <p>
-                Corporate grievance officers access disputes securely via time-bound, tokenized 1-click resolution links without compromising consumer account credentials.
+                Corporate grievance officers access dispute materials via secure, tokenized links without accessing or storing user credentials.
               </p>
             </div>
 
             <div className="trust-pillar-card">
               <div className="pillar-icon-wrap">
-                <FaShieldAlt />
+                <FaBalanceScale />
               </div>
               <h3>Independent & Transparent</h3>
               <p>
-                Clear non-affiliation disclosures, transparent community brand benchmarks, and straightforward data correction mechanisms under our published policy.
+                Clear non-affiliation disclosures, voluntary mediation facilitation, and published data correction policies under DPDP 2023.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 5. Brand Trust Preview Section */}
+      {/* 5. Brand Redressal Benchmarks Preview */}
       <section className="brand-preview-section">
         <div className="section-container">
           <div className="brand-preview-header">
             <div>
-              <span className="section-badge">Corporate Accountability</span>
-              <h2>Enterprise Brand Trust Preview</h2>
-              <p>Community resolution benchmarks and verified grievance desk metrics across leading consumer platforms.</p>
+              <span className="section-badge">Corporate Benchmarks</span>
+              <h2>Enterprise Resolution Benchmarks</h2>
+              <p>Community response rates, turnaround times, and verified grievance contacts across major platforms.</p>
             </div>
             <Link to="/brands" className="view-all-brands-link">
               <span>View Full Brand Index</span>
@@ -224,51 +203,51 @@ export default function Home() {
             <div className="brand-mini-card">
               <div className="brand-mini-top">
                 <span className="brand-cat">E-Commerce</span>
-                <span className="brand-rate text-green">96.4% Resolution</span>
+                <span className="brand-rate text-teal">96.4% Resolution Rate</span>
               </div>
               <h4>Amazon India</h4>
-              <p className="brand-meta">⚡ 48h Ack / 7 Days Target • ★ 4.8 Rating</p>
+              <p className="brand-meta">Target: 48h Ack / 7 Days • Community Rating: 4.8/5.0</p>
             </div>
 
             <div className="brand-mini-card">
               <div className="brand-mini-top">
                 <span className="brand-cat">Banking & UPI</span>
-                <span className="brand-rate text-green">98.2% Resolution</span>
+                <span className="brand-rate text-teal">98.2% Resolution Rate</span>
               </div>
               <h4>PhonePe Payments</h4>
-              <p className="brand-meta">⚡ 24h Ack / 5 Days Target • ★ 4.9 Rating</p>
+              <p className="brand-meta">Target: 24h Ack / 5 Days • Community Rating: 4.9/5.0</p>
             </div>
 
             <div className="brand-mini-card">
               <div className="brand-mini-top">
                 <span className="brand-cat">Food Delivery</span>
-                <span className="brand-rate text-green">97.6% Resolution</span>
+                <span className="brand-rate text-teal">97.6% Resolution Rate</span>
               </div>
               <h4>Zomato</h4>
-              <p className="brand-meta">⚡ 24h Ack / 3 Days Target • ★ 4.8 Rating</p>
+              <p className="brand-meta">Target: 24h Ack / 3 Days • Community Rating: 4.8/5.0</p>
             </div>
           </div>
 
           <div className="brand-methodology-note">
-            <span>* Ratings are community benchmarks computed from verified user reports and nodal responses. Learn more in our <Link to="/methodology">Brand Methodology & Takedown Policy</Link>.</span>
+            <span>* Ratings are community benchmarks computed from verified user reports and public nodal responses. Learn more in our <Link to="/methodology">Brand Methodology & Takedown Policy</Link>.</span>
           </div>
         </div>
       </section>
 
-      {/* 6. CTA Callout Banner */}
+      {/* 6. CTA Action Strip */}
       <section className="home-cta-banner">
         <div className="section-container">
           <div className="cta-banner-box">
             <div className="cta-text-wrap">
-              <h2>Have an Unresolved Consumer Dispute?</h2>
-              <p>Do not let delayed refunds, defective deliveries, or unresponsive customer care go unaddressed. Register your grievance docket today.</p>
+              <h2>Have an unresolved consumer dispute?</h2>
+              <p>Structure your grievance details and dispatch an evidence-backed resolution notice to the enterprise desk.</p>
             </div>
             <div className="cta-actions-wrap">
               <Link to="/register" className="cta-btn-main">
-                <FaFileAlt /> File a Grievance Now
+                <FaFileAlt /> File a Grievance
               </Link>
               <Link to="/brands" className="cta-btn-alt">
-                <FaBuilding /> Brand Trust Index
+                <FaBuilding /> Brand Index
               </Link>
             </div>
           </div>

@@ -93,7 +93,7 @@ export default function Navbar() {
           </div>
           <div className="logo-text">
             <span className="logo-title">Consumer Trust</span>
-            <span className="logo-sub">Independent Dispute Desk</span>
+            <span className="logo-sub">Dispute Facilitation</span>
           </div>
         </Link>
 
@@ -163,7 +163,7 @@ export default function Navbar() {
               <li>
                 <Link
                   to="/my-complaints"
-                  className={`nav-link dashboard ${isActive("/my-complaints") ? "active" : ""}`}
+                  className={`nav-link ${isActive("/my-complaints") ? "active" : ""}`}
                   onClick={() => setMenuOpen(false)}
                 >
                   <FaClipboardList className="nav-icon" />
@@ -175,7 +175,7 @@ export default function Navbar() {
               <li>
                 <Link
                   to="/admin"
-                  className={`nav-link admin ${isActive("/admin") ? "active" : ""}`}
+                  className={`nav-link admin-link ${isActive("/admin") ? "active" : ""}`}
                   onClick={() => setMenuOpen(false)}
                 >
                   <FaUserShield className="nav-icon" />
@@ -208,7 +208,6 @@ export default function Navbar() {
                       className={`lang-dropdown-item ${currentLang === lang.code ? "selected" : ""}`}
                       onClick={() => handleLangChange(lang.code)}
                     >
-                      <span className="lang-flag">{lang.flag}</span>
                       <span>{lang.label}</span>
                     </button>
                   ))}

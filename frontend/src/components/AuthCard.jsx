@@ -16,6 +16,9 @@ import {
   FaArrowRight,
   FaSignOutAlt,
   FaClipboardList,
+  FaLockOpen,
+  FaFileAlt,
+  FaBalanceScale,
 } from "react-icons/fa";
 import api from "../services/api";
 import "./AuthCard.css";
@@ -94,11 +97,11 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
           localStorage.setItem("consumerTrustToken", res.data.token);
           localStorage.setItem("consumerTrustUser", JSON.stringify(res.data.user));
           window.dispatchEvent(new Event("authChange"));
-          setSuccessMsg("Administrator clearance verified! Redirecting...");
+          setSuccessMsg("Administrator clearance verified. Redirecting...");
           setTimeout(() => {
             if (onAuthSuccess) onAuthSuccess(res.data.user);
             else navigate("/admin");
-          }, 600);
+          }, 500);
         }
       } else if (isRegisterMode) {
         if (!formData.name || !formData.email || !formData.password) {
@@ -121,11 +124,11 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
           localStorage.setItem("consumerTrustToken", res.data.token);
           localStorage.setItem("consumerTrustUser", JSON.stringify(res.data.user));
           window.dispatchEvent(new Event("authChange"));
-          setSuccessMsg("Account created! Redirecting to your dashboard...");
+          setSuccessMsg("Account created. Redirecting to your dashboard...");
           setTimeout(() => {
             if (onAuthSuccess) onAuthSuccess(res.data.user);
             else navigate("/my-complaints");
-          }, 600);
+          }, 500);
         }
       } else {
         const res = await api.post("/auth/login", {
@@ -137,11 +140,11 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
           localStorage.setItem("consumerTrustToken", res.data.token);
           localStorage.setItem("consumerTrustUser", JSON.stringify(res.data.user));
           window.dispatchEvent(new Event("authChange"));
-          setSuccessMsg("Signed in successfully! Redirecting...");
+          setSuccessMsg("Signed in. Redirecting...");
           setTimeout(() => {
             if (onAuthSuccess) onAuthSuccess(res.data.user);
             else navigate("/my-complaints");
-          }, 600);
+          }, 500);
         }
       }
     } catch (err) {
@@ -169,11 +172,11 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
         localStorage.setItem("consumerTrustToken", res.data.token);
         localStorage.setItem("consumerTrustUser", JSON.stringify(res.data.user));
         window.dispatchEvent(new Event("authChange"));
-        setSuccessMsg(`Welcome, ${res.data.user.name}! Redirecting...`);
+        setSuccessMsg(`Welcome, ${res.data.user.name}. Redirecting...`);
         setTimeout(() => {
           if (onAuthSuccess) onAuthSuccess(res.data.user);
           else navigate("/my-complaints");
-        }, 600);
+        }, 500);
       } else {
         throw new Error(res.data?.message || "Google Sign-In failed.");
       }
@@ -221,7 +224,7 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
           </Link>
 
           <Link to="/register" className="session-btn secondary">
-            <FaShieldAlt />
+            <FaFileAlt />
             <span>File New Grievance</span>
           </Link>
         </div>
@@ -229,14 +232,14 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
         <div className="session-footer">
           <button type="button" onClick={handleLogout} className="session-logout-btn">
             <FaSignOutAlt />
-            <span>Log Out of Session</span>
+            <span>Sign Out</span>
           </button>
         </div>
       </div>
     );
   }
 
-  // 2. UNAUTHENTICATED SIGN-IN / SIGN-UP CARD
+  // 2. COMPACT ACCOUNT ACCESS PANEL
   return (
     <div className="auth-card">
       {showAdminSwitch && (
@@ -249,7 +252,7 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
               setError("");
             }}
           >
-            <FaUser /> Citizen Portal
+            <FaUser /> Citizen Access
           </button>
           <button
             type="button"
@@ -260,7 +263,7 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
               setError("");
             }}
           >
-            <FaUserShield /> Officer / Admin
+            <FaUserShield /> Officer Access
           </button>
         </div>
       )}
@@ -268,17 +271,17 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
       <div className="auth-card-header">
         <h3>
           {portal === "admin"
-            ? "Administrative Clearance"
+            ? "Officer Sign In"
             : isRegisterMode
-            ? "Create Citizen Account"
-            : "Welcome Back"}
+            ? "Create an Account"
+            : "Sign In to Consumer Trust"}
         </h3>
         <p>
           {portal === "admin"
-            ? "Authorized grievance officers sign in to manage corporate redressal dockets."
+            ? "Authorized grievance desk access to review and resolve dockets."
             : isRegisterMode
-            ? "Register to file grievances, upload evidence, and track live milestones."
-            : "Access your dashboard, manage dispute dockets, and view live case status."}
+            ? "Manage grievances, review case progress, and receive resolution records."
+            : "Access your active grievances, track milestones, and view responses."}
         </p>
       </div>
 
@@ -330,7 +333,7 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
               <GoogleLogin
                 onSuccess={handleGoogleSuccess}
                 onError={handleGoogleError}
-                shape="pill"
+                shape="rectangular"
                 size="large"
                 theme="outline"
                 text={isRegisterMode ? "signup_with" : "signin_with"}
@@ -360,7 +363,7 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
         {portal === "citizen" && isRegisterMode && (
           <>
             <div className="form-group">
-              <label>Full Legal Name *</label>
+              <label>Full Legal Name</label>
               <div className="input-box">
                 <FaUser className="box-icon" />
                 <input
@@ -392,7 +395,7 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
         )}
 
         <div className="form-group">
-          <label>Email Address *</label>
+          <label>Email Address</label>
           <div className="input-box">
             <FaEnvelope className="box-icon" />
             <input
@@ -409,7 +412,7 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
 
         <div className="form-group">
           <div className="label-row">
-            <label>Password *</label>
+            <label>Password</label>
             {!isRegisterMode && portal === "citizen" && (
               <span className="forgot-link" onClick={() => setError("For account recovery, sign in with Google or contact support.")}>
                 Forgot password?
@@ -421,7 +424,7 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
             <input
               type={showPassword ? "text" : "password"}
               name="password"
-              placeholder={isRegisterMode ? "Min. 8 chars (letters & numbers)" : "Enter password"}
+              placeholder={isRegisterMode ? "Min. 8 characters (letters & numbers)" : "Enter password"}
               value={formData.password}
               onChange={handleChange}
               required
@@ -432,6 +435,7 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
               className="pwd-toggle"
               onClick={() => setShowPassword(!showPassword)}
               tabIndex={-1}
+              aria-label="Toggle password visibility"
             >
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </button>
@@ -444,14 +448,25 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
             : portal === "admin"
             ? "Sign In as Officer"
             : isRegisterMode
-            ? "Create Free Account"
+            ? "Create Account"
             : "Sign In"}
         </button>
       </form>
 
-      <div className="auth-card-footer">
-        <FaShieldAlt className="shield-icon" />
-        <span>256-Bit SSL Encrypted • Zero Public Data Exposure</span>
+      {/* Trust Statements */}
+      <div className="auth-trust-strip">
+        <div className="trust-item">
+          <FaLock className="trust-icon" />
+          <span>Private case access</span>
+        </div>
+        <div className="trust-item">
+          <FaShieldAlt className="trust-icon" />
+          <span>Secure document handling</span>
+        </div>
+        <div className="trust-item">
+          <FaBalanceScale className="trust-icon" />
+          <span>Independent facilitation</span>
+        </div>
       </div>
     </div>
   );
