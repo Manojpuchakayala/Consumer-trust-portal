@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import NotificationToast from "./components/NotificationToast";
+import InstallAppBanner from "./components/InstallAppBanner";
 
 import Home from "./pages/Home";
 import RegisterComplaint from "./pages/RegisterComplaint";
@@ -90,6 +91,7 @@ function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
+        <InstallAppBanner />
         <Footer />
       </div>
     </BrowserRouter>

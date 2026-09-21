@@ -1,16 +1,18 @@
 {
-  "name": "Consumer Trust Portal",
-  "short_name": "ConsumerTrust",
-  "description": "Unified Citizen Grievance Redressal Gateway with Free WhatsApp Tracking Cards",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#1e3a8a",
+  "short_name": "Consumer Trust",
+  "name": "Consumer Trust — Independent Dispute Facilitation",
   "icons": [
     {
       "src": "/favicon.svg",
+      "type": "image/svg+xml",
       "sizes": "192x192 512x512",
-      "type": "image/svg+xml"
+      "purpose": "any maskable"
     }
-  ]
+  ],
+  "start_url": "/",
+  "background_color": "#0B1F3A",
+  "theme_color": "#0B1F3A",
+  "display": "standalone",
+  "orientation": "portrait",
+  "description": "Independent consumer grievance facilitation, evidence organization, and dispute tracking platform."
 }

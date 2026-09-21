@@ -12,6 +12,7 @@ import {
   FaInfoCircle,
   FaBalanceScale,
 } from "react-icons/fa";
+import ResolutionTicker from "../components/ResolutionTicker";
 import "./Home.css";
 
 export default function Home() {
@@ -68,6 +69,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Live Settlements Marquee Ticker */}
+      <ResolutionTicker />
 
       {/* =========================================================================
           2. HOW IT WORKS — SINGLE 4-STEP WORKFLOW SECTION

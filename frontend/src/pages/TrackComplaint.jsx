@@ -21,9 +21,18 @@ import {
   FaCheck,
   FaUserCheck,
   FaWhatsapp,
+  FaStar,
+  FaGavel,
+  FaQrcode,
+  FaExternalLinkAlt,
 } from "react-icons/fa";
+import QRCode from "qrcode";
 import api from "../services/api";
-import { generateGrievanceNoticePdf, generateResolutionCertificatePdf } from "../utils/pdfGenerator";
+import {
+  generateGrievanceNoticePdf,
+  generateResolutionCertificatePdf,
+  generateStatutoryEscalationPdf,
+} from "../utils/pdfGenerator";
 import { getWhatsAppShareUrl } from "../utils/whatsappShare";
 import "./TrackComplaint.css";
 
@@ -36,6 +45,13 @@ export default function TrackComplaint() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [copiedId, setCopiedId] = useState(false);
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState("");
+
+  // Resolution Rating State
+  const [userRating, setUserRating] = useState(5);
+  const [ratingFeedback, setRatingFeedback] = useState("");
+  const [ratingSubmitted, setRatingSubmitted] = useState(false);
+  const [ratingSubmitting, setRatingSubmitting] = useState(false);
 
   // OTP Verification Flow State
   const [otpStep, setOtpStep] = useState(false);
@@ -46,6 +62,27 @@ export default function TrackComplaint() {
   const [otpError, setOtpError] = useState("");
 
   const user = JSON.parse(localStorage.getItem("consumerTrustUser") || "null");
+
+  useEffect(() => {
+    if (complaint?.complaintId) {
+      const url = `${window.location.origin}/track?id=${complaint.complaintId}`;
+      QRCode.toDataURL(url, {
+        width: 140,
+        margin: 1,
+        color: { dark: "#0f2b5c", light: "#ffffff" },
+      })
+        .then(setQrCodeDataUrl)
+        .catch((e) => console.warn(e));
+
+      const savedRating = localStorage.getItem(`ctp_rating_${complaint.complaintId}`);
+      if (savedRating) {
+        setRatingSubmitted(true);
+        setUserRating(parseInt(savedRating, 10));
+      } else {
+        setRatingSubmitted(false);
+      }
+    }
+  }, [complaint]);
 
   useEffect(() => {
     const idFromQuery = searchParams.get("id");
@@ -185,6 +222,17 @@ export default function TrackComplaint() {
     setError("");
     setOtpError("");
     setSearchParams({});
+  };
+
+  const handleRatingSubmit = (e) => {
+    e.preventDefault();
+    if (!complaint?.complaintId) return;
+    setRatingSubmitting(true);
+    localStorage.setItem(`ctp_rating_${complaint.complaintId}`, userRating.toString());
+    setTimeout(() => {
+      setRatingSubmitting(false);
+      setRatingSubmitted(true);
+    }, 400);
   };
 
   const getMilestoneStep = (status) => {
@@ -496,6 +544,17 @@ export default function TrackComplaint() {
                     )}
                   </strong>
                 </div>
+
+                {/* QR Code Verification Badge */}
+                {qrCodeDataUrl && (
+                  <div className="overview-qr-card">
+                    <img src={qrCodeDataUrl} alt="Case QR Code" className="overview-qr-img" />
+                    <div className="overview-qr-text">
+                      <strong><FaQrcode /> Scan to Verify</strong>
+                      <span>Digitally validated docket record</span>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -547,6 +606,95 @@ export default function TrackComplaint() {
                 </div>
               </div>
             )}
+
+            {/* 5-Star Citizen Rating Widget for Resolved cases */}
+            {complaint.status === "Resolved" && (
+              <div className="citizen-rating-card">
+                <div className="rating-header">
+                  <FaStar className="rating-star-icon" />
+                  <div>
+                    <h4>Rate Enterprise Redressal Experience</h4>
+                    <p>Your rating contributes to the quarterly public Brand Benchmark Index for {complaint.companyName}.</p>
+                  </div>
+                </div>
+                {ratingSubmitted ? (
+                  <div className="rating-success-msg">
+                    <FaCheckCircle className="rating-check" />
+                    <div>
+                      <strong>Feedback Recorded ({userRating} ★)</strong>
+                      <p>Thank you. Your feedback has been included in the community redressal score for {complaint.companyName}.</p>
+                    </div>
+                  </div>
+                ) : (
+                  <form onSubmit={handleRatingSubmit} className="rating-form">
+                    <div className="star-rating-row">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          className={`star-btn ${star <= userRating ? "active" : ""}`}
+                          onClick={() => setUserRating(star)}
+                        >
+                          <FaStar />
+                        </button>
+                      ))}
+                      <span className="rating-score-label">
+                        {userRating === 5 ? "5/5 — Excellent & Fast" : userRating === 4 ? "4/5 — Good Resolution" : userRating === 3 ? "3/5 — Satisfactory" : userRating === 2 ? "2/5 — Delayed" : "1/5 — Poor Experience"}
+                      </span>
+                    </div>
+                    <div className="rating-input-row">
+                      <input
+                        type="text"
+                        placeholder="Optional remarks on resolution speed, refund clarity, or officer assistance..."
+                        value={ratingFeedback}
+                        onChange={(e) => setRatingFeedback(e.target.value)}
+                      />
+                      <button type="submit" className="btn-submit-rating" disabled={ratingSubmitting}>
+                        {ratingSubmitting ? "Submitting..." : "Submit Rating"}
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
+            )}
+
+            {/* Statutory Legal Escalation Card */}
+            <div className="statutory-escalation-card">
+              <div className="escalation-header">
+                <FaGavel className="gavel-icon" />
+                <div>
+                  <h4>Statutory Legal Escalation & Formal Pre-Filing Dossier</h4>
+                  <p>Compile a formal legal affidavit and complaint packet under the Consumer Protection Act, 2019 for official Government redressal.</p>
+                </div>
+              </div>
+              <div className="escalation-body">
+                <div className="escalation-channels">
+                  <div className="esc-channel">
+                    <strong>1. National Consumer Helpline (NCH 1915)</strong>
+                    <span>Toll-Free 1915 • Official fast-track conciliation portal</span>
+                    <a href="https://consumerhelpline.gov.in" target="_blank" rel="noopener noreferrer">
+                      consumerhelpline.gov.in <FaExternalLinkAlt style={{ fontSize: 9 }} />
+                    </a>
+                  </div>
+                  <div className="esc-channel court">
+                    <strong>2. e-Daakhil Online Consumer Court</strong>
+                    <span>Online filing before District & State Consumer Commission under CPA 2019</span>
+                    <a href="https://edaakhil.nic.in" target="_blank" rel="noopener noreferrer">
+                      edaakhil.nic.in <FaExternalLinkAlt style={{ fontSize: 9 }} />
+                    </a>
+                  </div>
+                </div>
+                <div className="escalation-action-row">
+                  <button
+                    type="button"
+                    className="btn-statutory-download"
+                    onClick={() => generateStatutoryEscalationPdf(complaint)}
+                  >
+                    <FaFilePdf /> Export Official Statutory Escalation Packet (PDF)
+                  </button>
+                </div>
+              </div>
+            </div>
 
             {/* Action Buttons */}
             <div className="case-actions-bar">

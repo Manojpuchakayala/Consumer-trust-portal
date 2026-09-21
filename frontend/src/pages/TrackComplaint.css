@@ -703,3 +703,298 @@
   font-weight: 600;
   cursor: pointer;
 }
+
+/* QR Code Verification Sidebar Box */
+.overview-qr-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  margin-top: 14px;
+}
+
+.overview-qr-img {
+  width: 54px;
+  height: 54px;
+  background: #ffffff;
+  padding: 2px;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+  flex-shrink: 0;
+}
+
+.overview-qr-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.overview-qr-text strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--brand-electric);
+  font-weight: 700;
+}
+
+.overview-qr-text span {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+/* 5-Star Citizen Rating Widget */
+.citizen-rating-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-5, 18px);
+  box-shadow: var(--shadow-sm);
+}
+
+.rating-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.rating-star-icon {
+  color: #f59e0b;
+  font-size: 20px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.rating-header h4 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-heading);
+  margin-bottom: 2px;
+}
+
+.rating-header p {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.rating-success-msg {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+}
+
+.rating-check {
+  color: #10b981;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.rating-success-msg strong {
+  display: block;
+  font-size: 13.5px;
+  color: #10b981;
+}
+
+.rating-success-msg p {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.star-rating-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.star-btn {
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  color: #d1d5db;
+  cursor: pointer;
+  padding: 2px;
+  transition: all 0.15s ease;
+}
+
+.star-btn:hover,
+.star-btn.active {
+  color: #f59e0b;
+  transform: scale(1.15);
+}
+
+.rating-score-label {
+  margin-left: 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.rating-input-row {
+  display: flex;
+  gap: 10px;
+}
+
+@media (max-width: 600px) {
+  .rating-input-row {
+    flex-direction: column;
+  }
+}
+
+.rating-input-row input {
+  flex: 1;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  font-size: 13px;
+  outline: none;
+}
+
+.rating-input-row input:focus {
+  border-color: var(--brand-electric);
+}
+
+.btn-submit-rating {
+  background: var(--brand-primary);
+  color: #ffffff;
+  border: none;
+  padding: 9px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--transition-fast);
+}
+
+.btn-submit-rating:hover:not(:disabled) {
+  background: var(--brand-primary-hover);
+}
+
+/* Statutory Legal Escalation Card */
+.statutory-escalation-card {
+  background: var(--card-bg);
+  border: 1px solid #fed7aa;
+  border-radius: var(--radius-md);
+  padding: var(--space-5, 18px);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+[data-theme="dark"] .statutory-escalation-card {
+  border-color: rgba(249, 115, 22, 0.35);
+  background: rgba(249, 115, 22, 0.03);
+}
+
+.escalation-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.gavel-icon {
+  color: #ea580c;
+  font-size: 20px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.escalation-header h4 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-heading);
+  margin-bottom: 2px;
+}
+
+.escalation-header p {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.escalation-channels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+@media (max-width: 640px) {
+  .escalation-channels {
+    grid-template-columns: 1fr;
+  }
+}
+
+.esc-channel {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.esc-channel strong {
+  font-size: 12.5px;
+  color: var(--text-heading);
+}
+
+.esc-channel span {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+.esc-channel a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--brand-electric);
+  text-decoration: none;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.esc-channel a:hover {
+  text-decoration: underline;
+}
+
+.btn-statutory-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ea580c;
+  color: #ffffff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: 0 2px 8px rgba(234, 88, 12, 0.25);
+}
+
+.btn-statutory-download:hover {
+  background: #c2410c;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.35);
+}
+

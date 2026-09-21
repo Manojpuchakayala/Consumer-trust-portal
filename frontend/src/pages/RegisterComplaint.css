@@ -1283,3 +1283,160 @@
 .print-only {
   display: none;
 }
+
+/* Voice Dictation Label Row */
+.label-with-action-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+/* Applicable CPA Clauses Box */
+.cpa-clauses-box {
+  margin-top: 14px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+}
+
+.cpa-clauses-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--text-heading);
+  margin-bottom: 8px;
+}
+
+.cpa-shield-icon {
+  color: var(--brand-electric);
+  font-size: 13px;
+}
+
+.cpa-clauses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 8px;
+}
+
+.cpa-chip {
+  background: var(--card-bg-solid, #ffffff);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xs);
+  padding: 6px 10px;
+  font-size: 11px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cpa-sec-badge {
+  display: inline-block;
+  font-size: 9.5px;
+  font-weight: 800;
+  color: var(--brand-electric);
+  text-transform: uppercase;
+}
+
+.cpa-chip strong {
+  font-size: 11.5px;
+  color: var(--text-heading);
+}
+
+.cpa-chip p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.3;
+}
+
+/* Claim Strength Scorer Card */
+.claim-strength-box {
+  margin-top: 16px;
+  background: var(--card-bg-solid, #ffffff);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-xs);
+}
+
+.strength-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.strength-title {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.strength-level {
+  font-size: 13.5px;
+  font-weight: 800;
+}
+
+.strength-score-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 3px solid #15803d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.strength-progress-track {
+  width: 100%;
+  height: 6px;
+  background: var(--bg-secondary);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.strength-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.strength-breakdown-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 12px;
+}
+
+@media (max-width: 600px) {
+  .strength-breakdown-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+.strength-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+}
+
+.strength-item.met {
+  color: var(--status-success);
+}
+
+.strength-item.unmet {
+  color: var(--text-muted);
+}
+
+.strength-item .item-points {
+  margin-left: auto;
+  font-size: 10.5px;
+  font-weight: 700;
+}

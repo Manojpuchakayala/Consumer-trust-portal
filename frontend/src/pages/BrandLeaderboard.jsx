@@ -11,6 +11,7 @@ import {
   FaArrowRight,
   FaTimes,
 } from "react-icons/fa";
+import ResolutionTicker from "../components/ResolutionTicker";
 import "./BrandLeaderboard.css";
 
 const BRAND_DATA = [
@@ -333,6 +334,7 @@ export default function BrandLeaderboard() {
 
   return (
     <div className="brand-leaderboard-page">
+      <ResolutionTicker />
       <div className="leaderboard-container">
         {/* Page Header */}
         <div className="leaderboard-header">

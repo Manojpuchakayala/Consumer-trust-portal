@@ -36,9 +36,16 @@ import {
   FaLaptop,
 } from "react-icons/fa";
 import api from "../services/api";
-import { enhanceGrievanceDescription, COMMON_RELIEFS, AI_ASSISTANT_DISCLAIMER } from "../utils/aiLegalAssistant";
+import {
+  enhanceGrievanceDescription,
+  calculateClaimScore,
+  getApplicableCpaSections,
+  COMMON_RELIEFS,
+  AI_ASSISTANT_DISCLAIMER,
+} from "../utils/aiLegalAssistant";
 import { generateGrievanceNoticePdf } from "../utils/pdfGenerator";
 import { getWhatsAppShareUrl } from "../utils/whatsappShare";
+import VoiceInputButton from "../components/VoiceInputButton";
 import "./RegisterComplaint.css";
 
 const ENTERPRISE_OPTIONS = [
@@ -275,6 +282,13 @@ export default function RegisterComplaint() {
     });
     setFormData((prev) => ({ ...prev, description: enhanced }));
     setTimeout(() => setIsAiEnhancing(false), 300);
+  };
+
+  const handleVoiceTranscript = (text) => {
+    setFormData((prev) => ({
+      ...prev,
+      description: prev.description ? `${prev.description} ${text}` : text,
+    }));
   };
 
   const handleChange = (e) => {
@@ -1111,12 +1125,15 @@ export default function RegisterComplaint() {
                   </div>
 
                   <div className="form-group" style={{ marginTop: 14 }}>
-                    <label htmlFor="description">Detailed Dispute Description *</label>
+                    <div className="label-with-action-row">
+                      <label htmlFor="description">Detailed Dispute Description *</label>
+                      <VoiceInputButton onTranscript={handleVoiceTranscript} />
+                    </div>
                     <textarea
                       id="description"
                       name="description"
                       rows="7"
-                      placeholder="Detail the timeline of events: purchase date, product/service failure, previous customer support attempts, and unmet commitments. Click 'Structure Narrative' above to organize your claim formally..."
+                      placeholder="Detail the timeline of events: purchase date, product/service failure, previous customer support attempts, and unmet commitments. You can also click 'Voice Dictation' to speak in your language or 'Structure Narrative' to organize facts..."
                       value={formData.description}
                       onChange={handleChange}
                       required
@@ -1124,6 +1141,25 @@ export default function RegisterComplaint() {
                     <div className="textarea-footer">
                       <span className="char-count">{formData.description.length} characters (min 20)</span>
                       <span className="tip-text">Clear dates and order references help expedite enterprise redressal.</span>
+                    </div>
+                  </div>
+
+                  {/* Applicable CPA 2019 Clauses Preview */}
+                  <div className="cpa-clauses-box">
+                    <div className="cpa-clauses-header">
+                      <FaShieldAlt className="cpa-shield-icon" />
+                      <strong>Applicable Consumer Protection Act, 2019 Framework:</strong>
+                    </div>
+                    <div className="cpa-clauses-grid">
+                      {getApplicableCpaSections(formData.category).map((cpa, idx) => (
+                        <div key={idx} className="cpa-chip">
+                          <span className="cpa-sec-badge">{cpa.section}</span>
+                          <div>
+                            <strong>{cpa.title}</strong>
+                            <p>{cpa.desc}</p>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -1248,12 +1284,40 @@ export default function RegisterComplaint() {
                     </div>
                   )}
 
-                  {files.length === 0 && (
-                    <div className="no-files-card">
-                      <FaInfoCircle />
-                      <span>No files attached yet. Invoices or defect photos help substantiate claims, but you may proceed if you do not have files at hand.</span>
-                    </div>
-                  )}
+                  {/* Claim Strength Meter */}
+                  {(() => {
+                    const claimStrength = calculateClaimScore(formData, files);
+                    return (
+                      <div className="claim-strength-box">
+                        <div className="strength-header">
+                          <div>
+                            <span className="strength-title">Evidence & Claim Strength Gauge</span>
+                            <strong className="strength-level" style={{ color: claimStrength.badgeColor }}>
+                              {claimStrength.level}
+                            </strong>
+                          </div>
+                          <div className="strength-score-circle" style={{ borderColor: claimStrength.badgeColor }}>
+                            <span style={{ color: claimStrength.badgeColor }}>{claimStrength.score}%</span>
+                          </div>
+                        </div>
+                        <div className="strength-progress-track">
+                          <div
+                            className="strength-progress-fill"
+                            style={{ width: `${claimStrength.score}%`, backgroundColor: claimStrength.badgeColor }}
+                          />
+                        </div>
+                        <div className="strength-breakdown-list">
+                          {claimStrength.breakdown.map((item, idx) => (
+                            <div key={idx} className={`strength-item ${item.met ? "met" : "unmet"}`}>
+                              <span className="item-icon">{item.met ? "✓" : "○"}</span>
+                              <span>{item.label}</span>
+                              <span className="item-points">{item.points}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               )}
 
