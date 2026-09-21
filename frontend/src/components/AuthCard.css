@@ -222,23 +222,24 @@
   text-decoration: underline;
 }
 
-.input-box {
+.auth-card .input-box {
   position: relative;
   display: flex;
   align-items: center;
 }
 
-.box-icon {
+.auth-card .box-icon {
   position: absolute;
-  left: 12px;
+  left: 13px;
   color: var(--text-muted);
   font-size: 13px;
   pointer-events: none;
+  z-index: 2;
 }
 
-.input-box input {
+.auth-card .input-box input {
   width: 100%;
-  padding: 9px 12px 9px 36px;
+  padding: 9px 36px 9px 38px !important;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   font-size: 13.5px;
@@ -249,7 +250,7 @@
   box-sizing: border-box;
 }
 
-.input-box input:focus {
+.auth-card .input-box input:focus {
   border-color: var(--brand-electric);
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }

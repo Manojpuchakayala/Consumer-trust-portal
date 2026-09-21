@@ -24,7 +24,7 @@ export default function Home() {
         <div className="home-notice-container">
           <FaShieldAlt className="notice-icon" />
           <span>
-            <strong>Independent Platform Notice:</strong> Consumer Trust is an independent private dispute facilitation service. We are not a government agency, court, or statutory commission. For statutory judicial filings, visit <a href="https://consumerhelpline.gov.in" target="_blank" rel="noopener noreferrer">consumerhelpline.gov.in <FaExternalLinkAlt style={{ fontSize: 9 }} /></a>.
+            <strong>Independent Platform Notice:</strong> Consumer Trust is an independent dispute facilitation service (non-governmental). For statutory judicial filings, visit <a href="https://consumerhelpline.gov.in" target="_blank" rel="noopener noreferrer">consumerhelpline.gov.in <FaExternalLinkAlt style={{ fontSize: 9 }} /></a>.
           </span>
         </div>
       </div>
@@ -60,29 +60,29 @@ export default function Home() {
               </Link>
             </div>
 
-            {/* Platform Benchmarks / Highlights */}
+            {/* Platform Proof Points */}
             <div className="hero-benchmarks-row">
               <div className="benchmark-item">
                 <FaClock className="benchmark-icon" />
                 <div>
-                  <strong>7-Day Window</strong>
-                  <span>Standard target SLA</span>
+                  <strong>Typical response target</strong>
+                  <span>Timelines vary by enterprise</span>
                 </div>
               </div>
               <div className="benchmark-divider" />
               <div className="benchmark-item">
                 <FaLock className="benchmark-icon" />
                 <div>
-                  <strong>Protected Access</strong>
-                  <span>2FA OTP verification</span>
+                  <strong>Private case access</strong>
+                  <span>Verification required</span>
                 </div>
               </div>
               <div className="benchmark-divider" />
               <div className="benchmark-item">
                 <FaBuilding className="benchmark-icon" />
                 <div>
-                  <strong>25+ Desks</strong>
-                  <span>Direct corporate channels</span>
+                  <strong>Enterprise contact channels</strong>
+                  <span>Supported grievance desks</span>
                 </div>
               </div>
             </div>
@@ -191,7 +191,7 @@ export default function Home() {
             <div>
               <span className="section-badge">Corporate Benchmarks</span>
               <h2>Enterprise Resolution Benchmarks</h2>
-              <p>Community response rates, turnaround times, and verified grievance contacts across major platforms.</p>
+              <p>Community response rates, turnaround times, and verified grievance contacts across major platforms (Q3 2026 data).</p>
             </div>
             <Link to="/brands" className="view-all-brands-link">
               <span>View Full Brand Index</span>
@@ -203,33 +203,33 @@ export default function Home() {
             <div className="brand-mini-card">
               <div className="brand-mini-top">
                 <span className="brand-cat">E-Commerce</span>
-                <span className="brand-rate text-teal">96.4% Resolution Rate</span>
+                <span className="brand-rate text-teal">Community Benchmark</span>
               </div>
               <h4>Amazon India</h4>
-              <p className="brand-meta">Target: 48h Ack / 7 Days • Community Rating: 4.8/5.0</p>
+              <p className="brand-meta">Typical Target: 48h Ack / 7 Days • Verified Nodal Channel</p>
             </div>
 
             <div className="brand-mini-card">
               <div className="brand-mini-top">
                 <span className="brand-cat">Banking & UPI</span>
-                <span className="brand-rate text-teal">98.2% Resolution Rate</span>
+                <span className="brand-rate text-teal">Community Benchmark</span>
               </div>
               <h4>PhonePe Payments</h4>
-              <p className="brand-meta">Target: 24h Ack / 5 Days • Community Rating: 4.9/5.0</p>
+              <p className="brand-meta">Typical Target: 24h Ack / 5 Days • Verified Nodal Channel</p>
             </div>
 
             <div className="brand-mini-card">
               <div className="brand-mini-top">
                 <span className="brand-cat">Food Delivery</span>
-                <span className="brand-rate text-teal">97.6% Resolution Rate</span>
+                <span className="brand-rate text-teal">Community Benchmark</span>
               </div>
               <h4>Zomato</h4>
-              <p className="brand-meta">Target: 24h Ack / 3 Days • Community Rating: 4.8/5.0</p>
+              <p className="brand-meta">Typical Target: 24h Ack / 3 Days • Verified Nodal Channel</p>
             </div>
           </div>
 
           <div className="brand-methodology-note">
-            <span>* Ratings are community benchmarks computed from verified user reports and public nodal responses. Learn more in our <Link to="/methodology">Brand Methodology & Takedown Policy</Link>.</span>
+            <span>* Community benchmarks compiled from voluntary user submissions and publicly stated nodal response targets (Q3 2026). For details or enterprise corrections, read our <Link to="/methodology">Methodology & Takedown Policy</Link>.</span>
           </div>
         </div>
       </section>
