@@ -1913,62 +1913,90 @@ export default function BrandLeaderboard() {
                 </div>
               </div>
 
-              <div className="brand-metrics-grid">
-                <div className="brand-metric-item">
-                  <span className="metric-title">Redressal Rate</span>
-                  <strong className="metric-val green">{brand.resolutionRate}</strong>
+              {/* Redressal Progress Bar */}
+              <div className="rate-progress-wrap">
+                <div className="rate-progress-header">
+                  <span>Resolution Rate</span>
+                  <strong>{brand.resolutionRate}</strong>
                 </div>
-                <div className="brand-metric-item">
-                  <span className="metric-title">Avg. Speed</span>
-                  <strong className="metric-val">{brand.avgDays}</strong>
+                <div className="rate-progress-track">
+                  <div
+                    className="rate-progress-fill"
+                    style={{ width: brand.resolutionRate }}
+                  />
                 </div>
-                <div className="brand-metric-item">
-                  <span className="metric-title">Facilitated Dockets</span>
-                  <strong className="metric-val">{brand.totalCases.toLocaleString()}</strong>
+              </div>
+
+              {/* Metrics Grid */}
+              <div className="brand-kpis-grid">
+                <div className="kpi-box">
+                  <span className="kpi-label">Avg. Speed</span>
+                  <strong className="kpi-val blue">{brand.avgDays}</strong>
                 </div>
-                <div className="brand-metric-item">
-                  <span className="metric-title">Citizen Rating</span>
-                  <strong className="metric-val rating-val">
-                    <FaStar className="star-icon" /> {brand.rating}
+                <div className="kpi-box">
+                  <span className="kpi-label">Volume</span>
+                  <strong className="kpi-val">{brand.totalCases.toLocaleString()} cases</strong>
+                </div>
+                <div className="kpi-box">
+                  <span className="kpi-label">Rating</span>
+                  <strong className="kpi-val gold">
+                    <FaStar style={{ fontSize: 10, marginRight: 2 }} /> {brand.rating}
                   </strong>
                 </div>
               </div>
 
-              <div className="brand-card-footer">
-                <div className="brand-meta-info">
-                  <div className="meta-row">
-                    <FaEnvelope className="meta-icon" />
-                    <span className="meta-text nodal-email" title={brand.nodalEmail}>
-                      {brand.nodalEmail}
-                    </span>
-                  </div>
-                  <div className="meta-row">
-                    <FaClock className="meta-icon" />
-                    <span className="meta-text">{brand.sla}</span>
-                  </div>
+              {/* Nodal Desk Info */}
+              <div className="brand-officer-box">
+                <div className="officer-line">
+                  <FaEnvelope className="officer-icon" />
+                  <span className="officer-email" title={brand.nodalEmail}>
+                    {brand.nodalEmail}
+                  </span>
                 </div>
+                <div className="officer-line">
+                  <FaClock className="officer-icon" />
+                  <span>SLA: <strong>{brand.sla}</strong></span>
+                </div>
+                <div className="officer-line">
+                  <FaShieldAlt className="officer-icon" />
+                  <span>{brand.authority}</span>
+                </div>
+              </div>
 
-                <div className="brand-card-actions">
-                  <Link
-                    to={`/register?company=${encodeURIComponent(brand.name)}`}
-                    className="file-grievance-btn"
-                  >
-                    File Grievance Against {brand.name.split(" ")[0]} <FaArrowRight />
-                  </Link>
-                </div>
+              {/* Card Action */}
+              <div className="brand-card-action">
+                <Link
+                  to={`/register?company=${encodeURIComponent(brand.name)}`}
+                  className="btn-dispute-enterprise"
+                >
+                  File Grievance with {brand.name} <FaArrowRight style={{ fontSize: 10 }} />
+                </Link>
               </div>
             </div>
           ))}
         </div>
 
+        {/* Empty State */}
         {filteredBrands.length === 0 && (
-          <div className="no-brands-found">
+          <div className="no-brands-card">
             <FaBuilding className="empty-icon" />
-            <h3>No enterprise matched your query</h3>
-            <p>You can still register a grievance against any organization or brand by entering its name manually.</p>
-            <Link to="/register" className="file-custom-btn">
-              File Grievance Against Other Organization <FaArrowRight />
-            </Link>
+            <h3>No enterprise found matching "{searchTerm}"</h3>
+            <p>You can still file a dispute against any custom organization or retailer through our custom enterprise desk.</p>
+            <div className="empty-actions">
+              <button
+                type="button"
+                className="btn-reset-search"
+                onClick={() => {
+                  setSearchTerm("");
+                  setSelectedCategory("All");
+                }}
+              >
+                Clear Filters
+              </button>
+              <Link to="/register" className="btn-file-custom">
+                File Custom Grievance <FaArrowRight />
+              </Link>
+            </div>
           </div>
         )}
       </div>
