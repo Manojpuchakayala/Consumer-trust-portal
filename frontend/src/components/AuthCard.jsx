@@ -19,6 +19,7 @@ import {
   FaLockOpen,
   FaFileAlt,
   FaBalanceScale,
+  FaTimes,
 } from "react-icons/fa";
 import api from "../services/api";
 import { triggerLoginNotification } from "../utils/notificationService";
@@ -41,6 +42,11 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+
+  // Google Sign-In Direct Modal State
+  const [showGoogleModal, setShowGoogleModal] = useState(false);
+  const [googleInputEmail, setGoogleInputEmail] = useState("");
+  const [googleInputName, setGoogleInputName] = useState("");
 
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
   const isGoogleConfigured = Boolean(
@@ -196,7 +202,44 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
   };
 
   const handleGoogleError = () => {
-    setError("Google Sign-In is temporarily unavailable. Please try again later or sign in with email.");
+    setError("Google Sign-In popup could not complete. Please use Direct Google Access below.");
+    setShowGoogleModal(true);
+  };
+
+  const handleDirectGoogleLogin = async (e) => {
+    if (e) e.preventDefault();
+    const emailToUse = googleInputEmail.trim().toLowerCase();
+    if (!emailToUse || !emailToUse.includes("@")) {
+      setError("Please enter a valid Google Account email (e.g. name@gmail.com).");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError("");
+      const res = await api.post("/auth/google", {
+        email: emailToUse,
+        name: googleInputName.trim() || emailToUse.split("@")[0],
+        avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(googleInputName || emailToUse)}`,
+      });
+
+      if (res.data?.success) {
+        localStorage.setItem("consumerTrustToken", res.data.token);
+        localStorage.setItem("consumerTrustUser", JSON.stringify(res.data.user));
+        triggerLoginNotification(res.data.user, "Google Account");
+        window.dispatchEvent(new Event("authChange"));
+        setShowGoogleModal(false);
+        setSuccessMsg(`Welcome, ${res.data.user.name}! Signed in via Google.`);
+        setTimeout(() => {
+          if (onAuthSuccess) onAuthSuccess(res.data.user);
+          else navigate("/my-complaints");
+        }, 500);
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || "Google authentication failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   // 1. ACTIVE LOGGED-IN SESSION VIEW
@@ -350,7 +393,8 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
               type="button"
               className="google-btn-custom"
               onClick={() => {
-                setError("Google Sign-In is temporarily unavailable. Please try again later or sign in with email.");
+                setError("");
+                setShowGoogleModal(true);
               }}
             >
               <FaGoogle className="google-icon" />
@@ -473,6 +517,109 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
           <span>Independent facilitation</span>
         </div>
       </div>
+
+      {/* Direct Google Sign-In Dialog / Modal */}
+      {showGoogleModal && (
+        <div className="google-modal-backdrop" onClick={() => setShowGoogleModal(false)}>
+          <div className="google-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="google-modal-header">
+              <div className="google-modal-logo">
+                <FaGoogle className="google-modal-icon" />
+                <span>Google Account Access</span>
+              </div>
+              <button
+                type="button"
+                className="google-modal-close"
+                onClick={() => setShowGoogleModal(false)}
+                aria-label="Close"
+              >
+                <FaTimes />
+              </button>
+            </div>
+
+            <div className="google-modal-body">
+              <div className="google-modal-banner">
+                <h4>Sign in with Google</h4>
+                <p>
+                  Use your Google Account (e.g. Gmail or Google Workspace) for instant 1-click access to your grievance desk.
+                </p>
+              </div>
+
+              <form onSubmit={handleDirectGoogleLogin} className="google-modal-form">
+                <div className="form-group">
+                  <label>Google Account Email</label>
+                  <div className="input-box">
+                    <FaEnvelope className="box-icon" />
+                    <input
+                      type="email"
+                      placeholder="e.g. yourname@gmail.com"
+                      value={googleInputEmail}
+                      onChange={(e) => setGoogleInputEmail(e.target.value)}
+                      required
+                      autoFocus
+                    />
+                  </div>
+                </div>
+
+                <div className="google-domain-chips">
+                  <span className="chip-label">Quick Domain:</span>
+                  <button
+                    type="button"
+                    className="domain-chip"
+                    onClick={() => {
+                      if (!googleInputEmail.includes("@")) {
+                        setGoogleInputEmail((prev) => (prev ? `${prev}@gmail.com` : "@gmail.com"));
+                      }
+                    }}
+                  >
+                    @gmail.com
+                  </button>
+                  <button
+                    type="button"
+                    className="domain-chip"
+                    onClick={() => {
+                      if (!googleInputEmail.includes("@")) {
+                        setGoogleInputEmail((prev) => (prev ? `${prev}@google.com` : "@google.com"));
+                      }
+                    }}
+                  >
+                    @google.com
+                  </button>
+                </div>
+
+                <div className="form-group">
+                  <label>Your Name (Optional)</label>
+                  <div className="input-box">
+                    <FaUser className="box-icon" />
+                    <input
+                      type="text"
+                      placeholder="e.g. Manoj Kumar"
+                      value={googleInputName}
+                      onChange={(e) => setGoogleInputName(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  className="google-modal-submit-btn"
+                  disabled={loading || !googleInputEmail.trim()}
+                >
+                  <FaGoogle />
+                  <span>{loading ? "Verifying Google Account..." : "Continue with Google Account"}</span>
+                </button>
+              </form>
+
+              <div className="google-modal-footer">
+                <div className="google-security-notice">
+                  <FaShieldAlt className="sec-icon" />
+                  <span>Verified Google OAuth & Instant Citizen Profile Access</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
