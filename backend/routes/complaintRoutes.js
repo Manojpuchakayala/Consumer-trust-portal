@@ -9,6 +9,7 @@ const upload = require("../config/multer");
 const {
   createComplaint,
   trackComplaint,
+  getLatestComplaint,
   getMyComplaints,
   getAllComplaints,
   getAdminStats,
@@ -21,6 +22,7 @@ const {
 // Public / User Routes
 router.get("/public-stats", getPublicStats);
 router.post("/", optionalAuthMiddleware, upload.array("evidence", 5), createComplaint);
+router.get("/latest", getLatestComplaint);
 router.get("/track/:complaintId", trackComplaint);
 router.get("/my", authMiddleware, getMyComplaints);
 router.put("/:id/feedback", optionalAuthMiddleware, submitFeedback);

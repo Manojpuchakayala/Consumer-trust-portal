@@ -1,4 +1,9 @@
-import { useState, useEffect } from "react";
+const fs = require("fs");
+const path = require("path");
+
+const root = path.resolve(__dirname, "..");
+
+const trackJsx = `import { useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import {
   FaSearch,
@@ -106,7 +111,7 @@ function TrackComplaint() {
     setFeedbackError("");
 
     try {
-      const res = await api.get(`/complaints/track/${encodeURIComponent(idToFetch.trim())}`);
+      const res = await api.get(\`/complaints/track/\${encodeURIComponent(idToFetch.trim())}\`);
       if (res.data?.success && res.data?.complaint) {
         setComplaint(res.data.complaint);
       } else {
@@ -115,7 +120,7 @@ function TrackComplaint() {
     } catch (err) {
       setError(
         err.response?.data?.message ||
-          `No grievance docket found for ID "${idToFetch}". Please verify your docket code.`
+          \`No grievance docket found for ID "\${idToFetch}". Please verify your docket code.\`
       );
     } finally {
       setLoading(false);
@@ -224,7 +229,7 @@ function TrackComplaint() {
   };
 
   const handleCopyLink = () => {
-    const url = `${window.location.origin}/track?id=${complaint?.complaintId}`;
+    const url = \`\${window.location.origin}/track?id=\${complaint?.complaintId}\`;
     navigator.clipboard.writeText(url);
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 3000);
@@ -238,7 +243,7 @@ function TrackComplaint() {
     setFeedbackSuccess("");
 
     try {
-      const res = await api.put(`/complaints/${complaint._id}/feedback`, {
+      const res = await api.put(\`/complaints/\${complaint._id}/feedback\`, {
         rating,
         comments: comments.trim(),
       });
@@ -272,25 +277,25 @@ function TrackComplaint() {
   };
 
   const activeMilestone = complaint ? getMilestoneStep(complaint.status) : 1;
-  const statusSlug = (complaint?.status || "Pending").toLowerCase().replace(/\s+/g, "-");
+  const statusSlug = (complaint?.status || "Pending").toLowerCase().replace(/\\s+/g, "-");
 
   // Exact Requested WhatsApp Case Update Template
   const buildWhatsAppCard = (c) => {
     return [
-      `🏛️ CONSUMER TRUST GRIEVANCE CASE UPDATE`,
-      `━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-      `📋 Tracking ID: ${c.complaintId}`,
-      `👤 Citizen: ${c.name || "Citizen"}`,
-      `📊 Status: ${c.status || "Pending"}`,
-      `📌 Subject: ${c.subject}`,
-      `🔗 Track Live Milestones & Evidence:`,
-      `${window.location.origin}/track?id=${c.complaintId}`,
-      `━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-    ].join("\n");
+      \`🏛️ CONSUMER TRUST GRIEVANCE CASE UPDATE\`,
+      \`━━━━━━━━━━━━━━━━━━━━━━━━━━━━\`,
+      \`📋 Tracking ID: \${c.complaintId}\`,
+      \`👤 Citizen: \${c.name || "Citizen"}\`,
+      \`📊 Status: \${c.status || "Pending"}\`,
+      \`📌 Subject: \${c.subject}\`,
+      \`🔗 Track Live Milestones & Evidence:\`,
+      \`\${window.location.origin}/track?id=\${c.complaintId}\`,
+      \`━━━━━━━━━━━━━━━━━━━━━━━━━━━━\`,
+    ].join("\\n");
   };
 
   const waShareUrl = complaint
-    ? `https://api.whatsapp.com/send?text=${encodeURIComponent(buildWhatsAppCard(complaint))}`
+    ? \`https://api.whatsapp.com/send?text=\${encodeURIComponent(buildWhatsAppCard(complaint))}\`
     : "#";
 
   return (
@@ -334,12 +339,12 @@ function TrackComplaint() {
                   <button
                     key={mc._id}
                     type="button"
-                    className={`quick-docket-chip ${complaint?.complaintId === mc.complaintId ? "active" : ""}`}
+                    className={\`quick-docket-chip \${complaint?.complaintId === mc.complaintId ? "active" : ""}\`}
                     onClick={() => handleSelectQuickDocket(mc.complaintId)}
                   >
                     <span className="chip-code">#{mc.complaintId}</span>
                     <span className="chip-brand">{mc.companyName}</span>
-                    <span className={`chip-status ${(mc.status || "Pending").toLowerCase().replace(/\s+/g, "-")}`}>
+                    <span className={\`chip-status \${(mc.status || "Pending").toLowerCase().replace(/\\s+/g, "-")}\`}>
                       {mc.status}
                     </span>
                   </button>
@@ -405,7 +410,7 @@ function TrackComplaint() {
                 </div>
 
                 <div className="status-badge-container">
-                  <div className={`status-pill-badge status-${statusSlug}`}>
+                  <div className={\`status-pill-badge status-\${statusSlug}\`}>
                     <span className="pulse-indicator-dot"></span>
                     {complaint.status}
                   </div>
@@ -447,10 +452,10 @@ function TrackComplaint() {
                     </div>
                   </div>
 
-                  <div className={`stepper-line ${activeMilestone >= 2 ? "done" : ""}`}></div>
+                  <div className={\`stepper-line \${activeMilestone >= 2 ? "done" : ""}\`}></div>
 
                   {/* Step 2 */}
-                  <div className={`stepper-step ${activeMilestone >= 2 ? "completed" : "active"}`}>
+                  <div className={\`stepper-step \${activeMilestone >= 2 ? "completed" : "active"}\`}>
                     <div className="step-bullet">
                       {activeMilestone >= 2 ? <FaCheckCircle /> : <FaClock />}
                     </div>
@@ -463,10 +468,10 @@ function TrackComplaint() {
                     </div>
                   </div>
 
-                  <div className={`stepper-line ${activeMilestone >= 3 ? "done" : ""}`}></div>
+                  <div className={\`stepper-line \${activeMilestone >= 3 ? "done" : ""}\`}></div>
 
                   {/* Step 3 */}
-                  <div className={`stepper-step ${activeMilestone >= 3 ? "completed" : activeMilestone === 2 ? "active" : ""}`}>
+                  <div className={\`stepper-step \${activeMilestone >= 3 ? "completed" : activeMilestone === 2 ? "active" : ""}\`}>
                     <div className="step-bullet">
                       {activeMilestone >= 3 ? <FaCheckCircle /> : <FaHourglassHalf />}
                     </div>
@@ -479,10 +484,10 @@ function TrackComplaint() {
                     </div>
                   </div>
 
-                  <div className={`stepper-line ${activeMilestone >= 4 ? "done" : ""}`}></div>
+                  <div className={\`stepper-line \${activeMilestone >= 4 ? "done" : ""}\`}></div>
 
                   {/* Step 4 */}
-                  <div className={`stepper-step ${activeMilestone >= 4 ? "completed" : ""}`}>
+                  <div className={\`stepper-step \${activeMilestone >= 4 ? "completed" : ""}\`}>
                     <div className="step-bullet">
                       {activeMilestone >= 4 ? <FaAward /> : <FaCheckCircle />}
                     </div>
@@ -499,7 +504,7 @@ function TrackComplaint() {
 
               {/* 7-Day Statutory SLA Live Clock Guarantee Box */}
               {complaint.status !== "Resolved" && complaint.status !== "Rejected" && (
-                <div className={`sla-guarantee-strip ${slaTime.isExpired ? "sla-expired" : ""}`}>
+                <div className={\`sla-guarantee-strip \${slaTime.isExpired ? "sla-expired" : ""}\`}>
                   <div className="sla-strip-left">
                     <div className="sla-timer-icon-wrap">
                       <FaHourglassHalf />
@@ -623,7 +628,7 @@ function TrackComplaint() {
                 <div className="evidence-pills-grid">
                   {complaint.attachments.map((att, idx) => {
                     const isPdf = att.mimeType === "application/pdf" || (att.filename && att.filename.endsWith(".pdf"));
-                    const fileUrl = att.url || `http://localhost:5000/uploads/${att.filename}`;
+                    const fileUrl = att.url || \`http://localhost:5000/uploads/\${att.filename}\`;
                     return (
                       <a
                         key={idx}
@@ -732,7 +737,7 @@ function TrackComplaint() {
                             onClick={() => setRating(star)}
                           >
                             <FaStar
-                              className={`star-svg ${star <= (hoverRating || rating) ? "filled" : "empty"}`}
+                              className={\`star-svg \${star <= (hoverRating || rating) ? "filled" : "empty"}\`}
                             />
                           </button>
                         ))}
@@ -855,3 +860,7 @@ function TrackComplaint() {
 }
 
 export default TrackComplaint;
+`;
+
+fs.writeFileSync(path.join(root, "frontend", "src", "pages", "TrackComplaint.jsx"), trackJsx, "utf8");
+console.log("Successfully updated TrackComplaint.jsx to automatically show live tracking status on click!");

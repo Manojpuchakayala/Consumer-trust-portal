@@ -569,7 +569,31 @@ const getPublicStats = async (req, res) => {
   }
 };
 
+// Get Latest Complaint for Instant Live Tracking
+const getLatestComplaint = async (req, res) => {
+  try {
+    let complaint = await Complaint.findOne().sort({ createdAt: -1 });
+    if (!complaint) {
+      // If no complaint exists in database, create or return demo
+      return res.status(404).json({
+        success: false,
+        message: "No complaints found",
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      complaint,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Failed to fetch latest complaint",
+    });
+  }
+};
+
 module.exports = {
+  getLatestComplaint,
   createComplaint,
   trackComplaint,
   getMyComplaints,
