@@ -573,6 +573,8 @@ module.exports = {
   login,
   initiateOtpLogin,
   verifyOtpLogin,
+  verifyOtp: verifyOtpLogin,
+  resendOtp: initiateOtpLogin,
   googleLogin,
   googleAuth: googleLogin,
   getMe,
