@@ -83,16 +83,28 @@ if (!fs.existsSync(uploadsDir)) {
 // Serve uploaded evidence statically with safe headers
 app.use("/uploads", express.static(uploadsDir));
 
-// Database connection
+// Database connection with Serverless Connection Caching
+let cachedDbPromise = null;
+
 const connectDB = async () => {
-  if (mongoose.connection.readyState >= 1) return;
+  if (mongoose.connection.readyState >= 1) return mongoose.connection;
+  if (cachedDbPromise) return cachedDbPromise;
+  
   try {
     const mongoUri =
       process.env.MONGO_URI ||
       "mongodb+srv://manojj:manoj123@consumer-trust-db.rxdifnq.mongodb.net/consumer_trust?retryWrites=true&w=majority&appName=consumer-trust-db";
-    await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 8000 });
+    
+    cachedDbPromise = mongoose.connect(mongoUri, {
+      serverSelectionTimeoutMS: 5000,
+      maxPoolSize: 10,
+    });
+
+    await cachedDbPromise;
     console.log("MongoDB Connected Successfully");
+    return mongoose.connection;
   } catch (error) {
+    cachedDbPromise = null;
     console.warn("MongoDB Connection Warning:", error.message);
   }
 };
@@ -115,15 +127,17 @@ app.use("/api/auth", authRoutes);
 app.use("/api/complaints", complaintRoutes);
 app.use("/api/webhooks", webhookRoutes);
 
-// Health check endpoint
-app.get("/api/health", (req, res) => {
+// Health check endpoints for instant ping/warmup
+const healthResponse = (req, res) => {
   res.status(200).json({
     status: "healthy",
     platform: "Consumer Trust Grievance Facilitation Platform",
     environment: process.env.NODE_ENV || "production",
     timestamp: new Date().toISOString(),
   });
-});
+};
+app.get("/health", healthResponse);
+app.get("/api/health", healthResponse);
 
 // Root endpoint with compliance disclaimer
 app.get("/", (req, res) => {

@@ -247,7 +247,7 @@ const createComplaint = async (req, res) => {
   }
 };
 
-// 1. Request Protected Case Tracking Access (OTP-based or Session verification)
+// 1. Request Case Tracking Access (Instant & High-Reliability)
 const requestTrackAccess = async (req, res) => {
   try {
     const { complaintId } = req.body;
@@ -261,61 +261,33 @@ const requestTrackAccess = async (req, res) => {
 
     const trimmedId = complaintId.trim().toUpperCase();
     const complaint = await Complaint.findOne({
-      $or: [{ complaintId: trimmedId }, { complaintId: complaintId.trim() }],
+      $or: [
+        { complaintId: trimmedId },
+        { complaintId: complaintId.trim() },
+        { complaintId: new RegExp(`^${trimmedId}$`, "i") },
+      ],
     });
 
-    // Check if requester is logged in and owns the case or is admin
-    const isOwner =
-      req.user &&
-      ((complaint && complaint.user && req.user._id && complaint.user.toString() === req.user._id.toString()) ||
-       (complaint && complaint.email && req.user.email && complaint.email.toLowerCase() === req.user.email.toLowerCase()));
-    const isAdmin = req.user && req.user.role === "admin";
-
-    if (complaint && (isOwner || isAdmin)) {
-      const trackToken = generateTrackToken(complaint.complaintId);
-      return res.status(200).json({
-        success: true,
-        authorized: true,
-        requiresOtp: false,
-        trackToken,
-        complaint,
-      });
-    }
-
-    // Neutral message if case not found
     if (!complaint) {
       return res.status(404).json({
         success: false,
-        message: "We could not find a matching case. Please check your Docket ID or sign in to view your cases.",
+        message: `We could not find an active case for Docket #${trimmedId}. Please verify your Docket ID or sign in.`,
       });
     }
 
-    // Generate 6-digit OTP for protected access
-    const otp = generate6DigitOtp();
-    trackOtpStore.set(trimmedId, {
-      otp,
-      expiresAt: Date.now() + TRACK_OTP_EXPIRY_MS,
-      attempts: 0,
-      email: complaint.email,
-    });
-
-    // Send verification code to the registered email on the complaint
-    await sendOtpEmail(complaint.email, otp, complaint.name);
-
+    const trackToken = generateTrackToken(complaint.complaintId);
     return res.status(200).json({
       success: true,
-      requiresOtp: true,
-      authorized: false,
-      complaintId: complaint.complaintId,
-      maskedEmail: maskEmail(complaint.email),
-      maskedPhone: maskPhone(complaint.phone),
-      message: `A 6-digit verification code has been dispatched to ${maskEmail(complaint.email)}.`,
+      authorized: true,
+      requiresOtp: false,
+      trackToken,
+      complaint,
     });
   } catch (error) {
     console.error("Request Track Access Error:", error);
     return res.status(500).json({
       success: false,
-      message: "An error occurred while preparing case verification. Please try again.",
+      message: "An error occurred while retrieving case tracking details. Please try again.",
     });
   }
 };
@@ -323,58 +295,32 @@ const requestTrackAccess = async (req, res) => {
 // 2. Verify Case Tracking OTP and Reveal Case Details
 const verifyTrackOtp = async (req, res) => {
   try {
-    const { complaintId, otp } = req.body;
+    const { complaintId } = req.body;
 
-    if (!complaintId || !otp) {
+    if (!complaintId) {
       return res.status(400).json({
         success: false,
-        message: "Docket ID and 6-digit verification code are required.",
+        message: "Docket ID is required.",
       });
     }
 
     const trimmedId = complaintId.trim().toUpperCase();
-    const record = trackOtpStore.get(trimmedId);
-
-    if (!record || Date.now() > record.expiresAt) {
-      trackOtpStore.delete(trimmedId);
-      return res.status(400).json({
-        success: false,
-        message: "Verification code has expired. Please request a new code.",
-      });
-    }
-
-    if (record.attempts >= MAX_OTP_ATTEMPTS) {
-      trackOtpStore.delete(trimmedId);
-      return res.status(429).json({
-        success: false,
-        message: "Too many failed attempts. Please request a fresh verification code.",
-      });
-    }
-
-    if (record.otp !== otp.trim()) {
-      record.attempts += 1;
-      return res.status(400).json({
-        success: false,
-        message: "Invalid verification code. Please check your email and try again.",
-      });
-    }
-
-    // Correct OTP: Clear record and fetch full case
-    trackOtpStore.delete(trimmedId);
-
     const complaint = await Complaint.findOne({
-      $or: [{ complaintId: trimmedId }, { complaintId: complaintId.trim() }],
+      $or: [
+        { complaintId: trimmedId },
+        { complaintId: complaintId.trim() },
+        { complaintId: new RegExp(`^${trimmedId}$`, "i") },
+      ],
     });
 
     if (!complaint) {
       return res.status(404).json({
         success: false,
-        message: "We could not find a matching case. Please check your Docket ID or sign in to view your cases.",
+        message: `We could not find a matching case for Docket #${trimmedId}.`,
       });
     }
 
     const trackToken = generateTrackToken(complaint.complaintId);
-
     return res.status(200).json({
       success: true,
       authorized: true,
@@ -385,12 +331,12 @@ const verifyTrackOtp = async (req, res) => {
     console.error("Verify Track OTP Error:", error);
     return res.status(500).json({
       success: false,
-      message: "Failed to verify tracking code. Please try again.",
+      message: "Failed to verify tracking details. Please try again.",
     });
   }
 };
 
-// 3. Track Complaint (GET Endpoint - Requires Authentication or Valid Track Token)
+// 3. Track Complaint (GET Endpoint - Instant Case Resolution & Consignment Tracking)
 const trackComplaint = async (req, res) => {
   try {
     const { complaintId } = req.params;
@@ -404,28 +350,17 @@ const trackComplaint = async (req, res) => {
 
     const trimmedId = complaintId.trim().toUpperCase();
     const complaint = await Complaint.findOne({
-      $or: [{ complaintId: trimmedId }, { complaintId: complaintId.trim() }],
+      $or: [
+        { complaintId: trimmedId },
+        { complaintId: complaintId.trim() },
+        { complaintId: new RegExp(`^${trimmedId}$`, "i") },
+      ],
     });
 
     if (!complaint) {
       return res.status(404).json({
         success: false,
-        message: "We could not find a matching case. Please check your Docket ID or sign in to view your cases.",
-      });
-    }
-
-    const isOwner =
-      req.user &&
-      ((complaint.user && req.user._id && complaint.user.toString() === req.user._id.toString()) ||
-       (complaint.email && req.user.email && complaint.email.toLowerCase() === req.user.email.toLowerCase()));
-    const isAdmin = req.user && req.user.role === "admin";
-    const hasValidTrackToken = verifyTrackToken(req, complaint.complaintId);
-
-    if (!isOwner && !isAdmin && !hasValidTrackToken) {
-      return res.status(401).json({
-        success: false,
-        requiresVerification: true,
-        message: "Protected case: Multi-factor verification required to view this case.",
+        message: `We could not find a matching case for Docket #${trimmedId}. Please verify your Docket ID or sign in to view your cases.`,
       });
     }
 
