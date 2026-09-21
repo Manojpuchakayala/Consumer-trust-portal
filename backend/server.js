@@ -118,14 +118,19 @@ app.use(async (req, res, next) => {
   next();
 });
 
-// Routes
+// Routes - Mounted with and without /api prefix for seamless Vercel serverless & standalone compatibility
 const authRoutes = require("./routes/authRoutes");
 const complaintRoutes = require("./routes/complaintRoutes");
 const webhookRoutes = require("./routes/webhookRoutes");
 
 app.use("/api/auth", authRoutes);
+app.use("/auth", authRoutes);
+
 app.use("/api/complaints", complaintRoutes);
+app.use("/complaints", complaintRoutes);
+
 app.use("/api/webhooks", webhookRoutes);
+app.use("/webhooks", webhookRoutes);
 
 // Health check endpoints for instant ping/warmup
 const healthResponse = (req, res) => {
@@ -153,7 +158,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-if (process.env.NODE_ENV !== "test" && !process.env.VERCEL) {
+if (require.main === module || (!process.env.VERCEL && process.env.NODE_ENV !== "test")) {
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => {
     console.log(`Consumer Trust Server running securely on port ${PORT}`);
