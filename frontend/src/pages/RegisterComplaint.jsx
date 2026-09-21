@@ -60,49 +60,136 @@ const ENTERPRISE_OPTIONS = [
   { id: "ajio", name: "Ajio (Reliance Retail)", category: "Product", nodal: "grievance.officer@ajio.com", sla: "48h Ack / 7 Days Target" },
   { id: "nykaa", name: "Nykaa", category: "Product", nodal: "grievanceofficer@nykaa.com", sla: "48h Ack / 7 Days Target" },
   { id: "tatacliq", name: "Tata CLiQ", category: "Product", nodal: "grievanceofficer@tatacliq.com", sla: "48h Ack / 7 Days Target" },
+  { id: "jiomart", name: "JioMart (Reliance)", category: "Product", nodal: "grievanceofficer@jiomart.com", sla: "48h Ack / 7 Days Target" },
+  { id: "croma", name: "Croma Electronics", category: "Product", nodal: "grievanceofficer@croma.com", sla: "48h Ack / 7 Days Target" },
+  { id: "reliancedigital", name: "Reliance Digital", category: "Product", nodal: "reliancedigital@ril.com", sla: "48h Ack / 7 Days Target" },
+  { id: "vijaysales", name: "Vijay Sales", category: "Product", nodal: "support@vijaysales.com", sla: "48h Ack / 7 Days Target" },
+  { id: "lenskart", name: "Lenskart", category: "Product", nodal: "grievance@lenskart.in", sla: "48h Ack / 5 Days Target" },
+  { id: "firstcry", name: "FirstCry", category: "Product", nodal: "grievanceofficer@firstcry.com", sla: "48h Ack / 7 Days Target" },
+  { id: "snapdeal", name: "Snapdeal", category: "Product", nodal: "grievanceofficer@snapdeal.com", sla: "48h Ack / 7 Days Target" },
 
-  // Food & Quick Commerce
+  // Food, Dining & Quick Commerce
   { id: "zomato", name: "Zomato", category: "Food", nodal: "grievance@zomato.com", sla: "24h Ack / 3 Days Target" },
   { id: "swiggy", name: "Swiggy", category: "Food", nodal: "grievances@swiggy.in", sla: "24h Ack / 3 Days Target" },
   { id: "blinkit", name: "Blinkit", category: "Food", nodal: "grievance@blinkit.com", sla: "24h Ack / 3 Days Target" },
   { id: "zepto", name: "Zepto", category: "Food", nodal: "grievance@zeptonow.com", sla: "24h Ack / 3 Days Target" },
   { id: "bigbasket", name: "BigBasket", category: "Food", nodal: "grievance@bigbasket.com", sla: "24h Ack / 3 Days Target" },
   { id: "dominos", name: "Domino's Pizza India", category: "Food", nodal: "guestcare@jublfood.com", sla: "24h Ack / 3 Days Target" },
+  { id: "mcdonalds", name: "McDonald's India", category: "Food", nodal: "customerfeedback@mcdonaldsindia.com", sla: "24h Ack / 3 Days Target" },
+  { id: "kfc", name: "KFC India (Yum! Brands)", category: "Food", nodal: "feedback@kfc.com", sla: "24h Ack / 3 Days Target" },
+  { id: "pizzahut", name: "Pizza Hut India", category: "Food", nodal: "feedback@pizzahut.co.in", sla: "24h Ack / 3 Days Target" },
+  { id: "burgerking", name: "Burger King India", category: "Food", nodal: "customercare@burgerking.in", sla: "24h Ack / 3 Days Target" },
+  { id: "starbucks", name: "Tata Starbucks India", category: "Food", nodal: "customercare@tatastarbucks.com", sla: "24h Ack / 3 Days Target" },
 
-  // Banking, UPI & Fintech
+  // Banking, Cards, UPI & Fintech
   { id: "sbi", name: "State Bank of India (SBI)", category: "Banking", nodal: "nodalofficer@sbi.co.in", sla: "48h Ack / 7 Days Target" },
   { id: "hdfc", name: "HDFC Bank", category: "Banking", nodal: "grievance.redressal@hdfcbank.com", sla: "48h Ack / 7 Days Target" },
   { id: "icici", name: "ICICI Bank", category: "Banking", nodal: "headservicequality@icicibank.com", sla: "48h Ack / 7 Days Target" },
   { id: "axis", name: "Axis Bank", category: "Banking", nodal: "nodal.officer@axisbank.com", sla: "48h Ack / 7 Days Target" },
   { id: "kotak", name: "Kotak Mahindra Bank", category: "Banking", nodal: "nodalofficer@kotak.com", sla: "48h Ack / 7 Days Target" },
   { id: "pnb", name: "Punjab National Bank (PNB)", category: "Banking", nodal: "care@pnb.co.in", sla: "48h Ack / 7 Days Target" },
+  { id: "bankofbaroda", name: "Bank of Baroda", category: "Banking", nodal: "gm.ops.ho@bankofbaroda.com", sla: "48h Ack / 7 Days Target" },
+  { id: "idfcfirst", name: "IDFC FIRST Bank", category: "Banking", nodal: "nodalofficer@idfcfirstbank.com", sla: "48h Ack / 7 Days Target" },
   { id: "phonepe", name: "PhonePe (UPI & Payments)", category: "Banking", nodal: "grievance-officer@phonepe.com", sla: "24h Ack / 5 Days Target" },
   { id: "paytm", name: "Paytm Payments", category: "Banking", nodal: "grievanceofficer@paytm.com", sla: "24h Ack / 5 Days Target" },
   { id: "googlepay", name: "Google Pay India", category: "Banking", nodal: "gpay-grievance-india@google.com", sla: "24h Ack / 5 Days Target" },
   { id: "cred", name: "CRED", category: "Banking", nodal: "grievance@cred.club", sla: "24h Ack / 5 Days Target" },
+  { id: "bharatpe", name: "BharatPe", category: "Banking", nodal: "nodal@bharatpe.com", sla: "24h Ack / 5 Days Target" },
+  { id: "zerodha", name: "Zerodha Broking", category: "Banking", nodal: "complaints@zerodha.com", sla: "24h Ack / 5 Days Target" },
+  { id: "groww", name: "Groww", category: "Banking", nodal: "grievance@groww.in", sla: "24h Ack / 5 Days Target" },
 
-  // Telecom & Utilities
+  // Telecom & Internet Service Providers
   { id: "jio", name: "Reliance Jio Infocomm", category: "Telecom", nodal: "appellate.authority@jio.com", sla: "48h Ack / 7 Days Target" },
   { id: "airtel", name: "Bharti Airtel", category: "Telecom", nodal: "nodalofficer.india@airtel.com", sla: "48h Ack / 7 Days Target" },
   { id: "vi", name: "Vodafone Idea (Vi)", category: "Telecom", nodal: "nodalofficer@vodafoneidea.com", sla: "48h Ack / 7 Days Target" },
   { id: "bsnl", name: "BSNL India", category: "Telecom", nodal: "cmdbsnl@bsnl.co.in", sla: "48h Ack / 7 Days Target" },
+  { id: "actfibernet", name: "ACT Fibernet", category: "Telecom", nodal: "nodal@actcorp.in", sla: "48h Ack / 5 Days Target" },
 
-  // Travel & Transport
+  // Travel, Airlines & Transport
   { id: "makemytrip", name: "MakeMyTrip", category: "Travel", nodal: "grievance.officer@makemytrip.com", sla: "24h Ack / 7 Days Target" },
   { id: "irctc", name: "IRCTC (Indian Railways)", category: "Travel", nodal: "customercare@irctc.co.in", sla: "24h Ack / 5 Days Target" },
   { id: "indigo", name: "IndiGo Airlines", category: "Travel", nodal: "nodalofficer@goindigo.in", sla: "24h Ack / 7 Days Target" },
   { id: "airindia", name: "Air India", category: "Travel", nodal: "nodalofficer@airindia.com", sla: "24h Ack / 7 Days Target" },
+  { id: "spicejet", name: "SpiceJet Airlines", category: "Travel", nodal: "nodalofficer@spicejet.com", sla: "24h Ack / 7 Days Target" },
+  { id: "akasaair", name: "Akasa Air", category: "Travel", nodal: "nodalofficer@akasaair.com", sla: "24h Ack / 7 Days Target" },
   { id: "uber", name: "Uber India", category: "Travel", nodal: "grievance-officer-india@uber.com", sla: "24h Ack / 5 Days Target" },
   { id: "ola", name: "Ola Cabs", category: "Travel", nodal: "grievanceofficer@olacabs.com", sla: "24h Ack / 5 Days Target" },
   { id: "rapido", name: "Rapido Bike Taxi", category: "Travel", nodal: "grievance@rapido.bike", sla: "24h Ack / 5 Days Target" },
+  { id: "easemytrip", name: "EaseMyTrip", category: "Travel", nodal: "care@easemytrip.com", sla: "24h Ack / 5 Days Target" },
+  { id: "cleartrip", name: "Cleartrip", category: "Travel", nodal: "grievance@cleartrip.com", sla: "24h Ack / 5 Days Target" },
+  { id: "oyo", name: "OYO Rooms", category: "Travel", nodal: "grievanceofficer@oyorooms.com", sla: "24h Ack / 5 Days Target" },
 
-  // Electronics & Appliances
+  // Electronics & Smartphones
   { id: "samsung", name: "Samsung Electronics India", category: "Product", nodal: "grievance.india@samsung.com", sla: "48h Ack / 7 Days Target" },
   { id: "apple", name: "Apple India", category: "Product", nodal: "india_grievance_officer@apple.com", sla: "48h Ack / 7 Days Target" },
   { id: "xiaomi", name: "Xiaomi / Redmi India", category: "Product", nodal: "grievance-officer@xiaomi.com", sla: "48h Ack / 7 Days Target" },
   { id: "oneplus", name: "OnePlus India", category: "Product", nodal: "grievance.officer@oneplus.com", sla: "48h Ack / 7 Days Target" },
+  { id: "realme", name: "Realme India", category: "Product", nodal: "grievance@realme.com", sla: "48h Ack / 7 Days Target" },
+  { id: "vivo", name: "Vivo India", category: "Product", nodal: "grievance@vivo.com", sla: "48h Ack / 7 Days Target" },
+  { id: "oppo", name: "Oppo India", category: "Product", nodal: "grievance@oppo.com", sla: "48h Ack / 7 Days Target" },
   { id: "sony", name: "Sony India", category: "Product", nodal: "sonyindia.care@sony.com", sla: "48h Ack / 7 Days Target" },
+  { id: "hp", name: "HP India (Hewlett Packard)", category: "Product", nodal: "in.contact@hp.com", sla: "48h Ack / 7 Days Target" },
+  { id: "dell", name: "Dell Technologies India", category: "Product", nodal: "india_customer_care@dell.com", sla: "48h Ack / 7 Days Target" },
+  { id: "lenovo", name: "Lenovo India", category: "Product", nodal: "grievance@lenovo.com", sla: "48h Ack / 7 Days Target" },
+  { id: "asus", name: "Asus India", category: "Product", nodal: "support_india@asus.com", sla: "48h Ack / 7 Days Target" },
+  { id: "boat", name: "boAt Lifestyle", category: "Product", nodal: "nodalofficer@imaginemarketingindia.com", sla: "48h Ack / 5 Days Target" },
+  { id: "noise", name: "Noise (Nexxbase)", category: "Product", nodal: "grievance@gonoise.com", sla: "48h Ack / 5 Days Target" },
+
+  // Home Appliances & Durables
   { id: "lg", name: "LG Electronics India", category: "Product", nodal: "serviceindia@lge.com", sla: "48h Ack / 7 Days Target" },
+  { id: "whirlpool", name: "Whirlpool of India", category: "Product", nodal: "grievanceofficer@whirlpool.com", sla: "48h Ack / 7 Days Target" },
+  { id: "voltas", name: "Voltas (Tata Enterprise)", category: "Product", nodal: "nodalofficer@voltas.com", sla: "48h Ack / 7 Days Target" },
+  { id: "havells", name: "Havells India (Lloyd)", category: "Product", nodal: "grievance@havells.com", sla: "48h Ack / 7 Days Target" },
+  { id: "godrej", name: "Godrej Appliances", category: "Product", nodal: "smartcare@godrej.com", sla: "48h Ack / 7 Days Target" },
+  { id: "bosch", name: "Bosch Home Appliances", category: "Product", nodal: "service.in@bosch.com", sla: "48h Ack / 7 Days Target" },
+  { id: "eurekaforbes", name: "Eureka Forbes (Aquaguard)", category: "Product", nodal: "customercare@eurekaforbes.com", sla: "48h Ack / 5 Days Target" },
+
+  // Automotive, Two-Wheelers & EV
+  { id: "tatamotors", name: "Tata Motors Passenger Vehicles", category: "Product", nodal: "nodalofficer@tatamotors.com", sla: "48h Ack / 7 Days Target" },
+  { id: "marutisuzuki", name: "Maruti Suzuki India", category: "Product", nodal: "nodal@maruti.co.in", sla: "48h Ack / 7 Days Target" },
+  { id: "hyundai", name: "Hyundai Motor India", category: "Product", nodal: "nodalofficer@hmil.net", sla: "48h Ack / 7 Days Target" },
+  { id: "mahindra", name: "Mahindra & Mahindra", category: "Product", nodal: "customercare@mahindra.com", sla: "48h Ack / 7 Days Target" },
+  { id: "olaelectric", name: "Ola Electric Mobility", category: "Product", nodal: "nodal@olaelectric.com", sla: "24h Ack / 7 Days Target" },
+  { id: "ather", name: "Ather Energy", category: "Product", nodal: "grievance@atherenergy.com", sla: "48h Ack / 7 Days Target" },
+  { id: "tvsmotor", name: "TVS Motor Company", category: "Product", nodal: "customercare@tvsmotor.com", sla: "48h Ack / 7 Days Target" },
+  { id: "heromotocorp", name: "Hero MotoCorp", category: "Product", nodal: "customercare@heromotocorp.com", sla: "48h Ack / 7 Days Target" },
+  { id: "royalenfield", name: "Royal Enfield", category: "Product", nodal: "support@royalenfield.com", sla: "48h Ack / 7 Days Target" },
+
+  // Insurance, Health & Pharmacy
+  { id: "lic", name: "Life Insurance Corporation (LIC)", category: "Banking", nodal: "co_crmgrv@licindia.com", sla: "48h Ack / 14 Days Target" },
+  { id: "starhealth", name: "Star Health Insurance", category: "Banking", nodal: "gro@starhealth.in", sla: "48h Ack / 7 Days Target" },
+  { id: "hdfcergo", name: "HDFC ERGO General Insurance", category: "Banking", nodal: "grievance@hdfcergo.com", sla: "48h Ack / 7 Days Target" },
+  { id: "icicilombard", name: "ICICI Lombard Insurance", category: "Banking", nodal: "grievanceredressal@icicilombard.com", sla: "48h Ack / 7 Days Target" },
+  { id: "policybazaar", name: "PolicyBazaar", category: "Banking", nodal: "grievance@policybazaar.com", sla: "24h Ack / 5 Days Target" },
+  { id: "tata1mg", name: "Tata 1mg", category: "Product", nodal: "grievance@1mg.com", sla: "24h Ack / 3 Days Target" },
+  { id: "apollo247", name: "Apollo 24|7", category: "Product", nodal: "helpdesk@apollo247.com", sla: "24h Ack / 3 Days Target" },
+  { id: "pharmeasy", name: "PharmEasy", category: "Product", nodal: "care@pharmeasy.in", sla: "24h Ack / 3 Days Target" },
+
+  // OTT, Streaming & Entertainment
+  { id: "netflix", name: "Netflix India", category: "Service", nodal: "grievance-officer-india@netflix.com", sla: "24h Ack / 5 Days Target" },
+  { id: "hotstar", name: "Disney+ Hotstar / JioHotstar", category: "Service", nodal: "grievanceofficer@hotstar.com", sla: "24h Ack / 5 Days Target" },
+  { id: "primevideo", name: "Amazon Prime Video", category: "Service", nodal: "grievanceofficer-primevideo@amazon.com", sla: "24h Ack / 5 Days Target" },
+  { id: "bookmyshow", name: "BookMyShow", category: "Service", nodal: "grievance@bookmyshow.com", sla: "24h Ack / 3 Days Target" },
+  { id: "spotify", name: "Spotify India", category: "Service", nodal: "grievance-india@spotify.com", sla: "24h Ack / 5 Days Target" },
+
+  // Logistics & Couriers
+  { id: "delhivery", name: "Delhivery Logistics", category: "Service", nodal: "nodalofficer@delhivery.com", sla: "24h Ack / 5 Days Target" },
+  { id: "bluedart", name: "Blue Dart Express (DHL)", category: "Service", nodal: "nodal@bluedart.com", sla: "24h Ack / 5 Days Target" },
+  { id: "dtdc", name: "DTDC Express", category: "Service", nodal: "grievance@dtdc.com", sla: "24h Ack / 5 Days Target" },
+  { id: "indiapost", name: "India Post (Speed Post)", category: "Service", nodal: "complaints@indiapost.gov.in", sla: "48h Ack / 7 Days Target" },
+  { id: "shadowfax", name: "Shadowfax", category: "Service", nodal: "grievance@shadowfax.in", sla: "24h Ack / 5 Days Target" },
+
+  // Ed-Tech & Online Education
+  { id: "byjus", name: "BYJU'S (Think & Learn)", category: "Service", nodal: "grievance@byjus.com", sla: "24h Ack / 7 Days Target" },
+  { id: "unacademy", name: "Unacademy", category: "Service", nodal: "grievance@unacademy.com", sla: "24h Ack / 7 Days Target" },
+  { id: "physicswallah", name: "Physics Wallah (PW)", category: "Service", nodal: "grievance@pw.live", sla: "24h Ack / 5 Days Target" },
+  { id: "upgrad", name: "upGrad Education", category: "Service", nodal: "grievance@upgrad.com", sla: "24h Ack / 7 Days Target" },
+
+  // Real Estate & Housing Developers
+  { id: "dlf", name: "DLF Limited", category: "Service", nodal: "nodalofficer@dlf.in", sla: "48h Ack / 14 Days Target" },
+  { id: "godrejproperties", name: "Godrej Properties", category: "Service", nodal: "customercare@godrejproperties.com", sla: "48h Ack / 14 Days Target" },
+  { id: "lodha", name: "Macrotech Developers (Lodha)", category: "Service", nodal: "customercare@lodhagroup.com", sla: "48h Ack / 14 Days Target" },
+  { id: "prestige", name: "Prestige Estates Projects", category: "Service", nodal: "properties@prestigeconstructions.com", sla: "48h Ack / 14 Days Target" },
 
   // Other / Custom
   { id: "other", name: "Other / Custom Enterprise", category: "Other", nodal: "Custom Enterprise Desk", sla: "Standard 7 Days Target" },
