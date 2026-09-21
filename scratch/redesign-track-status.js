@@ -1,4 +1,9 @@
-import { useState, useEffect } from "react";
+const fs = require("fs");
+const path = require("path");
+
+const root = path.resolve(__dirname, "..");
+
+const trackJsx = `import { useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import {
   FaSearch,
@@ -108,7 +113,7 @@ function TrackComplaint() {
     setFeedbackError("");
 
     try {
-      const res = await api.get(`/complaints/track/${encodeURIComponent(idToFetch.trim())}`);
+      const res = await api.get(\`/complaints/track/\${encodeURIComponent(idToFetch.trim())}\`);
       if (res.data?.success && res.data?.complaint) {
         setComplaint(res.data.complaint);
       } else {
@@ -117,7 +122,7 @@ function TrackComplaint() {
     } catch (err) {
       setError(
         err.response?.data?.message ||
-          `No grievance docket found for ID "${idToFetch}". Please check the docket number and try again.`
+          \`No grievance docket found for ID "\${idToFetch}". Please check the docket number and try again.\`
       );
     } finally {
       setLoading(false);
@@ -184,7 +189,7 @@ function TrackComplaint() {
   };
 
   const handleCopyLink = () => {
-    const url = `${window.location.origin}/track?id=${complaint?.complaintId}`;
+    const url = \`\${window.location.origin}/track?id=\${complaint?.complaintId}\`;
     navigator.clipboard.writeText(url);
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 3000);
@@ -198,7 +203,7 @@ function TrackComplaint() {
     setFeedbackSuccess("");
 
     try {
-      const res = await api.put(`/complaints/${complaint._id}/feedback`, {
+      const res = await api.put(\`/complaints/\${complaint._id}/feedback\`, {
         rating,
         comments: comments.trim(),
       });
@@ -232,25 +237,25 @@ function TrackComplaint() {
   };
 
   const activeMilestone = complaint ? getMilestoneStep(complaint.status) : 0;
-  const statusSlug = (complaint?.status || "Pending").toLowerCase().replace(/\s+/g, "-");
+  const statusSlug = (complaint?.status || "Pending").toLowerCase().replace(/\\s+/g, "-");
 
   // Exact WhatsApp Case Update Card
   const buildWhatsAppCard = (c) => {
     return [
-      `🏛️ CONSUMER TRUST GRIEVANCE CASE UPDATE`,
-      `━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-      `📋 Tracking ID: ${c.complaintId}`,
-      `👤 Citizen: ${c.name || "Citizen"}`,
-      `📊 Status: ${c.status || "Pending"}`,
-      `📌 Subject: ${c.subject}`,
-      `🔗 Track Live Milestones & Evidence:`,
-      `${window.location.origin}/track?id=${c.complaintId}`,
-      `━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-    ].join("\n");
+      \`🏛️ CONSUMER TRUST GRIEVANCE CASE UPDATE\`,
+      \`━━━━━━━━━━━━━━━━━━━━━━━━━━━━\`,
+      \`📋 Tracking ID: \${c.complaintId}\`,
+      \`👤 Citizen: \${c.name || "Citizen"}\`,
+      \`📊 Status: \${c.status || "Pending"}\`,
+      \`📌 Subject: \${c.subject}\`,
+      \`🔗 Track Live Milestones & Evidence:\`,
+      \`\${window.location.origin}/track?id=\${c.complaintId}\`,
+      \`━━━━━━━━━━━━━━━━━━━━━━━━━━━━\`,
+    ].join("\\n");
   };
 
   const waShareUrl = complaint
-    ? `https://api.whatsapp.com/send?text=${encodeURIComponent(buildWhatsAppCard(complaint))}`
+    ? \`https://api.whatsapp.com/send?text=\${encodeURIComponent(buildWhatsAppCard(complaint))}\`
     : "#";
 
   return (
@@ -294,12 +299,12 @@ function TrackComplaint() {
                   <button
                     key={mc._id}
                     type="button"
-                    className={`quick-docket-chip ${complaint?.complaintId === mc.complaintId ? "active" : ""}`}
+                    className={\`quick-docket-chip \${complaint?.complaintId === mc.complaintId ? "active" : ""}\`}
                     onClick={() => handleSelectQuickDocket(mc.complaintId)}
                   >
                     <span className="chip-code">#{mc.complaintId}</span>
                     <span className="chip-brand">{mc.companyName}</span>
-                    <span className={`chip-status ${(mc.status || "Pending").toLowerCase().replace(/\s+/g, "-")}`}>
+                    <span className={\`chip-status \${(mc.status || "Pending").toLowerCase().replace(/\\s+/g, "-")}\`}>
                       {mc.status}
                     </span>
                   </button>
@@ -357,7 +362,7 @@ function TrackComplaint() {
                 </div>
 
                 <div className="status-badge-container">
-                  <div className={`status-pill-badge status-${statusSlug}`}>
+                  <div className={\`status-pill-badge status-\${statusSlug}\`}>
                     <span className="pulse-indicator-dot"></span>
                     {complaint.status}
                   </div>
@@ -399,10 +404,10 @@ function TrackComplaint() {
                     </div>
                   </div>
 
-                  <div className={`stepper-line ${activeMilestone >= 2 ? "done" : ""}`}></div>
+                  <div className={\`stepper-line \${activeMilestone >= 2 ? "done" : ""}\`}></div>
 
                   {/* Step 2 */}
-                  <div className={`stepper-step ${activeMilestone >= 2 ? "completed" : "active"}`}>
+                  <div className={\`stepper-step \${activeMilestone >= 2 ? "completed" : "active"}\`}>
                     <div className="step-bullet">
                       {activeMilestone >= 2 ? <FaCheckCircle /> : <FaClock />}
                     </div>
@@ -415,10 +420,10 @@ function TrackComplaint() {
                     </div>
                   </div>
 
-                  <div className={`stepper-line ${activeMilestone >= 3 ? "done" : ""}`}></div>
+                  <div className={\`stepper-line \${activeMilestone >= 3 ? "done" : ""}\`}></div>
 
                   {/* Step 3 */}
-                  <div className={`stepper-step ${activeMilestone >= 3 ? "completed" : activeMilestone === 2 ? "active" : ""}`}>
+                  <div className={\`stepper-step \${activeMilestone >= 3 ? "completed" : activeMilestone === 2 ? "active" : ""}\`}>
                     <div className="step-bullet">
                       {activeMilestone >= 3 ? <FaCheckCircle /> : <FaHourglassHalf />}
                     </div>
@@ -431,10 +436,10 @@ function TrackComplaint() {
                     </div>
                   </div>
 
-                  <div className={`stepper-line ${activeMilestone >= 4 ? "done" : ""}`}></div>
+                  <div className={\`stepper-line \${activeMilestone >= 4 ? "done" : ""}\`}></div>
 
                   {/* Step 4 */}
-                  <div className={`stepper-step ${activeMilestone >= 4 ? "completed" : ""}`}>
+                  <div className={\`stepper-step \${activeMilestone >= 4 ? "completed" : ""}\`}>
                     <div className="step-bullet">
                       {activeMilestone >= 4 ? <FaAward /> : <FaCheckCircle />}
                     </div>
@@ -451,7 +456,7 @@ function TrackComplaint() {
 
               {/* 7-Day Statutory SLA Live Clock Guarantee Box */}
               {complaint.status !== "Resolved" && complaint.status !== "Rejected" && (
-                <div className={`sla-guarantee-strip ${slaTime.isExpired ? "sla-expired" : ""}`}>
+                <div className={\`sla-guarantee-strip \${slaTime.isExpired ? "sla-expired" : ""}\`}>
                   <div className="sla-strip-left">
                     <div className="sla-timer-icon-wrap">
                       <FaHourglassHalf />
@@ -575,7 +580,7 @@ function TrackComplaint() {
                 <div className="evidence-pills-grid">
                   {complaint.attachments.map((att, idx) => {
                     const isPdf = att.mimeType === "application/pdf" || (att.filename && att.filename.endsWith(".pdf"));
-                    const fileUrl = att.url || `http://localhost:5000/uploads/${att.filename}`;
+                    const fileUrl = att.url || \`http://localhost:5000/uploads/\${att.filename}\`;
                     return (
                       <a
                         key={idx}
@@ -684,7 +689,7 @@ function TrackComplaint() {
                             onClick={() => setRating(star)}
                           >
                             <FaStar
-                              className={`star-svg ${star <= (hoverRating || rating) ? "filled" : "empty"}`}
+                              className={\`star-svg \${star <= (hoverRating || rating) ? "filled" : "empty"}\`}
                             />
                           </button>
                         ))}
@@ -943,3 +948,1422 @@ function TrackComplaint() {
 }
 
 export default TrackComplaint;
+`;
+
+const trackCss = `/* ==========================================================================
+   TRACK COMPLAINT - MODERN BOX PANELS & CLEAN TRACKING SYSTEM
+   ========================================================================== */
+
+.track-layout-clean {
+  min-height: calc(100vh - 80px);
+  background: var(--bg-primary, #f4f7fb);
+  padding: 36px 20px 80px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.track-inner-container {
+  max-width: 960px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* ==========================================================================
+   1. Search & Quick Docket Selector Header
+   ========================================================================== */
+.track-search-header-panel {
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 20px;
+  padding: 36px 32px 28px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+  margin-bottom: 24px;
+}
+
+.search-header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  padding: 5px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.track-search-header-panel h1 {
+  font-size: clamp(24px, 4vw, 30px);
+  font-weight: 800;
+  color: var(--text-heading, #0f2b5c);
+  margin: 0 0 8px;
+  letter-spacing: -0.5px;
+}
+
+.track-search-header-panel p {
+  color: var(--text-muted, #64748b);
+  font-size: 14.5px;
+  max-width: 620px;
+  margin: 0 auto 24px;
+  line-height: 1.5;
+}
+
+.track-search-bar-wrap {
+  display: flex;
+  gap: 12px;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+@media (max-width: 600px) {
+  .track-search-bar-wrap {
+    flex-direction: column;
+  }
+}
+
+.search-input-field {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-mag-icon {
+  position: absolute;
+  left: 16px;
+  color: #2563eb;
+  font-size: 16px;
+  pointer-events: none;
+}
+
+.search-input-field input {
+  width: 100%;
+  height: 48px;
+  padding: 0 16px 0 46px;
+  border: 1.5px solid var(--border-color, #cbd5e1);
+  border-radius: 12px;
+  font-size: 15px;
+  background: var(--card-bg, #ffffff);
+  color: var(--text-primary, #0f172a);
+  outline: none;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.search-input-field input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.btn-track-action-submit {
+  background: linear-gradient(135deg, #0f2b5c 0%, #1e3a8a 100%);
+  color: white;
+  border: none;
+  padding: 0 28px;
+  height: 48px;
+  border-radius: 12px;
+  font-size: 14.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(15, 43, 92, 0.25);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-track-action-submit:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(15, 43, 92, 0.35);
+}
+
+/* Quick Dockets Strip */
+.quick-dockets-strip {
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border-color, #f1f5f9);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.quick-dockets-label {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #64748b;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.quick-dockets-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.quick-docket-chip {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  transition: all 0.2s ease;
+}
+
+.quick-docket-chip:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  transform: translateY(-1px);
+}
+
+.quick-docket-chip.active {
+  background: #0f2b5c;
+  color: white;
+  border-color: #0f2b5c;
+}
+
+.chip-code {
+  font-weight: 700;
+  font-family: monospace;
+}
+
+.chip-brand {
+  font-weight: 600;
+}
+
+.chip-status {
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.chip-status.pending { background: #fffbeb; color: #b45309; }
+.chip-status.in-progress { background: #eff6ff; color: #1d4ed8; }
+.chip-status.resolved { background: #ecfdf5; color: #059669; }
+.chip-status.rejected { background: #fef2f2; color: #dc2626; }
+
+/* Error Alert Box */
+.track-error-alert-box {
+  background: #fef2f2;
+  border: 1.5px solid #fecaca;
+  border-radius: 14px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: #991b1b;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.05);
+}
+
+.err-icon {
+  font-size: 20px;
+  color: #dc2626;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.err-text strong {
+  display: block;
+  font-size: 14.5px;
+  margin-bottom: 3px;
+}
+
+.err-text p {
+  margin: 0;
+  font-size: 13.5px;
+}
+
+/* ==========================================================================
+   2. Results Box Panels Flow
+   ========================================================================== */
+.track-results-view-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.track-card-box {
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 18px;
+  padding: 24px 28px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
+}
+
+.panel-box-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border-color, #f1f5f9);
+}
+
+.panel-header-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.panel-header-icon.blue-icon { background: #eff6ff; color: #2563eb; }
+.panel-header-icon.indigo-icon { background: #e0e7ff; color: #4338ca; }
+.panel-header-icon.green-icon { background: #ecfdf5; color: #059669; }
+.panel-header-icon.cyan-icon { background: #f0fdfa; color: #0d9488; }
+.panel-header-icon.teal-icon { background: #f0fdf4; color: #16a34a; }
+
+.panel-header-text h3 {
+  font-size: 16.5px;
+  font-weight: 800;
+  color: var(--text-heading, #0f2b5c);
+  margin: 0 0 3px;
+}
+
+.panel-header-text p {
+  color: var(--text-muted, #64748b);
+  font-size: 13px;
+  margin: 0;
+}
+
+/* PANEL 1: Docket Overview Card */
+.docket-overview-card {
+  border-top: 4px solid #2563eb;
+}
+
+.docket-top-flex-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.docket-title-area {
+  flex: 1;
+  min-width: 260px;
+}
+
+.docket-id-copy-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.docket-id-code {
+  font-family: monospace;
+  font-size: 16px;
+  font-weight: 800;
+  color: #1d4ed8;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  padding: 4px 10px;
+  border-radius: 8px;
+  letter-spacing: 0.5px;
+}
+
+.btn-copy-tag {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  border-radius: 6px;
+  padding: 4px 9px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s ease;
+}
+
+.btn-copy-tag:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.docket-main-subject {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text-heading, #0f2b5c);
+  margin: 0 0 12px;
+  line-height: 1.35;
+}
+
+.docket-chips-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.docket-chip {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12.5px;
+  color: #475569;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.docket-chip.brand-chip {
+  background: #0f2b5c;
+  color: white;
+  border-color: #0f2b5c;
+}
+
+.docket-chip.brand-chip .chip-icon {
+  color: #f59e0b;
+}
+
+/* Status Badge Container */
+.status-pill-badge {
+  font-size: 13px;
+  font-weight: 800;
+  padding: 8px 18px;
+  border-radius: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pulse-indicator-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-pill-badge.status-pending {
+  background: #fffbeb;
+  color: #b45309;
+  border: 1.5px solid #fde68a;
+}
+.status-pill-badge.status-pending .pulse-indicator-dot {
+  background: #f59e0b;
+  box-shadow: 0 0 8px #f59e0b;
+}
+
+.status-pill-badge.status-in-progress {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1.5px solid #bfdbfe;
+}
+.status-pill-badge.status-in-progress .pulse-indicator-dot {
+  background: #0284c7;
+  box-shadow: 0 0 8px #0284c7;
+}
+
+.status-pill-badge.status-resolved {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1.5px solid #a7f3d0;
+}
+.status-pill-badge.status-resolved .pulse-indicator-dot {
+  background: #059669;
+  box-shadow: 0 0 8px #059669;
+}
+
+.status-pill-badge.status-rejected {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1.5px solid #fecaca;
+}
+.status-pill-badge.status-rejected .pulse-indicator-dot {
+  background: #dc2626;
+}
+
+/* PANEL 2: 4-Stage Stepper */
+.milestone-stepper-amazon {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin: 20px 0 24px;
+  position: relative;
+}
+
+@media (max-width: 640px) {
+  .milestone-stepper-amazon {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+.stepper-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+  flex: 1;
+}
+
+@media (max-width: 640px) {
+  .stepper-step {
+    flex-direction: row;
+    gap: 14px;
+    text-align: left;
+  }
+}
+
+.step-bullet {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  color: #94a3b8;
+  border: 2px solid #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  margin-bottom: 8px;
+  transition: all 0.25s ease;
+}
+
+.stepper-step.completed .step-bullet {
+  background: #059669;
+  color: white;
+  border-color: #059669;
+  box-shadow: 0 0 10px rgba(5, 150, 105, 0.3);
+}
+
+.stepper-step.active .step-bullet {
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
+  box-shadow: 0 0 10px rgba(37, 99, 235, 0.3);
+}
+
+.step-desc strong {
+  display: block;
+  font-size: 13px;
+  color: var(--text-heading, #0f2b5c);
+  margin-bottom: 2px;
+}
+
+.step-desc span {
+  display: block;
+  font-size: 11.5px;
+  color: var(--text-muted, #64748b);
+}
+
+.step-time {
+  font-size: 10.5px;
+  color: #2563eb;
+  font-weight: 700;
+  display: block;
+  margin-top: 3px;
+}
+
+.stepper-line {
+  flex: 1;
+  height: 3px;
+  background: #e2e8f0;
+  margin-top: 18px;
+  align-self: flex-start;
+}
+
+@media (max-width: 640px) {
+  .stepper-line {
+    display: none;
+  }
+}
+
+.stepper-line.done {
+  background: #059669;
+}
+
+/* SLA Guarantee Strip */
+.sla-guarantee-strip {
+  background: #fffdf5;
+  border: 1.5px solid #fde68a;
+  border-radius: 14px;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.sla-guarantee-strip.sla-expired {
+  background: #fff5f5;
+  border-color: #fecaca;
+}
+
+.sla-strip-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.sla-timer-icon-wrap {
+  width: 44px;
+  height: 44px;
+  background: #fef3c7;
+  color: #d97706;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.sla-title {
+  font-size: 13.5px;
+  color: #92400e;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.sla-countdown-nums {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.timer-pill {
+  background: #ffffff;
+  border: 1px solid #fde68a;
+  color: #b45309;
+  font-weight: 800;
+  font-size: 12.5px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-family: monospace;
+}
+
+.timer-sub {
+  font-size: 12px;
+  color: #78350f;
+  margin-left: 4px;
+}
+
+.btn-escalate-trigger {
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 9px 18px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+  transition: all 0.2s ease;
+}
+
+.btn-escalate-trigger:hover {
+  background: #b91c1c;
+  transform: translateY(-1px);
+}
+
+/* Dispute Facts Grid */
+.dispute-grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 640px) {
+  .dispute-grid-2col {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dispute-info-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.dispute-info-card.full-width-grid {
+  grid-column: 1 / -1;
+}
+
+.info-sub-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 4px;
+}
+
+.info-main-val {
+  display: block;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-heading, #0f2b5c);
+  margin-bottom: 2px;
+}
+
+.info-sub-val {
+  display: block;
+  font-size: 12.5px;
+  color: #64748b;
+}
+
+.order-chip-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.receipt-ico {
+  color: #64748b;
+}
+
+.order-val-text {
+  font-family: monospace;
+  font-size: 14.5px;
+  color: #0f172a;
+}
+
+.dispute-desc-container {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #2563eb;
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+
+.desc-heading-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 800;
+  color: #1d4ed8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.desc-text-body {
+  margin: 0;
+  font-size: 14px;
+  color: #334155;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+/* Nodal Resolution Box */
+.nodal-resolution-box {
+  background: #f0fdf4;
+  border: 1.5px solid #86efac;
+}
+
+.corporate-resolution-banner {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.res-action-pill {
+  background: #dcfce7;
+  color: #15803d;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 12.5px;
+}
+
+.settlement-ref-pill {
+  background: #dcfce7;
+  color: #15803d;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-family: monospace;
+}
+
+.nodal-remarks-content p {
+  margin: 0;
+  font-size: 14px;
+  color: #14532d;
+  line-height: 1.6;
+}
+
+/* Evidence Pills Grid */
+.evidence-pills-grid {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.evidence-item-pill {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f2b5c;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.evidence-item-pill:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  transform: translateY(-2px);
+}
+
+.att-pdf-icon { color: #dc2626; font-size: 16px; }
+.att-img-icon { color: #2563eb; font-size: 16px; }
+.att-open-icon { color: #94a3b8; font-size: 11px; margin-left: 4px; }
+
+/* Action Buttons Grid */
+.clean-actions-buttons-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.btn-clean-pdf-notice {
+  background: #0f2b5c;
+  color: white;
+  border: none;
+  padding: 11px 20px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(15, 43, 92, 0.2);
+  transition: all 0.2s ease;
+}
+
+.btn-clean-pdf-notice:hover {
+  background: #1e3a8a;
+  transform: translateY(-2px);
+}
+
+.btn-clean-pdf-cert {
+  background: #059669;
+  color: white;
+  border: none;
+  padding: 11px 20px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2);
+  transition: all 0.2s ease;
+}
+
+.btn-clean-pdf-cert:hover {
+  background: #047857;
+  transform: translateY(-2px);
+}
+
+.btn-clean-whatsapp-share {
+  background: #16a34a;
+  color: white;
+  border: none;
+  padding: 11px 20px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 700;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2);
+  transition: all 0.2s ease;
+}
+
+.btn-clean-whatsapp-share:hover {
+  background: #15803d;
+  transform: translateY(-2px);
+  color: white;
+}
+
+.btn-clean-copy-link {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  padding: 11px 20px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-clean-copy-link:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+/* Amazon-Style Feedback Widget */
+.amazon-feedback-box {
+  background: #fdfaf3;
+  border: 1.5px solid #fde68a;
+  border-radius: 14px;
+  padding: 20px;
+  margin-top: 14px;
+}
+
+.amazon-feedback-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.star-gold-header {
+  font-size: 24px;
+  color: #f59e0b;
+}
+
+.amazon-feedback-header h4 {
+  font-size: 15px;
+  font-weight: 800;
+  color: #92400e;
+  margin: 0 0 2px;
+}
+
+.amazon-feedback-header p {
+  font-size: 12.5px;
+  color: #78350f;
+  margin: 0;
+}
+
+.star-picker-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.star-click-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0 2px;
+}
+
+.star-svg.filled { color: #f59e0b; }
+.star-svg.empty { color: #d1d5db; }
+
+.rating-numeric-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #92400e;
+  margin-left: 8px;
+}
+
+.rating-comment-input-wrap {
+  display: flex;
+  gap: 10px;
+}
+
+.rating-comment-input-wrap input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 13px;
+  outline: none;
+}
+
+.btn-submit-rating-clean {
+  background: #d97706;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   3. Default Overview: Lifecycle & Portals Directory
+   ========================================================================== */
+.tracking-status-overview-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.lifecycle-header-box {
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 18px;
+  padding: 30px;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
+}
+
+.lifecycle-icon-wrap {
+  width: 56px;
+  height: 56px;
+  background: #eff6ff;
+  color: #2563eb;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin: 0 auto 14px;
+}
+
+.lifecycle-header-box h2 {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text-heading, #0f2b5c);
+  margin: 0 0 8px;
+}
+
+.lifecycle-header-box p {
+  color: var(--text-muted, #64748b);
+  font-size: 14px;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+/* 4 Stage Cards Grid */
+.status-lifecycle-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .status-lifecycle-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .status-lifecycle-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.status-stage-card {
+  background: var(--card-bg, #ffffff);
+  border: 1.5px solid var(--border-color, #e2e8f0);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.03);
+  transition: all 0.25s ease;
+}
+
+.status-stage-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.07);
+}
+
+.stage-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.stage-number {
+  font-size: 22px;
+  font-weight: 800;
+  color: #94a3b8;
+  font-family: monospace;
+}
+
+.stage-status-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 12px;
+  text-transform: uppercase;
+}
+
+.stage-status-badge.pending { background: #fffbeb; color: #b45309; }
+.stage-status-badge.progress { background: #eff6ff; color: #1d4ed8; }
+.stage-status-badge.sla { background: #fefce8; color: #a16207; }
+.stage-status-badge.resolved { background: #ecfdf5; color: #059669; }
+
+.status-stage-card h4 {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-heading, #0f2b5c);
+  margin: 0 0 8px;
+  line-height: 1.35;
+}
+
+.status-stage-card p {
+  font-size: 12.5px;
+  color: var(--text-secondary, #475569);
+  line-height: 1.5;
+  margin: 0 0 14px;
+  flex: 1;
+}
+
+.stage-sla-tag {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 4px 8px;
+  border-radius: 6px;
+  display: inline-block;
+  align-self: flex-start;
+}
+
+.status-stage-card.stage-pending { border-top: 4px solid #d97706; }
+.status-stage-card.stage-progress { border-top: 4px solid #0284c7; }
+.status-stage-card.stage-sla { border-top: 4px solid #eab308; }
+.status-stage-card.stage-resolved { border-top: 4px solid #059669; }
+
+/* Ombudsman Directory */
+.statutory-ombudsman-directory {
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 18px;
+  padding: 24px 28px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
+}
+
+.omb-dir-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color, #f1f5f9);
+}
+
+.omb-dir-icon {
+  font-size: 28px;
+  color: #0f2b5c;
+}
+
+.omb-dir-header h3 {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text-heading, #0f2b5c);
+  margin: 0 0 3px;
+}
+
+.omb-dir-header p {
+  font-size: 13px;
+  color: var(--text-muted, #64748b);
+  margin: 0;
+}
+
+.omb-dir-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+@media (max-width: 800px) {
+  .omb-dir-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.omb-dir-card {
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 16px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s ease;
+}
+
+.omb-dir-card:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  transform: translateY(-2px);
+}
+
+.dir-icon {
+  font-size: 24px;
+}
+
+.dir-info {
+  flex: 1;
+}
+
+.dir-info strong {
+  display: block;
+  font-size: 13px;
+  color: #0f2b5c;
+  margin-bottom: 2px;
+}
+
+.dir-info span {
+  display: block;
+  font-size: 11.5px;
+  color: #64748b;
+}
+
+.dir-link-ico {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+/* Quick Action Footer */
+.track-quick-footer {
+  background: #0f2b5c;
+  color: white;
+  border-radius: 14px;
+  padding: 18px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.track-quick-footer span {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.track-register-cta {
+  background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
+  color: white;
+  padding: 9px 20px;
+  border-radius: 20px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3);
+  transition: all 0.2s ease;
+}
+
+.track-register-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(234, 88, 12, 0.45);
+  color: white;
+}
+
+/* ==========================================================================
+   4. Ombudsman Modal
+   ========================================================================== */
+.ombudsman-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.ombudsman-modal-card {
+  background: white;
+  border-radius: 20px;
+  padding: 28px;
+  max-width: 600px;
+  width: 100%;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25);
+  animation: modalIn 0.25s ease;
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.ombudsman-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.modal-case-tag {
+  background: #fee2e2;
+  color: #991b1b;
+  font-family: monospace;
+  font-size: 11.5px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 6px;
+  display: inline-block;
+  margin-bottom: 4px;
+}
+
+.ombudsman-modal-header h3 {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.close-omb-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.omb-lead-text {
+  font-size: 13.5px;
+  color: #475569;
+  line-height: 1.5;
+  margin-bottom: 18px;
+}
+
+.ombudsman-links-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.omb-link-box {
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: all 0.2s ease;
+}
+
+.omb-link-box:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  transform: translateX(3px);
+}
+
+.omb-icon-pill {
+  font-size: 22px;
+}
+
+.omb-text-col {
+  flex: 1;
+}
+
+.omb-text-col strong {
+  display: block;
+  font-size: 13.5px;
+  color: #0f2b5c;
+  margin-bottom: 2px;
+}
+
+.omb-text-col span {
+  display: block;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.omb-arrow-icon {
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.ombudsman-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.btn-modal-download-pdf {
+  background: #0f2b5c;
+  color: white;
+  border: none;
+  padding: 9px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-modal-close {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  padding: 9px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+`;
+
+fs.writeFileSync(path.join(root, "frontend", "src", "pages", "TrackComplaint.jsx"), trackJsx, "utf8");
+fs.writeFileSync(path.join(root, "frontend", "src", "pages", "TrackComplaint.css"), trackCss, "utf8");
+
+console.log("Successfully overhauled TrackComplaint.jsx & TrackComplaint.css with decent, modern box panels, full status lifecycle, quick dockets, and ombudsman directory!");
