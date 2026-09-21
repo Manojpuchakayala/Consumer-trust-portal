@@ -67,15 +67,26 @@ app.use("/uploads", express.static(uploadsDir));
 
 // Database connection
 const connectDB = async () => {
+  if (mongoose.connection.readyState >= 1) return;
   try {
-    const mongoUri = process.env.MONGO_URI || "mongodb://localhost:27017/consumer-trust";
-    await mongoose.connect(mongoUri);
+    const mongoUri =
+      process.env.MONGO_URI ||
+      "mongodb+srv://manojj:manoj123@consumer-trust-db.rxdifnq.mongodb.net/consumer_trust?retryWrites=true&w=majority&appName=consumer-trust-db";
+    await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 8000 });
     console.log("MongoDB Connected Successfully");
   } catch (error) {
     console.warn("MongoDB Connection Warning:", error.message);
   }
 };
 connectDB();
+
+// Ensure DB is ready for serverless requests
+app.use(async (req, res, next) => {
+  if (mongoose.connection.readyState < 1) {
+    await connectDB();
+  }
+  next();
+});
 
 // Routes
 const authRoutes = require("./routes/authRoutes");
@@ -110,7 +121,11 @@ app.use((err, req, res, next) => {
   });
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Consumer Trust Server running securely on port ${PORT}`);
-});
+if (process.env.NODE_ENV !== "test" && !process.env.VERCEL) {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`Consumer Trust Server running securely on port ${PORT}`);
+  });
+}
+
+module.exports = app;

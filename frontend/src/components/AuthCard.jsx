@@ -47,6 +47,7 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
   const [showGoogleModal, setShowGoogleModal] = useState(false);
   const [googleInputEmail, setGoogleInputEmail] = useState("");
   const [googleInputName, setGoogleInputName] = useState("");
+  const [googleModalError, setGoogleModalError] = useState("");
 
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
   const isGoogleConfigured = Boolean(
@@ -169,7 +170,8 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
 
   const handleGoogleSuccess = async (credentialResponse) => {
     if (!credentialResponse?.credential) {
-      setError("Google Sign-In is temporarily unavailable. Please try again later or sign in with email.");
+      setGoogleModalError("Google Sign-In is temporarily unavailable. Please use direct access below.");
+      setShowGoogleModal(true);
       return;
     }
     try {
@@ -192,30 +194,32 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
         throw new Error(res.data?.message || "Google Sign-In failed.");
       }
     } catch (err) {
-      setError(
+      setGoogleModalError(
         err.response?.data?.message ||
-          "Google Sign-In is temporarily unavailable. Please try again later or sign in with email."
+          "Google Sign-In popup could not complete. Please enter your Google email below."
       );
+      setShowGoogleModal(true);
     } finally {
       setLoading(false);
     }
   };
 
   const handleGoogleError = () => {
-    setError("Google Sign-In popup could not complete. Please use Direct Google Access below.");
+    setGoogleModalError("Google Sign-In popup was closed or blocked. Sign in directly with your Google account below.");
     setShowGoogleModal(true);
   };
 
-  const handleDirectGoogleLogin = async (e) => {
+  const handleDirectGoogleLogin = async (e, customEmail = null) => {
     if (e) e.preventDefault();
-    const emailToUse = googleInputEmail.trim().toLowerCase();
+    const emailToUse = (customEmail || googleInputEmail).trim().toLowerCase();
     if (!emailToUse || !emailToUse.includes("@")) {
-      setError("Please enter a valid Google Account email (e.g. name@gmail.com).");
+      setGoogleModalError("Please enter a valid Google Account email (e.g. name@gmail.com).");
       return;
     }
 
     try {
       setLoading(true);
+      setGoogleModalError("");
       setError("");
       const res = await api.post("/auth/google", {
         email: emailToUse,
@@ -236,7 +240,7 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
         }, 500);
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Google authentication failed. Please try again.");
+      setGoogleModalError(err.response?.data?.message || "Google authentication failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -545,6 +549,13 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
                 </p>
               </div>
 
+              {googleModalError && (
+                <div className="auth-alert error" style={{ margin: "0" }}>
+                  <FaExclamationCircle className="alert-icon" />
+                  <span>{googleModalError}</span>
+                </div>
+              )}
+
               <form onSubmit={handleDirectGoogleLogin} className="google-modal-form">
                 <div className="form-group">
                   <label>Google Account Email</label>
@@ -554,7 +565,10 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
                       type="email"
                       placeholder="e.g. yourname@gmail.com"
                       value={googleInputEmail}
-                      onChange={(e) => setGoogleInputEmail(e.target.value)}
+                      onChange={(e) => {
+                        setGoogleInputEmail(e.target.value);
+                        setGoogleModalError("");
+                      }}
                       required
                       autoFocus
                     />
