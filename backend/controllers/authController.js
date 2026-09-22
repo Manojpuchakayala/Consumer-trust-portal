@@ -1,9 +1,8 @@
 const mongoose = require("mongoose");
 const User = require("../models/User");
-const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { OAuth2Client } = require("google-auth-library");
-const { sendOtpEmail, sendPasswordResetEmail, sendLoginNotificationEmail } = require("../utils/emailService");
+const { sendOtpEmail, sendLoginNotificationEmail } = require("../utils/emailService");
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID || "");
 
@@ -54,14 +53,6 @@ const generate6DigitOtp = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
 };
 
-// Validate Password Strength
-const isStrongPassword = (pwd) => {
-  if (!pwd || pwd.length < 8) return false;
-  const hasLetter = /[a-zA-Z]/.test(pwd);
-  const hasNumber = /[0-9]/.test(pwd);
-  return hasLetter && hasNumber;
-};
-
 // Helper to reliably parse body in serverless, proxy, and containerized runtimes
 const getRequestBody = (req) => {
   if (!req || !req.body) return {};
@@ -82,328 +73,18 @@ const getRequestBody = (req) => {
   return req.body;
 };
 
-// Register User
-const register = async (req, res) => {
-  try {
-    const body = getRequestBody(req);
-    const { name, email, password, phone } = body;
-
-    if (!name || !email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Full name, email address and password are required",
-      });
-    }
-
-    if (!isStrongPassword(password)) {
-      return res.status(400).json({
-        success: false,
-        message: "Password must be at least 8 characters long and contain both letters and numbers for account security.",
-      });
-    }
-
-    const normalizedEmail = email.toLowerCase().trim();
-
-    // Check if user already exists
-    const userExists = await User.findOne({ email: normalizedEmail });
-    if (userExists) {
-      return res.status(400).json({
-        success: false,
-        message: "An account with this email address already exists. Please sign in.",
-      });
-    }
-
-    // Hash password securely with 12 salt rounds
-    const salt = await bcrypt.genSalt(12);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    // Create citizen user in database
-    const user = await User.create({
-      name: name.trim(),
-      email: normalizedEmail,
-      password: hashedPassword,
-      phone: phone ? phone.trim() : "",
-      role: "citizen",
-      authProvider: "local",
-      isEmailVerified: true,
-      isTwoFactorEnabled: false,
-    });
-
-    const token = generateToken(user, user.role);
-
-    // Log security notification email asynchronously
-    sendLoginNotificationEmail({
-      email: user.email,
-      name: user.name,
-      role: user.role,
-      authMethod: "Password Registration",
-    }).catch((err) => console.warn("Async login email error:", err.message));
-
-    return res.status(201).json({
-      success: true,
-      message: "Citizen account registered successfully!",
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        role: user.role,
-        avatar: user.avatar || "",
-      },
-    });
-  } catch (error) {
-    console.error("Register Error:", error);
-    return res.status(500).json({
-      success: false,
-      message: error.message || "Failed to register account",
-    });
-  }
-};
-
-// Standard Password Login (Citizen or Officer/Admin)
-const login = async (req, res) => {
-  try {
-    const body = getRequestBody(req);
-    const { email, password, portal } = body;
-
-    if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Email and password are required",
-      });
-    }
-
-    const normalizedEmail = email.toLowerCase().trim();
-
-    // Check brute-force lockout
-    if (isLockedOut(normalizedEmail)) {
-      return res.status(429).json({
-        success: false,
-        message: "Account temporarily locked due to multiple failed login attempts. Please try again after 15 minutes or use Email OTP.",
-      });
-    }
-
-    const user = await User.findOne({ email: normalizedEmail });
-
-    if (!user) {
-      recordFailedAttempt(normalizedEmail);
-      return res.status(404).json({
-        success: false,
-        notFound: true,
-        message: "No account found with this email address. Please click 'Create Account' to register or sign in with Google.",
-      });
-    }
-
-    if (!user.password) {
-      return res.status(400).json({
-        success: false,
-        isGoogleUser: true,
-        message: `This account was registered using ${user.authProvider === "google" ? "Google Sign-In" : "Email OTP"}. Please sign in with Google or use Email OTP below.`,
-      });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-
-    if (!isMatch) {
-      recordFailedAttempt(normalizedEmail);
-      return res.status(401).json({
-        success: false,
-        wrongPassword: true,
-        message: "Incorrect password. Please verify your password or use 'Forgot Password' to reset with an Email OTP.",
-      });
-    }
-
-    // Role check if logging in through Admin Portal
-    if (portal === "admin" && user.role !== "admin") {
-      recordFailedAttempt(normalizedEmail);
-      return res.status(403).json({
-        success: false,
-        message: "Access Denied: This account is not authorized for administrative access. Please switch to Citizen Access.",
-      });
-    }
-
-    // Successful login - reset failure counter
-    resetLoginAttempts(normalizedEmail);
-
-    const token = generateToken(user, user.role);
-
-    sendLoginNotificationEmail({
-      email: user.email,
-      name: user.name,
-      role: user.role,
-      authMethod: portal === "admin" ? "Admin Password Auth" : "Citizen Password Auth",
-    }).catch((err) => console.warn("Async login email error:", err.message));
-
-    return res.status(200).json({
-      success: true,
-      message: "Logged in successfully!",
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        role: user.role,
-        avatar: user.avatar || "",
-      },
-    });
-  } catch (error) {
-    console.error("Login Error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "An error occurred during authentication. Please try again.",
-    });
-  }
-};
-
-// Request Password Reset OTP
-const forgotPassword = async (req, res) => {
-  try {
-    const body = getRequestBody(req);
-    const { email } = body;
-
-    if (!email) {
-      return res.status(400).json({
-        success: false,
-        message: "Please enter your registered email address.",
-      });
-    }
-
-    const normalizedEmail = email.toLowerCase().trim();
-
-    if (isLockedOut(normalizedEmail)) {
-      return res.status(429).json({
-        success: false,
-        message: "Too many attempts. Please try again after 15 minutes.",
-      });
-    }
-
-    const user = await User.findOne({ email: normalizedEmail });
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        notFound: true,
-        message: "No account registered with this email address. Please create an account or sign in with Google.",
-      });
-    }
-
-    const otp = generate6DigitOtp();
-    const expiry = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
-
-    user.otp = otp;
-    user.otpExpiry = expiry;
-    await user.save();
-
-    await sendPasswordResetEmail(user.email, otp, user.name);
-
-    return res.status(200).json({
-      success: true,
-      message: "A 6-digit password reset verification code has been dispatched to your email.",
-      email: user.email,
-    });
-  } catch (error) {
-    console.error("Forgot Password Error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Failed to dispatch password reset code. Please try again.",
-    });
-  }
-};
-
-// Reset Password with OTP
-const resetPassword = async (req, res) => {
-  try {
-    const body = getRequestBody(req);
-    const { email, otp, newPassword } = body;
-
-    if (!email || !otp || !newPassword) {
-      return res.status(400).json({
-        success: false,
-        message: "Email, verification code, and new password are required.",
-      });
-    }
-
-    if (!isStrongPassword(newPassword)) {
-      return res.status(400).json({
-        success: false,
-        message: "New password must be at least 8 characters with letters and numbers.",
-      });
-    }
-
-    const normalizedEmail = email.toLowerCase().trim();
-    const user = await User.findOne({ email: normalizedEmail });
-
-    if (!user || !user.otp) {
-      return res.status(400).json({
-        success: false,
-        message: "No active password reset code found. Please request a new code.",
-      });
-    }
-
-    if (user.otpExpiry && new Date() > user.otpExpiry) {
-      return res.status(400).json({
-        success: false,
-        message: "Password reset code has expired. Please request a new code.",
-      });
-    }
-
-    if (user.otp !== otp.trim()) {
-      recordFailedAttempt(normalizedEmail);
-      return res.status(400).json({
-        success: false,
-        message: "Invalid verification code. Please check the code sent to your email.",
-      });
-    }
-
-    // Hash new password
-    const salt = await bcrypt.genSalt(12);
-    const hashedPassword = await bcrypt.hash(newPassword, salt);
-
-    user.password = hashedPassword;
-    user.otp = null;
-    user.otpExpiry = null;
-    user.isEmailVerified = true;
-    user.authProvider = "local";
-    await user.save();
-
-    resetLoginAttempts(normalizedEmail);
-
-    const token = generateToken(user, user.role);
-
-    return res.status(200).json({
-      success: true,
-      message: "Password has been reset successfully! You are now signed in.",
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        role: user.role,
-        avatar: user.avatar || "",
-      },
-    });
-  } catch (error) {
-    console.error("Reset Password Error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Failed to reset password. Please try again.",
-    });
-  }
-};
-
-// Initiate 2FA OTP Login
+/**
+ * 1. Dispatch Email Verification Code (Passwordless Sign-In & Sign-Up)
+ */
 const initiateOtpLogin = async (req, res) => {
   try {
     const body = getRequestBody(req);
-    const { email } = body;
+    const { email, name, phone } = body;
 
-    if (!email) {
+    if (!email || !email.includes("@")) {
       return res.status(400).json({
         success: false,
-        message: "Email address is required",
+        message: "A valid email address is required to receive your verification code.",
       });
     }
 
@@ -412,20 +93,29 @@ const initiateOtpLogin = async (req, res) => {
     if (isLockedOut(normalizedEmail)) {
       return res.status(429).json({
         success: false,
-        message: "Too many attempts. Please try again after 15 minutes.",
+        message: "Too many attempts on this email. Please try again after 15 minutes.",
       });
     }
 
     let user = await User.findOne({ email: normalizedEmail });
 
     if (!user) {
+      // Automatically provision new citizen account
       user = await User.create({
-        name: normalizedEmail.split("@")[0],
+        name: (name && name.trim()) || normalizedEmail.split("@")[0],
         email: normalizedEmail,
+        phone: (phone && phone.trim()) || "",
         role: "citizen",
-        authProvider: "otp",
+        authProvider: "email_otp",
         isEmailVerified: false,
       });
+    } else {
+      if (name && name.trim() && (!user.name || user.name === normalizedEmail.split("@")[0])) {
+        user.name = name.trim();
+      }
+      if (phone && phone.trim() && !user.phone) {
+        user.phone = phone.trim();
+      }
     }
 
     const otp = generate6DigitOtp();
@@ -439,28 +129,30 @@ const initiateOtpLogin = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "A 6-digit verification code has been dispatched to your email address.",
+      message: `A 6-digit verification code has been dispatched to ${user.email}.`,
       email: user.email,
     });
   } catch (error) {
-    console.error("Initiate OTP Error:", error);
+    console.error("Initiate Code Error:", error);
     return res.status(500).json({
       success: false,
-      message: "Failed to dispatch verification code. Please try again.",
+      message: "Failed to dispatch email verification code. Please try again.",
     });
   }
 };
 
-// Verify 2FA OTP Login
+/**
+ * 2. Verify Email Verification Code (Authenticates & Issues JWT Token)
+ */
 const verifyOtpLogin = async (req, res) => {
   try {
     const body = getRequestBody(req);
-    const { email, otp } = body;
+    const { email, otp, name, phone } = body;
 
     if (!email || !otp) {
       return res.status(400).json({
         success: false,
-        message: "Email and verification code are required",
+        message: "Email address and 6-digit verification code are required.",
       });
     }
 
@@ -469,7 +161,7 @@ const verifyOtpLogin = async (req, res) => {
     if (isLockedOut(normalizedEmail)) {
       return res.status(429).json({
         success: false,
-        message: "Too many attempts. Please try again after 15 minutes.",
+        message: "Too many failed attempts. Please try again after 15 minutes.",
       });
     }
 
@@ -479,7 +171,7 @@ const verifyOtpLogin = async (req, res) => {
       recordFailedAttempt(normalizedEmail);
       return res.status(400).json({
         success: false,
-        message: "No active verification code found. Please request a new code.",
+        message: "No active verification code found for this email. Please request a new code.",
       });
     }
 
@@ -487,7 +179,7 @@ const verifyOtpLogin = async (req, res) => {
       recordFailedAttempt(normalizedEmail);
       return res.status(400).json({
         success: false,
-        message: "Verification code has expired. Please request a new code.",
+        message: "Your verification code has expired. Please click 'Resend Code'.",
       });
     }
 
@@ -495,33 +187,44 @@ const verifyOtpLogin = async (req, res) => {
       recordFailedAttempt(normalizedEmail);
       return res.status(400).json({
         success: false,
-        message: "Invalid verification code. Please check your email and try again.",
+        message: "Invalid verification code. Please check your email inbox and enter the 6-digit code.",
       });
     }
 
+    // Code verified successfully
     user.otp = null;
     user.otpExpiry = null;
     user.isEmailVerified = true;
+    if (name && name.trim()) user.name = name.trim();
+    if (phone && phone.trim()) user.phone = phone.trim();
     await user.save();
+
     resetLoginAttempts(normalizedEmail);
 
     const token = generateToken(user, user.role);
 
+    sendLoginNotificationEmail({
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      authMethod: "Email Verification Code",
+    }).catch((err) => console.warn("Async login email error:", err.message));
+
     return res.status(200).json({
       success: true,
-      message: "Identity verified successfully.",
+      message: "Identity verified successfully. Welcome!",
       token,
       user: {
         id: user._id,
         name: user.name,
         email: user.email,
-        phone: user.phone,
+        phone: user.phone || "",
         role: user.role,
         avatar: user.avatar || "",
       },
     });
   } catch (error) {
-    console.error("Verify OTP Error:", error);
+    console.error("Verify Code Error:", error);
     return res.status(500).json({
       success: false,
       message: "Failed to verify code. Please try again.",
@@ -529,7 +232,9 @@ const verifyOtpLogin = async (req, res) => {
   }
 };
 
-// Official Google OAuth 2.0 / OpenID Connect Sign-In
+/**
+ * 3. Official Google OAuth 2.0 / OpenID Connect Sign-In
+ */
 const googleLogin = async (req, res) => {
   try {
     const body = getRequestBody(req);
@@ -567,7 +272,7 @@ const googleLogin = async (req, res) => {
         }
       }
 
-      // 2. Fallback: Native JWT decode (handles base64url automatically)
+      // 2. Fallback: Native JWT decode
       if (!googlePayload) {
         try {
           const decoded = jwt.decode(tokenToVerify);
@@ -597,7 +302,7 @@ const googleLogin = async (req, res) => {
       }
     }
 
-    // Extract resolved fields across all possible nested and direct keys
+    // Extract resolved email across all possible payload fields
     const resolvedEmail =
       bodyEmail ||
       userEmail ||
@@ -663,9 +368,7 @@ const googleLogin = async (req, res) => {
       if (resolvedPicture && !user.avatar) user.avatar = resolvedPicture;
       if (resolvedGoogleId && !user.googleId) user.googleId = resolvedGoogleId;
       user.isEmailVerified = true;
-      if (!user.authProvider || user.authProvider === "local") {
-        user.authProvider = "google";
-      }
+      user.authProvider = "google";
       await user.save();
     }
 
@@ -702,7 +405,15 @@ const googleLogin = async (req, res) => {
   }
 };
 
-// Get Current Authenticated Profile
+/**
+ * 4. Fallback Register / Login Handlers (Direct to Passwordless Email Code)
+ */
+const register = initiateOtpLogin;
+const login = initiateOtpLogin;
+
+/**
+ * 5. Get Current Authenticated Profile
+ */
 const getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select("-password -otp -otpExpiry");
@@ -716,15 +427,15 @@ const getMe = async (req, res) => {
 };
 
 module.exports = {
-  register,
-  login,
-  forgotPassword,
-  resetPassword,
+  sendVerificationCode: initiateOtpLogin,
+  verifyVerificationCode: verifyOtpLogin,
   initiateOtpLogin,
   verifyOtpLogin,
   verifyOtp: verifyOtpLogin,
   resendOtp: initiateOtpLogin,
   googleLogin,
   googleAuth: googleLogin,
+  register,
+  login,
   getMe,
 };

@@ -388,7 +388,7 @@
 .auth-submit-btn {
   margin-top: var(--space-2);
   width: 100%;
-  padding: 10px 16px;
+  padding: 11px 16px;
   background: var(--brand-primary);
   border: none;
   border-radius: var(--radius-sm);
@@ -396,6 +396,10 @@
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   transition: background var(--transition-fast);
 }
 
@@ -406,6 +410,48 @@
 .auth-submit-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.passwordless-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: rgba(37, 99, 235, 0.06);
+  border: 1px dashed rgba(37, 99, 235, 0.25);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+  margin-top: 4px;
+}
+
+.passwordless-notice .notice-icon {
+  color: var(--brand-electric);
+  font-size: 13px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.otp-code-input {
+  letter-spacing: 6px !important;
+  font-size: 18px !important;
+  font-weight: 800 !important;
+  color: var(--brand-primary) !important;
+}
+
+.change-email-btn {
+  background: transparent;
+  border: none;
+  color: var(--brand-electric);
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+}
+
+.change-email-btn:hover {
+  text-decoration: underline;
 }
 
 /* Trust Statements Strip */

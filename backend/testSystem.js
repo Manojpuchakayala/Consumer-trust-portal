@@ -36,13 +36,13 @@ async function runFullSystemCheck() {
     testUser = await User.create({
       name: "Integration Test User",
       email: testEmail,
-      password: "TestPassword123!",
       role: "citizen",
-      authProvider: "local",
+      authProvider: "email_otp",
+      otp: "123456",
       isEmailVerified: true,
     });
-    console.log(`✅ [2/7] Citizen Account Provisioning: SUCCESS (User ID: ${testUser._id})`);
-    results.push({ test: "User Provisioning", status: "PASS" });
+    console.log(`✅ [2/7] Passwordless Citizen Provisioning: SUCCESS (User ID: ${testUser._id})`);
+    results.push({ test: "Passwordless Citizen Provisioning", status: "PASS" });
   } catch (err) {
     console.error("❌ [2/7] User Provisioning: FAILED", err.message);
     results.push({ test: "User Provisioning", status: "FAIL", error: err.message });

@@ -16,10 +16,7 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      // Required only for local email/password authentication
-      required: function () {
-        return this.authProvider === "local";
-      },
+      default: null,
     },
     phone: {
       type: String,
@@ -33,8 +30,8 @@ const userSchema = new mongoose.Schema(
     },
     authProvider: {
       type: String,
-      enum: ["local", "google", "otp"],
-      default: "local",
+      enum: ["google", "email_otp", "otp", "local"],
+      default: "email_otp",
     },
     googleId: {
       type: String,
