@@ -8,7 +8,7 @@ const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID || "");
 
 // In-Memory Login Failure Tracker for Account Lockout / Brute-Force Backoff
 const loginAttempts = new Map();
-const MAX_ATTEMPTS = 5;
+const MAX_ATTEMPTS = 10;
 const LOCKOUT_TIME_MS = 15 * 60 * 1000; // 15 minutes
 
 const isLockedOut = (email) => {
@@ -125,6 +125,9 @@ const initiateOtpLogin = async (req, res) => {
     user.otpExpiry = expiry;
     await user.save();
 
+    // Reset failed attempts when a new code is issued
+    resetLoginAttempts(normalizedEmail);
+
     // Asynchronously dispatch OTP email in background - do NOT block HTTP response
     sendOtpEmail(user.email, otp, user.name).catch((err) => {
       console.warn("Async OTP dispatch error:", err.message);
@@ -159,12 +162,20 @@ const verifyOtpLogin = async (req, res) => {
       });
     }
 
-    const normalizedEmail = email.toLowerCase().trim();
+    const normalizedEmail = String(email).toLowerCase().trim();
+    const cleanOtp = String(otp || "").replace(/\D/g, "").trim();
+
+    if (!normalizedEmail || !cleanOtp || cleanOtp.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "A valid email address and 6-digit verification code are required.",
+      });
+    }
 
     if (isLockedOut(normalizedEmail)) {
       return res.status(429).json({
         success: false,
-        message: "Too many failed attempts. Please try again after 15 minutes.",
+        message: "Too many failed attempts. Please try again after 15 minutes or click 'Resend Code'.",
       });
     }
 
@@ -174,7 +185,7 @@ const verifyOtpLogin = async (req, res) => {
       recordFailedAttempt(normalizedEmail);
       return res.status(400).json({
         success: false,
-        message: "No active verification code found for this email. Please request a new code.",
+        message: "No active verification code found for this email. Please click 'Resend Verification Code'.",
       });
     }
 
@@ -182,15 +193,15 @@ const verifyOtpLogin = async (req, res) => {
       recordFailedAttempt(normalizedEmail);
       return res.status(400).json({
         success: false,
-        message: "Your verification code has expired. Please click 'Resend Code'.",
+        message: "Your verification code has expired. Please click 'Resend Verification Code'.",
       });
     }
 
-    if (user.otp !== otp.trim()) {
+    if (String(user.otp).trim() !== cleanOtp) {
       recordFailedAttempt(normalizedEmail);
       return res.status(400).json({
         success: false,
-        message: "Invalid verification code. Please check your email inbox and enter the 6-digit code.",
+        message: "Invalid verification code. Please check your email inbox for the latest 6-digit code.",
       });
     }
 
