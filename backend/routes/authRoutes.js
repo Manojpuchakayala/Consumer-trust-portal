@@ -4,6 +4,9 @@ const router = express.Router();
 const {
   register,
   login,
+  forgotPassword,
+  resetPassword,
+  initiateOtpLogin,
   verifyOtp,
   resendOtp,
   googleAuth,
@@ -14,8 +17,12 @@ const { authRateLimiter, otpRateLimiter } = require("../middleware/rateLimiter")
 // Apply rate limiting to critical authentication entry points
 router.post("/register", authRateLimiter, register);
 router.post("/login", authRateLimiter, login);
+router.post("/initiate-otp", otpRateLimiter, initiateOtpLogin);
 router.post("/verify-otp", verifyOtp);
 router.post("/resend-otp", otpRateLimiter, resendOtp);
+router.post("/forgot-password", otpRateLimiter, forgotPassword);
+router.post("/reset-password", resetPassword);
 router.post("/google", googleAuth);
 
 module.exports = router;
+

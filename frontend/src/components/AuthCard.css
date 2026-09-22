@@ -74,12 +74,16 @@
   margin-bottom: var(--space-4);
 }
 
+.auth-mode-switch.three-tabs {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
 .auth-mode-tab {
   background: transparent;
   border: none;
   border-bottom: 2px solid transparent;
   padding: var(--space-2) 0;
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--text-muted);
   cursor: pointer;
@@ -97,7 +101,7 @@
   font-weight: 700;
 }
 
-/* Alerts */
+/* Alerts & Contextual Actions */
 .auth-alert {
   display: flex;
   align-items: flex-start;
@@ -107,6 +111,70 @@
   font-size: 12.5px;
   line-height: 1.4;
   margin-bottom: var(--space-4);
+}
+
+.alert-content-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.alert-action-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.btn-alert-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  font-weight: 700;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-alert-action.google {
+  background: #ffffff;
+  color: #ea4335;
+  border-color: #fca5a5;
+}
+
+.btn-alert-action.google:hover {
+  background: #fef2f2;
+}
+
+.btn-alert-action.otp {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.btn-alert-action.otp:hover {
+  background: #1d4ed8;
+}
+
+.btn-alert-action.primary {
+  background: #0f2b5c;
+  color: #ffffff;
+}
+
+.btn-alert-action.primary:hover {
+  background: #1e3a8a;
+}
+
+.btn-alert-action.forgot {
+  background: #b45309;
+  color: #ffffff;
+}
+
+.btn-alert-action.forgot:hover {
+  background: #92400e;
 }
 
 .auth-alert.error {
@@ -125,6 +193,46 @@
   margin-top: 1px;
   flex-shrink: 0;
   font-size: 14px;
+}
+
+.input-hint {
+  font-size: 11.5px;
+  color: var(--text-muted, #64748b);
+  margin-top: 2px;
+}
+
+.otp-login-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.resend-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+  font-size: 12px;
+}
+
+.cooldown-text {
+  color: var(--text-muted, #64748b);
+  font-weight: 600;
+}
+
+.btn-resend-link {
+  background: transparent;
+  border: none;
+  color: var(--brand-electric, #2563eb);
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+}
+
+.btn-resend-link:hover {
+  text-decoration: underline;
 }
 
 /* Google Auth Section */

@@ -74,6 +74,50 @@ const sendOtpEmail = async (email, otp, name = "Consumer") => {
   return true;
 };
 
+// 1B. Password Reset Code Email
+const sendPasswordResetEmail = async (email, otp, name = "Consumer") => {
+  console.log("=========================================");
+  console.log(`🔑 [PASSWORD RESET CODE DISPATCHED]`);
+  console.log(`   To: ${email} (${name})`);
+  console.log(`   Code: ${otp}`);
+  console.log(`   Expires in: 15 minutes`);
+  console.log("=========================================");
+
+  const mailer = getTransporter();
+
+  if (mailer) {
+    try {
+      await mailer.sendMail({
+        from: `"Consumer Trust Security" <${process.env.SMTP_USER}>`,
+        to: email,
+        subject: `Password Reset Verification Code: ${otp} - Consumer Trust`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background: #ffffff;">
+            <div style="text-align: center; margin-bottom: 20px;">
+              <h2 style="color: #0f2b5c; margin: 0;">Consumer Trust Platform</h2>
+              <p style="color: #64748b; font-size: 13px; margin-top: 4px;">Account Security & Password Recovery</p>
+            </div>
+            <p style="font-size: 15px; color: #334155;">Hello <strong>${name}</strong>,</p>
+            <p style="color: #475569; line-height: 1.5; font-size: 14px;">We received a request to reset the password for your Consumer Trust account (<strong>${email}</strong>). Use the 6-digit verification code below to set a new password:</p>
+            <div style="text-align: center; margin: 26px 0;">
+              <div style="display: inline-block; font-size: 34px; font-weight: 800; letter-spacing: 8px; background: #fef2f2; color: #dc2626; padding: 12px 30px; border-radius: 10px; border: 2px dashed #ef4444;">
+                ${otp}
+              </div>
+            </div>
+            <p style="color: #64748b; font-size: 12.5px; text-align: center;">⏱️ This reset code is valid for <strong>15 minutes</strong>. If you did not request this, please ignore this email.</p>
+            ${DISCLAIMER_HTML}
+          </div>
+        `,
+      });
+      console.log(`✅ Password reset email delivered to ${email}`);
+    } catch (smtpErr) {
+      console.warn("⚠️ SMTP Password reset dispatch error:", smtpErr.message);
+    }
+  }
+
+  return true;
+};
+
 // 2. Complaint Submission Confirmation Email
 const sendComplaintConfirmationEmail = async (complaint) => {
   console.log("=========================================");
@@ -517,6 +561,7 @@ const sendConsumerCompanyResolutionEmail = async ({ complaint, companyResolution
 
 module.exports = {
   sendOtpEmail,
+  sendPasswordResetEmail,
   sendComplaintConfirmationEmail,
   sendComplaintStatusUpdateEmail,
   sendLoginNotificationEmail,

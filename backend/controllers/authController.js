@@ -3,7 +3,7 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { OAuth2Client } = require("google-auth-library");
-const { sendOtpEmail, sendLoginNotificationEmail } = require("../utils/emailService");
+const { sendOtpEmail, sendPasswordResetEmail, sendLoginNotificationEmail } = require("../utils/emailService");
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID || "");
 
@@ -180,17 +180,26 @@ const login = async (req, res) => {
     if (isLockedOut(normalizedEmail)) {
       return res.status(429).json({
         success: false,
-        message: "Account temporarily locked due to multiple failed login attempts. Please try again after 15 minutes.",
+        message: "Account temporarily locked due to multiple failed login attempts. Please try again after 15 minutes or use Email OTP.",
       });
     }
 
     const user = await User.findOne({ email: normalizedEmail });
 
-    if (!user || !user.password) {
+    if (!user) {
       recordFailedAttempt(normalizedEmail);
-      return res.status(401).json({
+      return res.status(404).json({
         success: false,
-        message: "Invalid email or password. Please verify your credentials.",
+        notFound: true,
+        message: "No account found with this email address. Please click 'Create Account' to register or sign in with Google.",
+      });
+    }
+
+    if (!user.password) {
+      return res.status(400).json({
+        success: false,
+        isGoogleUser: true,
+        message: `This account was registered using ${user.authProvider === "google" ? "Google Sign-In" : "Email OTP"}. Please sign in with Google or use Email OTP below.`,
       });
     }
 
@@ -200,7 +209,8 @@ const login = async (req, res) => {
       recordFailedAttempt(normalizedEmail);
       return res.status(401).json({
         success: false,
-        message: "Invalid email or password. Please verify your credentials.",
+        wrongPassword: true,
+        message: "Incorrect password. Please verify your password or use 'Forgot Password' to reset with an Email OTP.",
       });
     }
 
@@ -209,7 +219,7 @@ const login = async (req, res) => {
       recordFailedAttempt(normalizedEmail);
       return res.status(403).json({
         success: false,
-        message: "Access Denied: This account is not authorized for administrative access.",
+        message: "Access Denied: This account is not authorized for administrative access. Please switch to Citizen Access.",
       });
     }
 
@@ -243,6 +253,143 @@ const login = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "An error occurred during authentication. Please try again.",
+    });
+  }
+};
+
+// Request Password Reset OTP
+const forgotPassword = async (req, res) => {
+  try {
+    const body = getRequestBody(req);
+    const { email } = body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter your registered email address.",
+      });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+
+    if (isLockedOut(normalizedEmail)) {
+      return res.status(429).json({
+        success: false,
+        message: "Too many attempts. Please try again after 15 minutes.",
+      });
+    }
+
+    const user = await User.findOne({ email: normalizedEmail });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        notFound: true,
+        message: "No account registered with this email address. Please create an account or sign in with Google.",
+      });
+    }
+
+    const otp = generate6DigitOtp();
+    const expiry = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+
+    user.otp = otp;
+    user.otpExpiry = expiry;
+    await user.save();
+
+    await sendPasswordResetEmail(user.email, otp, user.name);
+
+    return res.status(200).json({
+      success: true,
+      message: "A 6-digit password reset verification code has been dispatched to your email.",
+      email: user.email,
+    });
+  } catch (error) {
+    console.error("Forgot Password Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to dispatch password reset code. Please try again.",
+    });
+  }
+};
+
+// Reset Password with OTP
+const resetPassword = async (req, res) => {
+  try {
+    const body = getRequestBody(req);
+    const { email, otp, newPassword } = body;
+
+    if (!email || !otp || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Email, verification code, and new password are required.",
+      });
+    }
+
+    if (!isStrongPassword(newPassword)) {
+      return res.status(400).json({
+        success: false,
+        message: "New password must be at least 8 characters with letters and numbers.",
+      });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+    const user = await User.findOne({ email: normalizedEmail });
+
+    if (!user || !user.otp) {
+      return res.status(400).json({
+        success: false,
+        message: "No active password reset code found. Please request a new code.",
+      });
+    }
+
+    if (user.otpExpiry && new Date() > user.otpExpiry) {
+      return res.status(400).json({
+        success: false,
+        message: "Password reset code has expired. Please request a new code.",
+      });
+    }
+
+    if (user.otp !== otp.trim()) {
+      recordFailedAttempt(normalizedEmail);
+      return res.status(400).json({
+        success: false,
+        message: "Invalid verification code. Please check the code sent to your email.",
+      });
+    }
+
+    // Hash new password
+    const salt = await bcrypt.genSalt(12);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    user.password = hashedPassword;
+    user.otp = null;
+    user.otpExpiry = null;
+    user.isEmailVerified = true;
+    user.authProvider = "local";
+    await user.save();
+
+    resetLoginAttempts(normalizedEmail);
+
+    const token = generateToken(user, user.role);
+
+    return res.status(200).json({
+      success: true,
+      message: "Password has been reset successfully! You are now signed in.",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        avatar: user.avatar || "",
+      },
+    });
+  } catch (error) {
+    console.error("Reset Password Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to reset password. Please try again.",
     });
   }
 };
@@ -571,6 +718,8 @@ const getMe = async (req, res) => {
 module.exports = {
   register,
   login,
+  forgotPassword,
+  resetPassword,
   initiateOtpLogin,
   verifyOtpLogin,
   verifyOtp: verifyOtpLogin,
