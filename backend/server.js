@@ -32,10 +32,10 @@ const globalLimiter = rateLimit({
 });
 app.use("/api/", globalLimiter);
 
-// Strict Rate Limiter for Authentication (20 requests per 15 mins)
+// Rate Limiter for Authentication (60 requests per 15 mins)
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 25,
+  max: 60,
   standardHeaders: true,
   legacyHeaders: false,
   message: {

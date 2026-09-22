@@ -125,7 +125,10 @@ const initiateOtpLogin = async (req, res) => {
     user.otpExpiry = expiry;
     await user.save();
 
-    await sendOtpEmail(user.email, otp, user.name);
+    // Asynchronously dispatch OTP email in background - do NOT block HTTP response
+    sendOtpEmail(user.email, otp, user.name).catch((err) => {
+      console.warn("Async OTP dispatch error:", err.message);
+    });
 
     return res.status(200).json({
       success: true,

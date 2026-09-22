@@ -8,8 +8,9 @@ const rateLimits = new Map();
  */
 const createRateLimiter = ({ maxRequests = 10, windowMs = 10 * 60 * 1000 }) => {
   return (req, res, next) => {
+    const forwarded = req.headers["x-forwarded-for"];
     const ip =
-      req.headers["x-forwarded-for"] ||
+      (forwarded ? forwarded.split(",")[0].trim() : null) ||
       req.connection?.remoteAddress ||
       req.ip ||
       "unknown-ip";
@@ -61,6 +62,6 @@ setInterval(() => {
 
 module.exports = {
   createRateLimiter,
-  authRateLimiter: createRateLimiter({ maxRequests: 15, windowMs: 10 * 60 * 1000 }), // 15 requests per 10 mins
-  otpRateLimiter: createRateLimiter({ maxRequests: 5, windowMs: 5 * 60 * 1000 }),   // 5 OTP resends per 5 mins
+  authRateLimiter: createRateLimiter({ maxRequests: 30, windowMs: 10 * 60 * 1000 }), // 30 requests per 10 mins
+  otpRateLimiter: createRateLimiter({ maxRequests: 20, windowMs: 5 * 60 * 1000 }),   // 20 OTP resends per 5 mins
 };
