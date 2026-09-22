@@ -81,36 +81,36 @@ const initiateOtpLogin = async (req, res) => {
     const body = getRequestBody(req);
     const { email, name, phone } = body;
 
-    if (!email || !email.includes("@")) {
+    const cleanEmail = String(email || "").toLowerCase().trim();
+
+    if (!cleanEmail || !cleanEmail.includes("@")) {
       return res.status(400).json({
         success: false,
         message: "A valid email address is required to receive your verification code.",
       });
     }
 
-    const normalizedEmail = email.toLowerCase().trim();
-
-    if (isLockedOut(normalizedEmail)) {
+    if (isLockedOut(cleanEmail)) {
       return res.status(429).json({
         success: false,
-        message: "Too many attempts on this email. Please try again after 15 minutes.",
+        message: "Too many failed attempts on this email. Please wait 15 minutes or contact support.",
       });
     }
 
-    let user = await User.findOne({ email: normalizedEmail });
+    let user = await User.findOne({ email: cleanEmail });
 
     if (!user) {
       // Automatically provision new citizen account
       user = await User.create({
-        name: (name && name.trim()) || normalizedEmail.split("@")[0],
-        email: normalizedEmail,
+        name: (name && name.trim()) || cleanEmail.split("@")[0],
+        email: cleanEmail,
         phone: (phone && phone.trim()) || "",
         role: "citizen",
         authProvider: "email_otp",
         isEmailVerified: false,
       });
     } else {
-      if (name && name.trim() && (!user.name || user.name === normalizedEmail.split("@")[0])) {
+      if (name && name.trim() && (!user.name || user.name === cleanEmail.split("@")[0])) {
         user.name = name.trim();
       }
       if (phone && phone.trim() && !user.phone) {
@@ -119,23 +119,33 @@ const initiateOtpLogin = async (req, res) => {
     }
 
     const otp = generate6DigitOtp();
-    const expiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    const expiry = new Date(Date.now() + 10 * 60 * 1000); // Valid for exactly 10 minutes
 
+    // Maintain recent valid unexpired OTPs (within 10-minute window, max 3)
+    const activeHistory = (user.otpHistory || []).filter(
+      (item) => item.expiresAt && new Date(item.expiresAt) > new Date()
+    );
+    activeHistory.push({ otp, expiresAt: expiry, createdAt: new Date() });
+    user.otpHistory = activeHistory.slice(-3);
+
+    // Set newest active OTP
     user.otp = otp;
+    user.otpCode = otp;
     user.otpExpiry = expiry;
+    user.otpExpiresAt = expiry;
     await user.save();
 
-    // Reset failed attempts when a new code is issued
-    resetLoginAttempts(normalizedEmail);
+    // Reset failed attempt counters upon generating a fresh valid code
+    resetLoginAttempts(cleanEmail);
 
-    // Asynchronously dispatch OTP email in background - do NOT block HTTP response
+    // Asynchronously dispatch OTP email in background - non-blocking for sub-second UI response
     sendOtpEmail(user.email, otp, user.name).catch((err) => {
       console.warn("Async OTP dispatch error:", err.message);
     });
 
     return res.status(200).json({
       success: true,
-      message: `A 6-digit verification code has been dispatched to ${user.email}.`,
+      message: `A 6-digit verification code has been dispatched to ${user.email} (valid for 10 minutes).`,
       email: user.email,
     });
   } catch (error) {
@@ -155,65 +165,100 @@ const verifyOtpLogin = async (req, res) => {
     const body = getRequestBody(req);
     const { email, otp, name, phone } = body;
 
-    if (!email || !otp) {
-      return res.status(400).json({
-        success: false,
-        message: "Email address and 6-digit verification code are required.",
-      });
-    }
-
-    const normalizedEmail = String(email).toLowerCase().trim();
+    const cleanEmail = String(email || "").toLowerCase().trim();
     const cleanOtp = String(otp || "").replace(/\D/g, "").trim();
 
-    if (!normalizedEmail || !cleanOtp || cleanOtp.length < 6) {
+    if (!cleanEmail || !cleanEmail.includes("@")) {
       return res.status(400).json({
         success: false,
-        message: "A valid email address and 6-digit verification code are required.",
+        message: "A valid email address is required.",
       });
     }
 
-    if (isLockedOut(normalizedEmail)) {
+    if (!cleanOtp || cleanOtp.length !== 6) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter the complete 6-digit verification code.",
+      });
+    }
+
+    if (isLockedOut(cleanEmail)) {
       return res.status(429).json({
         success: false,
-        message: "Too many failed attempts. Please try again after 15 minutes or click 'Resend Code'.",
+        message: "Too many failed attempts. Please wait 15 minutes or click 'Resend Verification Code'.",
       });
     }
 
-    const user = await User.findOne({ email: normalizedEmail });
+    const user = await User.findOne({ email: cleanEmail });
 
-    if (!user || !user.otp) {
-      recordFailedAttempt(normalizedEmail);
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "No active account or code found for this email. Please request a verification code.",
+      });
+    }
+
+    // Check if code was ALREADY USED (prevent duplicate submissions)
+    if (user.lastOtpUsed === cleanOtp && (!user.otp || user.otp !== cleanOtp)) {
+      return res.status(400).json({
+        success: false,
+        message: "This verification code has already been used. Please click 'Resend Verification Code' to receive a new code.",
+      });
+    }
+
+    // Check if any active valid code exists
+    const hasPrimaryCode = Boolean(user.otp);
+    const isPrimaryExpired = Boolean(user.otpExpiry && new Date() > user.otpExpiry);
+    const matchingHistoryItem = (user.otpHistory || []).find(
+      (item) => item.otp === cleanOtp && item.expiresAt && new Date(item.expiresAt) > new Date()
+    );
+
+    if (!hasPrimaryCode && !matchingHistoryItem) {
+      recordFailedAttempt(cleanEmail);
       return res.status(400).json({
         success: false,
         message: "No active verification code found for this email. Please click 'Resend Verification Code'.",
       });
     }
 
-    if (user.otpExpiry && new Date() > user.otpExpiry) {
-      recordFailedAttempt(normalizedEmail);
+    // Check if matching code is valid (Newest OTP OR valid recent history OTP)
+    const isPrimaryMatch = Boolean(
+      (user.otp && String(user.otp).trim() === cleanOtp) ||
+      (user.otpCode && String(user.otpCode).trim() === cleanOtp)
+    );
+
+    if (isPrimaryMatch && isPrimaryExpired && !matchingHistoryItem) {
+      recordFailedAttempt(cleanEmail);
       return res.status(400).json({
         success: false,
-        message: "Your verification code has expired. Please click 'Resend Verification Code'.",
+        message: "Your verification code has expired (valid for 10 minutes). Please click 'Resend Verification Code'.",
       });
     }
 
-    if (String(user.otp).trim() !== cleanOtp) {
-      recordFailedAttempt(normalizedEmail);
+    const isMatch = isPrimaryMatch || Boolean(matchingHistoryItem);
+
+    if (!isMatch) {
+      recordFailedAttempt(cleanEmail);
       return res.status(400).json({
         success: false,
-        message: "Invalid verification code. Please check your email inbox for the latest 6-digit code.",
+        message: "Invalid verification code. Please check your latest email inbox and enter the 6-digit code.",
       });
     }
 
-    // Code verified successfully
+    // Code verified successfully -> Atomically invalidate all active OTPs to prevent duplicate reuse
+    user.lastOtpUsed = cleanOtp;
+    user.lastOtpUsedAt = new Date();
     user.otp = null;
+    user.otpCode = null;
     user.otpExpiry = null;
+    user.otpExpiresAt = null;
+    user.otpHistory = [];
     user.isEmailVerified = true;
     if (name && name.trim()) user.name = name.trim();
     if (phone && phone.trim()) user.phone = phone.trim();
     await user.save();
 
-    resetLoginAttempts(normalizedEmail);
+    resetLoginAttempts(cleanEmail);
 
     const token = generateToken(user, user.role);
 

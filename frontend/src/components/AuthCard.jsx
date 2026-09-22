@@ -106,6 +106,7 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
   // Step 1: Request 6-digit verification code to email
   const handleSendCode = async (e) => {
     if (e) e.preventDefault();
+    if (loading) return; // Prevent duplicate submissions
     const cleanEmail = email.trim().toLowerCase();
     if (!cleanEmail || !cleanEmail.includes("@")) {
       setError("Please enter a valid email address.");
@@ -125,8 +126,9 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
 
       if (res.data?.success) {
         setStep(2);
+        setOtpCode(""); // Reset OTP input for fresh entry
         setResendCooldown(60);
-        setSuccessMsg(`6-digit code sent to ${cleanEmail}! Check your inbox.`);
+        setSuccessMsg(res.data?.message || `6-digit code sent to ${cleanEmail}! Check your inbox.`);
       } else {
         throw new Error(res.data?.message || "Failed to dispatch verification code.");
       }
@@ -140,9 +142,10 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
   // Step 2: Verify 6-digit code and authenticate
   const handleVerifyCode = async (e) => {
     if (e) e.preventDefault();
-    const cleanCode = otpCode.trim();
-    if (!cleanCode || cleanCode.length < 6) {
-      setError("Please enter the 6-digit verification code.");
+    if (loading) return; // Prevent duplicate submissions
+    const cleanCode = otpCode.replace(/\D/g, "").trim();
+    if (!cleanCode || cleanCode.length !== 6) {
+      setError("Please enter the complete 6-digit verification code.");
       return;
     }
 

@@ -5,15 +5,6 @@ import axios from "axios";
 // 2. Explicit VITE_API_URL if configured
 // 3. Render Cloud Backend API for production Vercel deployment
 const getBaseUrl = () => {
-  // If running locally in development:
-  if (
-    typeof window !== "undefined" &&
-    (window.location.hostname === "localhost" ||
-      window.location.hostname === "127.0.0.1")
-  ) {
-    return "http://localhost:5000/api";
-  }
-
   // If explicit production API URL is set:
   if (
     import.meta.env.VITE_API_URL &&
@@ -21,6 +12,15 @@ const getBaseUrl = () => {
     !import.meta.env.VITE_API_URL.includes("127.0.0.1")
   ) {
     return import.meta.env.VITE_API_URL.replace(/\/+$/, "");
+  }
+
+  // If running locally in development:
+  if (
+    typeof window !== "undefined" &&
+    (window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1")
+  ) {
+    return "http://localhost:5000/api";
   }
 
   // Production Render Cloud Backend
