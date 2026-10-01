@@ -31,6 +31,7 @@ import {
   generatePreLitigationLegalNoticePdf,
 } from "../utils/pdfGenerator";
 import { getWhatsAppShareUrl } from "../utils/whatsappShare";
+import api from "../services/api";
 import EDaakhilExportModal from "../components/EDaakhilExportModal";
 import LegalNoticePreviewModal from "../components/LegalNoticePreviewModal";
 import { ComplaintCardSkeleton } from "../components/SkeletonLoader";
