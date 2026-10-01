@@ -45,12 +45,25 @@
   height: 7px;
   border-radius: 50%;
   background: #22c55e;
-  animation: livePulse 1.8s infinite ease-in-out;
+  position: relative;
+  box-shadow: 0 0 6px #22c55e;
 }
 
-@keyframes livePulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.4); opacity: 0.6; }
+.live-dot::after {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  border-radius: 50%;
+  border: 1.5px solid #22c55e;
+  animation: liveRadarPing 2s infinite cubic-bezier(0, 0, 0.2, 1);
+}
+
+@keyframes liveRadarPing {
+  0% { transform: scale(0.6); opacity: 1; }
+  75%, 100% { transform: scale(2.4); opacity: 0; }
 }
 
 .ticker-bolt-icon {
