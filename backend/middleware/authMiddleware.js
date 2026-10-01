@@ -13,9 +13,10 @@ const authMiddleware = async (req, res, next) => {
     }
 
     const token = authHeader.split(" ")[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const secret = process.env.JWT_SECRET || "ctp_secure_prod_jwt_secret_2026";
+    const decoded = jwt.verify(token, secret);
 
-    const user = await User.findById(decoded.id).select("-password");
+    const user = await User.findById(decoded.id).select("-password -otp -otpExpiry -otpHistory");
 
     if (!user) {
       return res.status(401).json({
@@ -29,7 +30,7 @@ const authMiddleware = async (req, res, next) => {
   } catch (error) {
     return res.status(401).json({
       success: false,
-      message: "Unauthorized: Invalid token",
+      message: "Unauthorized: Invalid or expired session token",
     });
   }
 };

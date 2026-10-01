@@ -97,10 +97,14 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
     window.dispatchEvent(new Event("authChange"));
     setSuccessMsg(`Welcome, ${resData.user.name || "Citizen"}! Redirecting...`);
     setTimeout(() => {
-      if (onAuthSuccess) onAuthSuccess(resData.user);
-      else if (resData.user.role === "admin") navigate("/admin");
-      else navigate("/my-complaints");
-    }, 500);
+      if (onAuthSuccess) {
+        onAuthSuccess(resData.user);
+      } else if (resData.user.role === "admin" || resData.user.role === "officer") {
+        navigate("/admin", { replace: true });
+      } else {
+        navigate("/my-complaints", { replace: true });
+      }
+    }, 400);
   };
 
   // Step 1: Request 6-digit verification code to email
@@ -253,9 +257,16 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
         </div>
 
         <div className="session-actions-grid">
-          <Link to="/my-complaints" className="session-btn primary">
+          <Link
+            to={user.role === "admin" || user.role === "officer" ? "/admin" : "/my-complaints"}
+            className="session-btn primary"
+          >
             <FaClipboardList />
-            <span>My Grievance Dashboard</span>
+            <span>
+              {user.role === "admin" || user.role === "officer"
+                ? "Admin Grievance Desk"
+                : "My Grievance Dashboard"}
+            </span>
             <FaArrowRight className="arrow-icon" />
           </Link>
 

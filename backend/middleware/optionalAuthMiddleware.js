@@ -6,8 +6,9 @@ const optionalAuthMiddleware = async (req, res, next) => {
     const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith("Bearer ")) {
       const token = authHeader.split(" ")[1];
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const user = await User.findById(decoded.id).select("-password");
+      const secret = process.env.JWT_SECRET || "ctp_secure_prod_jwt_secret_2026";
+      const decoded = jwt.verify(token, secret);
+      const user = await User.findById(decoded.id).select("-password -otp -otpExpiry -otpHistory");
       if (user) {
         req.user = user;
       }

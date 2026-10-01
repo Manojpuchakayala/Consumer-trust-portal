@@ -45,6 +45,24 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Response interceptor to handle 401s cleanly
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      const hadToken = localStorage.getItem("consumerTrustToken");
+      if (hadToken) {
+        localStorage.removeItem("consumerTrustToken");
+        localStorage.removeItem("consumerTrustUser");
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new Event("authChange"));
+        }
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 // Warmup ping to ensure backend is active immediately
 if (typeof window !== "undefined") {
   setTimeout(() => {
