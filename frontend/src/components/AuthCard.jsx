@@ -35,8 +35,10 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [otpCode, setOtpCode] = useState("");
+  const [otpDigits, setOtpDigits] = useState(["", "", "", "", "", ""]);
   const [resendCooldown, setResendCooldown] = useState(0);
+
+  const digitRefs = useRef([]);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -130,9 +132,12 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
 
       if (res.data?.success) {
         setStep(2);
-        setOtpCode(""); // Reset OTP input for fresh entry
+        setOtpDigits(["", "", "", "", "", ""]);
         setResendCooldown(60);
         setSuccessMsg(res.data?.message || `6-digit code sent to ${cleanEmail}! Check your inbox.`);
+        setTimeout(() => {
+          if (digitRefs.current[0]) digitRefs.current[0].focus();
+        }, 100);
       } else {
         throw new Error(res.data?.message || "Failed to dispatch verification code.");
       }
@@ -143,13 +148,11 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
     }
   };
 
-  // Step 2: Verify 6-digit code and authenticate
-  const handleVerifyCode = async (e) => {
-    if (e) e.preventDefault();
-    if (loading) return; // Prevent duplicate submissions
-    const cleanCode = otpCode.replace(/\D/g, "").trim();
+  // Execute verification with full 6-digit string
+  const executeVerifyCode = async (codeToVerify) => {
+    const cleanCode = String(codeToVerify || "").replace(/\D/g, "").trim();
     if (!cleanCode || cleanCode.length !== 6) {
-      setError("Please enter the complete 6-digit verification code.");
+      setError("Please enter all 6 digits of the verification code.");
       return;
     }
 
@@ -173,6 +176,73 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
       setError(err.response?.data?.message || err.message || "Invalid or expired verification code. Please try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Step 2: Form submit
+  const handleVerifyCode = (e) => {
+    if (e) e.preventDefault();
+    if (loading) return;
+    executeVerifyCode(otpDigits.join(""));
+  };
+
+  // 6-Box Input Handlers (Auto-jump, backspace, paste)
+  const handleDigitChange = (index, value) => {
+    const digit = value.replace(/\D/g, "").slice(-1);
+    const newDigits = [...otpDigits];
+    newDigits[index] = digit;
+    setOtpDigits(newDigits);
+    setError("");
+
+    if (digit && index < 5) {
+      if (digitRefs.current[index + 1]) {
+        digitRefs.current[index + 1].focus();
+      }
+    }
+
+    // Auto-submit when all 6 digits are populated
+    const fullCode = newDigits.join("");
+    if (fullCode.length === 6 && !newDigits.includes("")) {
+      executeVerifyCode(fullCode);
+    }
+  };
+
+  const handleDigitKeyDown = (index, e) => {
+    if (e.key === "Backspace") {
+      if (!otpDigits[index] && index > 0) {
+        const newDigits = [...otpDigits];
+        newDigits[index - 1] = "";
+        setOtpDigits(newDigits);
+        if (digitRefs.current[index - 1]) {
+          digitRefs.current[index - 1].focus();
+        }
+      }
+    } else if (e.key === "ArrowLeft" && index > 0) {
+      digitRefs.current[index - 1]?.focus();
+    } else if (e.key === "ArrowRight" && index < 5) {
+      digitRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleDigitPaste = (e) => {
+    e.preventDefault();
+    const pasteData = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    if (!pasteData) return;
+
+    const newDigits = ["", "", "", "", "", ""];
+    for (let i = 0; i < pasteData.length; i++) {
+      newDigits[i] = pasteData[i];
+    }
+    setOtpDigits(newDigits);
+    setError("");
+
+    const nextIndex = Math.min(pasteData.length, 5);
+    if (digitRefs.current[nextIndex]) {
+      digitRefs.current[nextIndex].focus();
+    }
+
+    if (pasteData.length === 6) {
+      executeVerifyCode(pasteData);
     }
   };
 
@@ -408,39 +478,50 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
         <form onSubmit={handleVerifyCode} className="auth-form">
           <div className="form-group">
             <div className="label-row">
-              <label>6-Digit Verification Code *</label>
+              <label>Enter 6-Digit Verification Code *</label>
               <button
                 type="button"
                 className="change-email-btn"
                 onClick={() => {
                   setStep(1);
-                  setOtpCode("");
+                  setOtpDigits(["", "", "", "", "", ""]);
                   setError("");
                 }}
               >
                 Change Email
               </button>
             </div>
-            <div className="input-box">
-              <FaKey className="box-icon" />
-              <input
-                type="text"
-                maxLength={6}
-                placeholder="123456"
-                value={otpCode}
-                onChange={(e) => {
-                  setOtpCode(e.target.value.replace(/\D/g, ""));
-                  setError("");
-                }}
-                className="otp-code-input"
-                required
-                autoFocus
-              />
+
+            <div className="otp-boxes-wrapper" onPaste={handleDigitPaste}>
+              {otpDigits.map((digit, idx) => (
+                <input
+                  key={idx}
+                  ref={(el) => (digitRefs.current[idx] = el)}
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  maxLength={1}
+                  value={digit}
+                  onChange={(e) => handleDigitChange(idx, e.target.value)}
+                  onKeyDown={(e) => handleDigitKeyDown(idx, e)}
+                  className={`otp-digit-box ${digit ? "filled" : ""}`}
+                  autoFocus={idx === 0}
+                  aria-label={`Digit ${idx + 1}`}
+                  required
+                />
+              ))}
             </div>
-            <span className="input-hint">Code sent to <strong>{email}</strong> (valid for 10 min)</span>
+
+            <span className="input-hint">
+              Security code sent to <strong>{email}</strong> (valid for 10 min)
+            </span>
           </div>
 
-          <button type="submit" className="auth-submit-btn" disabled={loading || otpCode.length < 6}>
+          <button
+            type="submit"
+            className="auth-submit-btn"
+            disabled={loading || otpDigits.join("").length < 6}
+          >
             <FaShieldAlt /> {loading ? "Verifying Code..." : "Verify & Access Dashboard"}
           </button>
 

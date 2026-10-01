@@ -729,3 +729,25 @@
   color: #ffffff;
   border-color: #15803d;
 }
+
+.btn-legal-mini {
+  background: #fdf2f8;
+  color: #be185d;
+  border: 1px solid #fbcfe8;
+  padding: 4px 9px;
+  border-radius: var(--radius-xs);
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s;
+}
+
+.btn-legal-mini:hover {
+  background: #be185d;
+  color: #ffffff;
+  border-color: #be185d;
+}
+

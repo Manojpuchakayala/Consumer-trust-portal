@@ -25,8 +25,11 @@ import {
   FaWhatsapp,
   FaGavel,
 } from "react-icons/fa";
-import api from "../services/api";
-import { generateGrievanceNoticePdf, generateResolutionCertificatePdf } from "../utils/pdfGenerator";
+import {
+  generateGrievanceNoticePdf,
+  generateResolutionCertificatePdf,
+  generatePreLitigationLegalNoticePdf,
+} from "../utils/pdfGenerator";
 import { getWhatsAppShareUrl } from "../utils/whatsappShare";
 import EDaakhilExportModal from "../components/EDaakhilExportModal";
 import "./MyComplaints.css";
@@ -475,6 +478,15 @@ export default function MyComplaints() {
                           <FaCheckCircle /> Certificate
                         </button>
                       )}
+
+                      <button
+                        type="button"
+                        className="btn-legal-mini"
+                        onClick={() => generatePreLitigationLegalNoticePdf(c)}
+                        title="Generate Official Statutory Legal Notice (Section 35 Consumer Protection Act)"
+                      >
+                        <FaShieldAlt /> Legal Notice
+                      </button>
 
                       <button
                         type="button"

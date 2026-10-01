@@ -854,6 +854,14 @@ export default function TrackComplaint() {
               </button>
               <button
                 type="button"
+                className="btn-action-legal"
+                onClick={() => generatePreLitigationLegalNoticePdf(complaint)}
+                title="Download formal 15-day statutory legal notice under Section 35 CPA 2019"
+              >
+                <FaFilePdf /> Legal Demand Notice (PDF)
+              </button>
+              <button
+                type="button"
                 className="btn-action-primary"
                 onClick={() => generateGrievanceNoticePdf(complaint)}
               >

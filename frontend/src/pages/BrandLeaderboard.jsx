@@ -12,6 +12,12 @@ import {
   FaTimes,
   FaUsers,
   FaCheckCircle,
+  FaGavel,
+  FaExternalLinkAlt,
+  FaCopy,
+  FaCheck,
+  FaPhoneAlt,
+  FaExclamationTriangle,
 } from "react-icons/fa";
 import ResolutionTicker from "../components/ResolutionTicker";
 import "./BrandLeaderboard.css";
@@ -1768,6 +1774,13 @@ const BRAND_DATA = [
 export default function BrandLeaderboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [copiedEmail, setCopiedEmail] = useState("");
+
+  const handleCopyEmail = (email) => {
+    navigator.clipboard.writeText(email);
+    setCopiedEmail(email);
+    setTimeout(() => setCopiedEmail(""), 2200);
+  };
 
   const categories = [
     "All",
@@ -1947,11 +1960,19 @@ export default function BrandLeaderboard() {
 
               {/* Nodal Desk Info */}
               <div className="brand-officer-box">
-                <div className="officer-line">
+                <div className="officer-line officer-line-copyable">
                   <FaEnvelope className="officer-icon" />
                   <span className="officer-email" title={brand.nodalEmail}>
                     {brand.nodalEmail}
                   </span>
+                  <button
+                    type="button"
+                    className={`btn-mini-copy ${copiedEmail === brand.nodalEmail ? "copied" : ""}`}
+                    onClick={() => handleCopyEmail(brand.nodalEmail)}
+                    title="Copy nodal email address"
+                  >
+                    {copiedEmail === brand.nodalEmail ? <><FaCheck /> Copied</> : <><FaCopy /> Copy</>}
+                  </button>
                 </div>
                 <div className="officer-line">
                   <FaClock className="officer-icon" />
@@ -1999,6 +2020,215 @@ export default function BrandLeaderboard() {
             </div>
           </div>
         )}
+
+        {/* ==========================================
+            STATUTORY ESCALATION MATRIX DIRECTORY
+            ========================================== */}
+        <div className="escalation-matrix-section">
+          <div className="matrix-header">
+            <div className="matrix-badge">
+              <FaGavel /> Statutory Escalation Framework
+            </div>
+            <h2>Sectoral Grievance Escalation Hierarchy</h2>
+            <p>
+              When an enterprise fails to acknowledge or resolve a dispute within the statutory SLA window, citizens are entitled to escalate across standardized Government & Regulatory tiers.
+            </p>
+          </div>
+
+          <div className="matrix-grid">
+            {/* Sector 1: Banking & UPI */}
+            <div className="matrix-card">
+              <div className="matrix-card-header">
+                <span className="matrix-sector-tag">Banking, UPI & FinTech</span>
+                <h3>RBI Integrated Ombudsman Scheme (2021)</h3>
+                <p>Governs Banks, NBFCs, Payment System Operators (PhonePe, Paytm, Google Pay, Razorpay), and PPI issuers.</p>
+              </div>
+              <div className="matrix-levels-list">
+                <div className="matrix-level-item">
+                  <div className="level-badge l1">Level 1</div>
+                  <div className="level-content">
+                    <strong>Bank / FinTech Grievance Redressal Officer (GRO)</strong>
+                    <span>Standard turnaround: <strong>48 hours Ack / 7–14 days Resolution</strong></span>
+                  </div>
+                </div>
+                <div className="matrix-level-item">
+                  <div className="level-badge l2">Level 2</div>
+                  <div className="level-content">
+                    <strong>Principal Nodal Officer (PNO)</strong>
+                    <span>Internal appellate desk. Maximum turnaround: <strong>30 days total</strong></span>
+                  </div>
+                </div>
+                <div className="matrix-level-item">
+                  <div className="level-badge l3">Level 3</div>
+                  <div className="level-content">
+                    <strong>RBI Centralized Receipt & Processing Centre (CRPC)</strong>
+                    <span>Statutory Ombudsman Portal: <a href="https://cms.rbi.org.in" target="_blank" rel="noopener noreferrer">cms.rbi.org.in <FaExternalLinkAlt style={{ fontSize: 9 }} /></a> • Toll-Free 14448</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Sector 2: E-Commerce & Marketplaces */}
+            <div className="matrix-card">
+              <div className="matrix-card-header">
+                <span className="matrix-sector-tag">E-Commerce & Digital Marketplaces</span>
+                <h3>Consumer Protection (E-Commerce) Rules, 2020</h3>
+                <p>Applies to Amazon, Flipkart, Myntra, Swiggy, Zomato, Blinkit, Zepto, and direct-to-consumer digital portals.</p>
+              </div>
+              <div className="matrix-levels-list">
+                <div className="matrix-level-item">
+                  <div className="level-badge l1">Level 1</div>
+                  <div className="level-content">
+                    <strong>Resident Grievance Officer (RGO)</strong>
+                    <span>Mandatory under Rule 5(4). Acknowledgement within <strong>48 hours</strong>; Resolution within <strong>1 month</strong>.</span>
+                  </div>
+                </div>
+                <div className="matrix-level-item">
+                  <div className="level-badge l2">Level 2</div>
+                  <div className="level-content">
+                    <strong>National Consumer Helpline (NCH 1915)</strong>
+                    <span>DoCA pre-litigation conciliation via Toll-Free 1915 or <a href="https://consumerhelpline.gov.in" target="_blank" rel="noopener noreferrer">consumerhelpline.gov.in <FaExternalLinkAlt style={{ fontSize: 9 }} /></a></span>
+                  </div>
+                </div>
+                <div className="matrix-level-item">
+                  <div className="level-badge l3">Level 3</div>
+                  <div className="level-content">
+                    <strong>e-Daakhil Online Consumer Court / CCPA</strong>
+                    <span>File formal complaint under Section 35 CPA 2019 via <a href="https://edaakhil.nic.in" target="_blank" rel="noopener noreferrer">edaakhil.nic.in <FaExternalLinkAlt style={{ fontSize: 9 }} /></a></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Sector 3: Telecom & Internet */}
+            <div className="matrix-card">
+              <div className="matrix-card-header">
+                <span className="matrix-sector-tag">Telecom, 5G & Broadband</span>
+                <h3>TRAI Telecom Consumers Protection Regulations</h3>
+                <p>Covers Jio, Airtel, Vodafone Idea, BSNL, ACT Fibernet, and registered internet service providers.</p>
+              </div>
+              <div className="matrix-levels-list">
+                <div className="matrix-level-item">
+                  <div className="level-badge l1">Level 1</div>
+                  <div className="level-content">
+                    <strong>Telecom Service Provider Call Centre & Grievance Desk</strong>
+                    <span>Docket number generation with maximum <strong>3–7 days resolution TAT</strong>.</span>
+                  </div>
+                </div>
+                <div className="matrix-level-item">
+                  <div className="level-badge l2">Level 2</div>
+                  <div className="level-content">
+                    <strong>Appellate Authority (Designated Senior Officer)</strong>
+                    <span>Appeal within 30 days of Call Centre rejection. Resolution TAT: <strong>10 working days</strong>.</span>
+                  </div>
+                </div>
+                <div className="matrix-level-item">
+                  <div className="level-badge l3">Level 3</div>
+                  <div className="level-content">
+                    <strong>TRAI / DoT Consumer Grievances & Consumer Forum</strong>
+                    <span>Statutory recourse under Consumer Protection Act 2019 for unfair trade practices or billing errors.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Sector 4: Insurance (Life, Health, Motor) */}
+            <div className="matrix-card">
+              <div className="matrix-card-header">
+                <span className="matrix-sector-tag">Life, Health & General Insurance</span>
+                <h3>IRDAI Protection of Policyholders' Interests Regulations</h3>
+                <p>Governs LIC, Star Health, HDFC ERGO, ICICI Lombard, Niva Bupa, Care Insurance, and Bajaj Allianz.</p>
+              </div>
+              <div className="matrix-levels-list">
+                <div className="matrix-level-item">
+                  <div className="level-badge l1">Level 1</div>
+                  <div className="level-content">
+                    <strong>Grievance Redressal Officer (GRO) of Insurance Company</strong>
+                    <span>Mandatory acknowledgement within <strong>3 days</strong>; Resolution within <strong>14 days</strong>.</span>
+                  </div>
+                </div>
+                <div className="matrix-level-item">
+                  <div className="level-badge l2">Level 2</div>
+                  <div className="level-content">
+                    <strong>IRDAI Bima Bharosa Portal (EPMS)</strong>
+                    <span>Online escalation via <a href="https://bimabharosa.irdai.gov.in" target="_blank" rel="noopener noreferrer">bimabharosa.irdai.gov.in <FaExternalLinkAlt style={{ fontSize: 9 }} /></a> or Toll-Free 155255.</span>
+                  </div>
+                </div>
+                <div className="matrix-level-item">
+                  <div className="level-badge l3">Level 3</div>
+                  <div className="level-content">
+                    <strong>Council for Insurance Ombudsmen (CIO)</strong>
+                    <span>Binding quasi-judicial awards up to ₹50 Lakhs within 3 months under Insurance Ombudsman Rules 2017.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Sector 5: Airlines & Aviation */}
+            <div className="matrix-card">
+              <div className="matrix-card-header">
+                <span className="matrix-sector-tag">Aviation & Airlines</span>
+                <h3>DGCA Civil Aviation Requirements (CAR Section 3)</h3>
+                <p>Applies to IndiGo, Air India, SpiceJet, Akasa Air, and flight booking travel aggregators.</p>
+              </div>
+              <div className="matrix-levels-list">
+                <div className="matrix-level-item">
+                  <div className="level-badge l1">Level 1</div>
+                  <div className="level-content">
+                    <strong>Airline Passenger Grievance Redressal Officer</strong>
+                    <span>Mandatory written resolution within <strong>30 days</strong> of complaint submission.</span>
+                  </div>
+                </div>
+                <div className="matrix-level-item">
+                  <div className="level-badge l2">Level 2</div>
+                  <div className="level-content">
+                    <strong>Ministry of Civil Aviation — AirSewa Portal</strong>
+                    <span>Government appellate platform via <a href="https://airsewa.gov.in" target="_blank" rel="noopener noreferrer">airsewa.gov.in <FaExternalLinkAlt style={{ fontSize: 9 }} /></a> • Nodal Officer Escalation.</span>
+                  </div>
+                </div>
+                <div className="matrix-level-item">
+                  <div className="level-badge l3">Level 3</div>
+                  <div className="level-content">
+                    <strong>District Consumer Commission (DCDRC)</strong>
+                    <span>Statutory claim for statutory delay/cancellation compensation and refund of denied boarding.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Sector 6: Real Estate & Housing */}
+            <div className="matrix-card">
+              <div className="matrix-card-header">
+                <span className="matrix-sector-tag">Real Estate & Construction</span>
+                <h3>RERA (Real Estate Regulation & Development Act, 2016)</h3>
+                <p>Covers DLF, Godrej Properties, Lodha, Sobha, Prestige, and state-registered builders.</p>
+              </div>
+              <div className="matrix-levels-list">
+                <div className="matrix-level-item">
+                  <div className="level-badge l1">Level 1</div>
+                  <div className="level-content">
+                    <strong>Developer / Builder Grievance Desk</strong>
+                    <span>Direct statutory pre-litigation notice demanding possession or interest for delay.</span>
+                  </div>
+                </div>
+                <div className="matrix-level-item">
+                  <div className="level-badge l2">Level 2</div>
+                  <div className="level-content">
+                    <strong>State Real Estate Regulatory Authority (RERA)</strong>
+                    <span>Filing before State RERA (e.g., MahaRERA, HRERA, UP RERA) for delay compensation or refund.</span>
+                  </div>
+                </div>
+                <div className="matrix-level-item">
+                  <div className="level-badge l3">Level 3</div>
+                  <div className="level-content">
+                    <strong>RERA Appellate Tribunal (REAT) & Consumer Court</strong>
+                    <span>High-level adjudication with execution warrants under RERA Section 40.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

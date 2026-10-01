@@ -1439,14 +1439,24 @@ export default function RegisterComplaint() {
                             </div>
                             <div className="file-actions-group">
                               {file.type.startsWith("image/") && (
-                                <button
-                                  type="button"
-                                  className="file-redact-btn"
-                                  onClick={() => setRedactingFile(file)}
-                                  title="Brush / blackout sensitive numbers on this image (DPDP Act)"
-                                >
-                                  <FaShieldAlt /> Redact
-                                </button>
+                                <>
+                                  <button
+                                    type="button"
+                                    className="file-ocr-btn"
+                                    onClick={() => setShowOcrModal(true)}
+                                    title="Auto-extract Order ID, Merchant & Amount from this receipt"
+                                  >
+                                    <FaMagic /> Auto-Fill
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="file-redact-btn"
+                                    onClick={() => setRedactingFile(file)}
+                                    title="Brush / blackout sensitive numbers on this image (DPDP Act)"
+                                  >
+                                    <FaShieldAlt /> Redact
+                                  </button>
+                                </>
                               )}
                               <button
                                 type="button"

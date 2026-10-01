@@ -1487,6 +1487,28 @@
   transform: translateY(-1px);
 }
 
+.btn-action-legal {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #831843 0%, #be185d 100%);
+  color: #ffffff;
+  border: none;
+  padding: 9px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(131, 24, 67, 0.25);
+}
+
+.btn-action-legal:hover {
+  background: linear-gradient(135deg, #9d174d 0%, #db2777 100%);
+  transform: translateY(-1px);
+}
+
+
 
 
 
