@@ -18,6 +18,7 @@ import {
 } from "react-icons/fa";
 import ResolutionTicker from "../components/ResolutionTicker";
 import GrievanceCompensationWidget from "../components/GrievanceCompensationWidget";
+import LiveDisputeRadar from "../components/LiveDisputeRadar";
 import "./Home.css";
 
 export default function Home() {
@@ -155,6 +156,11 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Live Dispute Facilitation Activity Radar Stream */}
+      <div className="section-container" style={{ paddingTop: 0, paddingBottom: 0 }}>
+        <LiveDisputeRadar />
+      </div>
 
       {/* =========================================================================
           2.5. COLLECTIVE ACTIONS & RECURRING DISPUTES SPOTLIGHT

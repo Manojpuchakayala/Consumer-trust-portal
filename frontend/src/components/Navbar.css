@@ -155,6 +155,42 @@
   transition: all var(--transition-fast);
 }
 
+.nav-cmd-k-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.nav-cmd-k-btn:hover {
+  border-color: var(--brand-electric);
+  color: var(--brand-electric);
+  background: var(--brand-primary-subtle);
+}
+
+.nav-cmd-k-btn .cmd-search-ico {
+  font-size: 12px;
+}
+
+.nav-cmd-k-btn .cmd-kbd {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 10px;
+  font-family: inherit;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
 .notif-toggle-btn:hover {
   border-color: var(--text-muted);
   color: var(--brand-electric);

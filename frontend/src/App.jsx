@@ -6,6 +6,7 @@ import Footer from "./components/Footer";
 import NotificationToast from "./components/NotificationToast";
 import ToastManager from "./components/ToastManager";
 import MobileBottomNav from "./components/MobileBottomNav";
+import CommandPalette from "./components/CommandPalette";
 import InstallAppBanner from "./components/InstallAppBanner";
 import AiLegalAssistant from "./components/AiLegalAssistant";
 
@@ -95,6 +96,7 @@ function App() {
         <Navbar />
         <NotificationToast />
         <ToastManager />
+        <CommandPalette />
         <main className="app-main">
           <Suspense fallback={<PageLoadingFallback />}>
             <Routes>

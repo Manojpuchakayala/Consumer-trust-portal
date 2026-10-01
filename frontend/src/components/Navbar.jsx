@@ -295,6 +295,18 @@ export default function Navbar() {
 
           {/* Right Action Controls */}
           <div className="nav-actions">
+            {/* Quick Command Palette Search Pill */}
+            <button
+              type="button"
+              className="nav-cmd-k-btn desktop"
+              onClick={() => window.dispatchEvent(new Event("openCommandPalette"))}
+              title="Quick Command Search (Ctrl + K)"
+            >
+              <FaSearch className="cmd-search-ico" />
+              <span className="cmd-text">Quick Search</span>
+              <kbd className="cmd-kbd">Ctrl K</kbd>
+            </button>
+
             {/* Notification Bell Dropdown */}
             <div className="notif-menu-wrapper" ref={notifRef}>
               <button
