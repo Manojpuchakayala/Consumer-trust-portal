@@ -17,6 +17,7 @@ import {
   FaBuilding,
 } from "react-icons/fa";
 import ResolutionTicker from "../components/ResolutionTicker";
+import GrievanceCompensationWidget from "../components/GrievanceCompensationWidget";
 import "./Home.css";
 
 export default function Home() {
@@ -76,6 +77,11 @@ export default function Home() {
 
       {/* Live Settlements Marquee Ticker */}
       <ResolutionTicker />
+
+      {/* Interactive CPA 2019 Statutory Compensation Calculator Widget */}
+      <div className="section-container" style={{ paddingTop: 0 }}>
+        <GrievanceCompensationWidget />
+      </div>
 
       {/* =========================================================================
           2. HOW IT WORKS — SINGLE 4-STEP WORKFLOW SECTION

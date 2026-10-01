@@ -49,6 +49,8 @@ import { getWhatsAppShareUrl } from "../utils/whatsappShare";
 import VoiceInputButton from "../components/VoiceInputButton";
 import InvoiceOcrModal from "../components/InvoiceOcrModal";
 import EvidenceRedactorModal from "../components/EvidenceRedactorModal";
+import { fireCelebrationConfetti } from "../utils/confettiHelper";
+import { toast } from "../utils/toast";
 import "./RegisterComplaint.css";
 
 const ENTERPRISE_OPTIONS = [
@@ -633,6 +635,10 @@ export default function RegisterComplaint() {
 
       // Clear draft on successful submission
       localStorage.removeItem(DRAFT_KEY);
+
+      // Trigger Celebration Confetti and Success Toast
+      fireCelebrationConfetti();
+      toast.success("Grievance docket created successfully! Tracking Ref generated.");
 
       setSubmittedData({
         complaintId: response.data.complaintId,

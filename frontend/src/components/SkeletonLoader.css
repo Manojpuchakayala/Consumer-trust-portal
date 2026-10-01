@@ -1,0 +1,69 @@
+/* Skeleton Shimmer Loading Styles */
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--bg-secondary) 0%,
+    var(--card-bg) 50%,
+    var(--bg-secondary) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmerWave 1.6s infinite ease-in-out;
+  display: block;
+}
+
+[data-theme="dark"] .skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+  background-size: 200% 100%;
+}
+
+@keyframes shimmerWave {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-5, 18px);
+  margin-bottom: var(--space-4, 16px);
+  box-shadow: var(--shadow-xs);
+}
+
+.skeleton-row {
+  display: flex;
+  align-items: center;
+}
+
+.skeleton-row.space-between {
+  justify-content: space-between;
+}
+
+.skeleton-timeline-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-top: 16px;
+}
+
+@media (max-width: 640px) {
+  .skeleton-timeline-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.skeleton-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}

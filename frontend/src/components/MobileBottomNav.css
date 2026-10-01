@@ -1,0 +1,93 @@
+/* Mobile Bottom Navigation Dock */
+.mobile-bottom-dock {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border-color, #e2e8f0);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+  padding: 6px 12px calc(6px + env(safe-area-inset-bottom, 0px));
+  justify-content: space-around;
+  align-items: center;
+}
+
+[data-theme="dark"] .mobile-bottom-dock {
+  background: rgba(15, 23, 42, 0.92);
+  border-top-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.4);
+}
+
+@media (max-width: 768px) {
+  .mobile-bottom-dock {
+    display: flex;
+  }
+}
+
+.dock-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  color: var(--text-secondary, #64748b);
+  text-decoration: none;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+  flex: 1;
+  text-align: center;
+}
+
+.dock-item .dock-icon {
+  font-size: 17px;
+  transition: transform 0.15s;
+}
+
+.dock-item:hover,
+.dock-item.active {
+  color: var(--brand-electric, #2563eb);
+}
+
+.dock-item.active .dock-icon {
+  transform: scale(1.15);
+}
+
+/* Center Highlight FAB */
+.dock-item.highlight {
+  position: relative;
+  top: -10px;
+  color: var(--text-primary);
+}
+
+.dock-fab-circle {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+  margin-bottom: 2px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.dock-item.highlight:hover .dock-fab-circle,
+.dock-item.highlight.active .dock-fab-circle {
+  transform: scale(1.08);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.5);
+  background: linear-gradient(135deg, #1d4ed8, #1e40af);
+}
+
+.dock-item.highlight .dock-icon {
+  font-size: 18px;
+  color: #ffffff;
+}

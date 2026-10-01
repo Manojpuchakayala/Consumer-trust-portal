@@ -1,0 +1,104 @@
+/* Modern Floating Toast Notification Styles */
+.toast-container {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 999999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 400px;
+  width: calc(100% - 48px);
+  pointer-events: none;
+}
+
+@media (max-width: 600px) {
+  .toast-container {
+    top: 16px;
+    right: 16px;
+    left: 16px;
+    width: auto;
+  }
+}
+
+.toast-bubble {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: var(--radius-md, 10px);
+  background: var(--card-bg, #ffffff);
+  color: var(--text-heading, #0f172a);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color, #e2e8f0);
+  font-size: 13.5px;
+  line-height: 1.4;
+  animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(12px);
+}
+
+[data-theme="dark"] .toast-bubble {
+  background: rgba(15, 23, 42, 0.95);
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+}
+
+.toast-bubble.success {
+  border-left: 4px solid #10b981;
+}
+
+.toast-bubble.error {
+  border-left: 4px solid #ef4444;
+}
+
+.toast-bubble.warning {
+  border-left: 4px solid #f59e0b;
+}
+
+.toast-bubble.info {
+  border-left: 4px solid #3b82f6;
+}
+
+.toast-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.toast-bubble.success .toast-icon { color: #10b981; }
+.toast-bubble.error .toast-icon { color: #ef4444; }
+.toast-bubble.warning .toast-icon { color: #f59e0b; }
+.toast-bubble.info .toast-icon { color: #3b82f6; }
+
+.toast-content {
+  flex: 1;
+  font-weight: 500;
+}
+
+.toast-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #94a3b8);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s;
+}
+
+.toast-close-btn:hover {
+  color: var(--text-heading, #0f172a);
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}

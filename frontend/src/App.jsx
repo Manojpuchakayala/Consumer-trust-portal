@@ -4,6 +4,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import NotificationToast from "./components/NotificationToast";
+import ToastManager from "./components/ToastManager";
+import MobileBottomNav from "./components/MobileBottomNav";
 import InstallAppBanner from "./components/InstallAppBanner";
 import AiLegalAssistant from "./components/AiLegalAssistant";
 
@@ -92,6 +94,7 @@ function App() {
       <div className="app-layout">
         <Navbar />
         <NotificationToast />
+        <ToastManager />
         <main className="app-main">
           <Suspense fallback={<PageLoadingFallback />}>
             <Routes>
@@ -99,6 +102,7 @@ function App() {
               <Route path="/register" element={<RegisterComplaint />} />
               <Route path="/track" element={<TrackComplaint />} />
               <Route path="/brands" element={<BrandLeaderboard />} />
+              <Route path="/leaderboard" element={<BrandLeaderboard />} />
               <Route path="/class-actions" element={<ClassActionHub />} />
               <Route
                 path="/my-complaints"
@@ -135,6 +139,7 @@ function App() {
         </main>
         <InstallAppBanner />
         <AiLegalAssistant />
+        <MobileBottomNav />
         <Footer />
       </div>
     </BrowserRouter>

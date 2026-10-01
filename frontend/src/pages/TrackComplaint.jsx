@@ -40,6 +40,8 @@ import {
 import { getWhatsAppShareUrl } from "../utils/whatsappShare";
 import CourtFeeCalculator from "../components/CourtFeeCalculator";
 import EDaakhilExportModal from "../components/EDaakhilExportModal";
+import LegalNoticePreviewModal from "../components/LegalNoticePreviewModal";
+import { TrackingTimelineSkeleton } from "../components/SkeletonLoader";
 import "./TrackComplaint.css";
 
 export default function TrackComplaint() {
@@ -54,6 +56,7 @@ export default function TrackComplaint() {
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState("");
   const [showCourtCalculator, setShowCourtCalculator] = useState(false);
   const [showEDaakhilModal, setShowEDaakhilModal] = useState(false);
+  const [showLegalNoticeModal, setShowLegalNoticeModal] = useState(false);
   const [speedPostNo, setSpeedPostNo] = useState("");
 
   // Resolution Rating State
@@ -789,9 +792,10 @@ export default function TrackComplaint() {
                   <button
                     type="button"
                     className="btn-legal-notice-download"
-                    onClick={() => generatePreLitigationLegalNoticePdf(complaint)}
+                    onClick={() => setShowLegalNoticeModal(true)}
+                    title="Interactive Stamp Paper Preview & PDF Export"
                   >
-                    <FaFilePdf /> 15-Day Pre-Litigation Demand Notice (PDF)
+                    <FaFilePdf /> 15-Day Pre-Litigation Demand Notice
                   </button>
                   <button
                     type="button"
@@ -855,8 +859,8 @@ export default function TrackComplaint() {
               <button
                 type="button"
                 className="btn-action-legal"
-                onClick={() => generatePreLitigationLegalNoticePdf(complaint)}
-                title="Download formal 15-day statutory legal notice under Section 35 CPA 2019"
+                onClick={() => setShowLegalNoticeModal(true)}
+                title="Preview & download formal 15-day statutory legal notice under Section 35 CPA 2019"
               >
                 <FaFilePdf /> Legal Demand Notice (PDF)
               </button>
@@ -891,6 +895,14 @@ export default function TrackComplaint() {
           <EDaakhilExportModal
             complaint={complaint}
             onClose={() => setShowEDaakhilModal(false)}
+          />
+        )}
+
+        {/* Modal: Interactive Legal Notice & Stamp Paper Preview */}
+        {showLegalNoticeModal && complaint && (
+          <LegalNoticePreviewModal
+            complaint={complaint}
+            onClose={() => setShowLegalNoticeModal(false)}
           />
         )}
       </div>

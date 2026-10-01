@@ -28,6 +28,7 @@ import {
   clearAllNotifications,
   getUnreadCount,
 } from "../utils/notificationService";
+import { toast } from "../utils/toast";
 import "./Navbar.css";
 
 export default function Navbar() {
@@ -63,6 +64,8 @@ export default function Navbar() {
     localStorage.setItem("consumerTrustLang", code);
     setLangMenuOpen(false);
     window.dispatchEvent(new Event("langChange"));
+    const langObj = LANGUAGES.find((l) => l.code === code);
+    toast.info(`Language set to ${langObj?.name || code}`);
   };
 
   const loadNotifications = () => {

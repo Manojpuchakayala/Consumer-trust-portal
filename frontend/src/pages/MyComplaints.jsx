@@ -32,6 +32,8 @@ import {
 } from "../utils/pdfGenerator";
 import { getWhatsAppShareUrl } from "../utils/whatsappShare";
 import EDaakhilExportModal from "../components/EDaakhilExportModal";
+import LegalNoticePreviewModal from "../components/LegalNoticePreviewModal";
+import { ComplaintCardSkeleton } from "../components/SkeletonLoader";
 import "./MyComplaints.css";
 
 export default function MyComplaints() {
@@ -47,6 +49,9 @@ export default function MyComplaints() {
 
   // e-Daakhil court export modal state
   const [eDaakhilComplaint, setEDaakhilComplaint] = useState(null);
+
+  // Legal notice modal state
+  const [legalNoticeComplaint, setLegalNoticeComplaint] = useState(null);
 
   // Delete modal state
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -347,9 +352,10 @@ export default function MyComplaints() {
 
         {/* 4. Modular Case Cards Grid */}
         {loading ? (
-          <div className="dash-loading-box">
-            <div className="dash-spinner"></div>
-            <p>Loading your registered grievances...</p>
+          <div className="complaints-cards-grid">
+            <ComplaintCardSkeleton />
+            <ComplaintCardSkeleton />
+            <ComplaintCardSkeleton />
           </div>
         ) : filteredComplaints.length === 0 ? (
           <div className="dash-empty-card">
@@ -482,8 +488,8 @@ export default function MyComplaints() {
                       <button
                         type="button"
                         className="btn-legal-mini"
-                        onClick={() => generatePreLitigationLegalNoticePdf(c)}
-                        title="Generate Official Statutory Legal Notice (Section 35 Consumer Protection Act)"
+                        onClick={() => setLegalNoticeComplaint(c)}
+                        title="Preview & Generate Official Statutory Legal Notice (Section 35 CPA 2019)"
                       >
                         <FaShieldAlt /> Legal Notice
                       </button>
@@ -558,6 +564,14 @@ export default function MyComplaints() {
           <EDaakhilExportModal
             complaint={eDaakhilComplaint}
             onClose={() => setEDaakhilComplaint(null)}
+          />
+        )}
+
+        {/* 7. Interactive Legal Notice & Stamp Paper Preview Modal */}
+        {legalNoticeComplaint && (
+          <LegalNoticePreviewModal
+            complaint={legalNoticeComplaint}
+            onClose={() => setLegalNoticeComplaint(null)}
           />
         )}
       </div>
