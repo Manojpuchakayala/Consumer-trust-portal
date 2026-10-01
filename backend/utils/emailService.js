@@ -49,7 +49,9 @@ const sendOtpEmail = async (email, otp, name = "Consumer") => {
       await mailer.sendMail({
         from: `"Consumer Trust Security" <${process.env.SMTP_USER}>`,
         to: email,
+        replyTo: process.env.SMTP_USER,
         subject: `Your Verification Code: ${otp} - Consumer Trust`,
+        text: `Hello ${name},\n\nYour Consumer Trust verification code is: ${otp}\n\nThis code is valid for 10 minutes. Never share this code with anyone.\n\nConsumer Trust Platform - Independent Dispute Facilitation Desk`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 12px; background: #ffffff;">
             <div style="text-align: center; margin-bottom: 20px;">
