@@ -160,7 +160,7 @@ app.use((err, req, res, next) => {
 
 if (require.main === module || (!process.env.VERCEL && process.env.NODE_ENV !== "test")) {
   const PORT = process.env.PORT || 5000;
-  app.listen(PORT, () => {
+  app.listen(PORT, "0.0.0.0", () => {
     console.log(`Consumer Trust Server running securely on port ${PORT}`);
   });
 }
