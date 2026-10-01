@@ -341,31 +341,19 @@ export default function AuthCard({ initialMode = "signin", onAuthSuccess, showAd
 
       {/* 1-Click Google Authentication */}
       <div className="google-auth-section">
-        {isGoogleConfigured ? (
-          <div className="google-login-container">
-            <GoogleLogin
-              onSuccess={handleGoogleSuccess}
-              onError={() => setShowGoogleModal(true)}
-              shape="rectangular"
-              size="large"
-              theme="outline"
-              text="continue_with"
-              width="100%"
-            />
-          </div>
-        ) : (
-          <button
-            type="button"
-            className="google-btn-custom"
-            onClick={() => {
-              setError("");
-              setShowGoogleModal(true);
-            }}
-          >
-            <FaGoogle className="google-icon" />
-            <span>Continue with Google Account</span>
-          </button>
-        )}
+        <button
+          type="button"
+          className="google-btn-custom"
+          onClick={() => {
+            setError("");
+            setGoogleModalError("");
+            setGoogleInputEmail(email.trim() || "");
+            setShowGoogleModal(true);
+          }}
+        >
+          <FaGoogle className="google-icon" />
+          <span>Continue with Google Account</span>
+        </button>
 
         <div className="auth-divider">
           <span>or sign in with email verification code</span>
