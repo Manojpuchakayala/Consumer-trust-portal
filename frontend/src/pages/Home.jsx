@@ -29,33 +29,16 @@ export default function Home() {
           ========================================================================= */}
       <section className="home-hero-section">
         <div className="hero-container">
-          {/* Floating subtle ambient metric badges on desktop */}
-          <div className="hero-floating-badge float-left" aria-hidden="true">
-            <span className="floating-badge-icon"><FaShieldAlt /></span>
-            <div className="floating-badge-info">
-              <span className="badge-stat">94.8% Reach</span>
-              <span className="badge-sub">Enterprise Grievance Desks</span>
-            </div>
-          </div>
-
-          <div className="hero-floating-badge float-right" aria-hidden="true">
-            <span className="floating-badge-icon"><FaCheckCircle /></span>
-            <div className="floating-badge-info">
-              <span className="badge-stat">CPA 2019 Ready</span>
-              <span className="badge-sub">Sec 35 Standardized Notice</span>
-            </div>
-          </div>
-
           <div className="hero-content">
-            {/* Tag Pill with concentric radar pulse */}
+            {/* Tag Pill */}
             <div className="hero-tag-pill">
               <span className="pill-dot" />
               <span>Independent Dispute Facilitation</span>
             </div>
 
-            {/* Main Headline with subtle shimmering gradient */}
+            {/* Main Headline */}
             <h1 className="hero-main-title">
-              A clearer path to <span className="hero-title-gradient">consumer resolution</span>.
+              A clearer path to consumer resolution.
             </h1>
 
             {/* Short Supporting Text */}
@@ -105,67 +88,61 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="steps-grid-wrapper">
-            <div className="steps-connector-bar" aria-hidden="true">
-              <div className="steps-laser-runner" />
+          <div className="steps-grid">
+            {/* Step 1 */}
+            <div className="step-card">
+              <div className="step-header">
+                <span className="step-number">01</span>
+                <div className="step-icon-wrap">
+                  <FaFileAlt />
+                </div>
+              </div>
+              <h3>1. Prepare your grievance</h3>
+              <p>
+                Structure your dispute chronology, transaction references, and desired remedy (refund, replacement, or rectification) in a clear format.
+              </p>
             </div>
 
-            <div className="steps-grid">
-              {/* Step 1 */}
-              <div className="step-card">
-                <div className="step-header">
-                  <span className="step-number">01</span>
-                  <div className="step-icon-wrap">
-                    <FaFileAlt />
-                  </div>
+            {/* Step 2 */}
+            <div className="step-card">
+              <div className="step-header">
+                <span className="step-number">02</span>
+                <div className="step-icon-wrap">
+                  <FaPaperclip />
                 </div>
-                <h3>1. Prepare your grievance</h3>
-                <p>
-                  Structure your dispute chronology, transaction references, and desired remedy (refund, replacement, or rectification) in a clear format.
-                </p>
               </div>
+              <h3>2. Add relevant evidence</h3>
+              <p>
+                Attach purchase invoices, receipts, customer chat logs, or defect photographs while keeping sensitive secrets safe.
+              </p>
+            </div>
 
-              {/* Step 2 */}
-              <div className="step-card">
-                <div className="step-header">
-                  <span className="step-number">02</span>
-                  <div className="step-icon-wrap">
-                    <FaPaperclip />
-                  </div>
+            {/* Step 3 */}
+            <div className="step-card">
+              <div className="step-header">
+                <span className="step-number">03</span>
+                <div className="step-icon-wrap">
+                  <FaEnvelopeOpenText />
                 </div>
-                <h3>2. Add relevant evidence</h3>
-                <p>
-                  Attach purchase invoices, receipts, customer chat logs, or defect photographs while keeping sensitive secrets safe.
-                </p>
               </div>
+              <h3>3. Share with the enterprise</h3>
+              <p>
+                A standardized dispute facilitation notice is delivered directly to the company&rsquo;s designated customer grievance desk.
+              </p>
+            </div>
 
-              {/* Step 3 */}
-              <div className="step-card">
-                <div className="step-header">
-                  <span className="step-number">03</span>
-                  <div className="step-icon-wrap">
-                    <FaEnvelopeOpenText />
-                  </div>
+            {/* Step 4 */}
+            <div className="step-card">
+              <div className="step-header">
+                <span className="step-number">04</span>
+                <div className="step-icon-wrap">
+                  <FaCheckCircle />
                 </div>
-                <h3>3. Share with the enterprise</h3>
-                <p>
-                  A standardized dispute facilitation notice is delivered directly to the company&rsquo;s designated customer grievance desk.
-                </p>
               </div>
-
-              {/* Step 4 */}
-              <div className="step-card">
-                <div className="step-header">
-                  <span className="step-number">04</span>
-                  <div className="step-icon-wrap">
-                    <FaCheckCircle />
-                  </div>
-                </div>
-                <h3>4. Track voluntary resolution</h3>
-                <p>
-                  Monitor milestone progress in real time, review enterprise remarks, and access your resolution record upon completion.
-                </p>
-              </div>
+              <h3>4. Track voluntary resolution</h3>
+              <p>
+                Monitor milestone progress in real time, review enterprise remarks, and access your resolution record upon completion.
+              </p>
             </div>
           </div>
         </div>

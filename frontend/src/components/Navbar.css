@@ -43,12 +43,6 @@
   align-items: center;
   justify-content: center;
   color: #ffffff;
-  transition: transform 0.25s ease, background 0.25s ease;
-}
-
-.navbar-logo:hover .logo-icon-wrap {
-  transform: rotate(-8deg) scale(1.08);
-  background: var(--brand-electric);
 }
 
 .logo-shield {
@@ -111,7 +105,6 @@
 .nav-link:hover {
   color: var(--text-heading);
   background: var(--bg-secondary);
-  transform: translateY(-1px);
 }
 
 .nav-link.active {
@@ -174,15 +167,13 @@
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--transition-fast);
 }
 
 .nav-cmd-k-btn:hover {
   border-color: var(--brand-electric);
   color: var(--brand-electric);
   background: var(--brand-primary-subtle);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
 }
 
 .nav-cmd-k-btn .cmd-search-ico {
@@ -198,13 +189,6 @@
   font-weight: 700;
   padding: 1px 5px;
   border-radius: 3px;
-  transition: transform 0.2s ease;
-}
-
-.nav-cmd-k-btn:hover .cmd-kbd {
-  transform: scale(1.08);
-  border-color: var(--brand-electric);
-  color: var(--brand-electric);
 }
 
 .notif-toggle-btn:hover {
