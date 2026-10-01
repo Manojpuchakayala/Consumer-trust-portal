@@ -4,7 +4,7 @@
 
 .admin-dashboard-page {
   min-height: calc(100vh - 80px);
-  background: var(--bg-primary, #f4f7fb);
+  background: transparent;
   padding: 36px 20px 80px;
   width: 100%;
   box-sizing: border-box;

@@ -4,7 +4,7 @@
 
 .dashboard-page-root {
   min-height: calc(100vh - 120px);
-  background: var(--bg-primary);
+  background: transparent;
   padding: var(--space-8) var(--space-4) var(--space-16);
   width: 100%;
   box-sizing: border-box;

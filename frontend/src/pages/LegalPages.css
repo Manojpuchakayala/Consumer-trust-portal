@@ -1,6 +1,6 @@
 .legal-page-container {
   min-height: calc(100vh - 160px);
-  background: var(--bg-primary, #f8fafc);
+  background: transparent;
   padding: 40px 20px 80px;
   color: var(--text-primary, #0f172a);
 }

@@ -4,7 +4,7 @@
 
 .login-page-root {
   min-height: calc(100vh - 140px);
-  background: var(--bg-primary);
+  background: transparent;
   display: flex;
   justify-content: center;
   align-items: center;

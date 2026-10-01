@@ -14,30 +14,30 @@
   --color-pale-teal: #DDF5F0;
   --color-warm-offwhite: #F8FAFC;
   
-  /* Semantic Tokens — Light Mode */
-  --bg-primary: #F8FAFC;
-  --bg-secondary: #f1f5f9;
-  --bg-tertiary: #e2e8f0;
-  --bg-soft-blue: #DDEBFF;
-  --bg-pale-teal: #DDF5F0;
+  /* Semantic Tokens — Light Mode (Crisp Slate Canvas with Pure White Surfaces) */
+  --bg-primary: #F1F5F9;
+  --bg-secondary: #E2E8F0;
+  --bg-tertiary: #CBD5E1;
+  --bg-soft-blue: #E0EDFF;
+  --bg-pale-teal: #E2F8F4;
   
   /* Multi-Layer Background System */
-  --bg-gradient-hero: linear-gradient(180deg, #F8FAFC 0%, #edf4fe 55%, #F8FAFC 100%);
-  --bg-gradient-howitworks: linear-gradient(180deg, #f1f5f9 0%, #e6effc 50%, #f1f5f9 100%);
-  --bg-gradient-trust: linear-gradient(180deg, rgba(221, 245, 240, 0.55) 0%, rgba(248, 250, 252, 0.95) 100%);
-  --bg-gradient-legal: linear-gradient(180deg, #f8fafc 0%, #eef5fc 100%);
-  --bg-gradient-cta: linear-gradient(135deg, #0B1F3A 0%, #102A4C 55%, #1d3557 100%);
-  --bg-footer: #08162b;
+  --bg-gradient-hero: linear-gradient(180deg, #F1F5F9 0%, #E8EFF8 55%, #F1F5F9 100%);
+  --bg-gradient-howitworks: linear-gradient(180deg, #EBF2FA 0%, #E2EBF6 50%, #EBF2FA 100%);
+  --bg-gradient-trust: linear-gradient(180deg, rgba(226, 248, 244, 0.6) 0%, rgba(241, 245, 249, 0.95) 100%);
+  --bg-gradient-legal: linear-gradient(180deg, #F1F5F9 0%, #E8EFF8 100%);
+  --bg-gradient-cta: linear-gradient(135deg, #0B1F3A 0%, #102A4C 55%, #1D3557 100%);
+  --bg-footer: #08162B;
   
-  /* Elevated Cards & Surfaces */
-  --card-bg: rgba(255, 255, 255, 0.92);
-  --card-bg-solid: #ffffff;
-  --card-bg-subtle: #f8fafc;
+  /* Elevated Cards & Surfaces (Pure White for Strong Visual Contrast) */
+  --card-bg: #FFFFFF;
+  --card-bg-solid: #FFFFFF;
+  --card-bg-subtle: #F8FAFC;
   --card-backdrop-blur: blur(12px);
-  --card-border: rgba(16, 42, 76, 0.08);
-  --card-border-hover: rgba(56, 71, 168, 0.35);
-  --border-color: rgba(16, 42, 76, 0.08);
-  --border-subtle: rgba(16, 42, 76, 0.05);
+  --card-border: #E2E8F0;
+  --card-border-hover: #CBD5E1;
+  --border-color: #E2E8F0;
+  --border-subtle: #F1F5F9;
   
   /* Typography Colors */
   --text-heading: #10213A;
@@ -235,7 +235,7 @@ body {
   position: relative;
 }
 
-/* Subtle, high-performance background grid overlay */
+/* Ambient mesh background with soft diffused lighting */
 body::before {
   content: "";
   position: fixed;
@@ -245,16 +245,19 @@ body::before {
   height: 100%;
   pointer-events: none;
   z-index: 0;
-  background-image: 
-    linear-gradient(to right, rgba(16, 42, 76, 0.02) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(16, 42, 76, 0.02) 1px, transparent 1px);
-  background-size: 48px 48px;
+  background: 
+    radial-gradient(at 15% 15%, rgba(219, 234, 254, 0.6) 0px, transparent 50%),
+    radial-gradient(at 85% 20%, rgba(204, 251, 241, 0.45) 0px, transparent 45%),
+    radial-gradient(at 50% 85%, rgba(224, 231, 255, 0.45) 0px, transparent 55%),
+    #F1F5F9;
 }
 
 [data-theme="dark"] body::before {
-  background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background: 
+    radial-gradient(at 15% 15%, rgba(30, 58, 138, 0.28) 0px, transparent 55%),
+    radial-gradient(at 85% 20%, rgba(13, 148, 136, 0.2) 0px, transparent 50%),
+    radial-gradient(at 50% 85%, rgba(67, 56, 202, 0.22) 0px, transparent 55%),
+    #071525;
 }
 
 #root {

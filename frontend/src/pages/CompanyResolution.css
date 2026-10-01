@@ -1,6 +1,6 @@
 .company-resolution-page {
   min-height: calc(100vh - 80px);
-  background: #f1f5f9;
+  background: transparent;
   padding: 40px 20px;
 }
 

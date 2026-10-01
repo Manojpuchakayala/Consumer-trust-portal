@@ -1,6 +1,6 @@
 .class-hub-root {
   min-height: calc(100vh - 120px);
-  background: var(--bg-primary, #f8fafc);
+  background: transparent;
   padding: var(--space-8, 32px) var(--space-4, 16px) var(--space-16, 64px);
 }
 
