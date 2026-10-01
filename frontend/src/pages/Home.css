@@ -171,22 +171,22 @@
 
 /* Hero Main Title */
 .hero-main-title {
-  font-size: clamp(2rem, 3.8vw, 3.1rem);
+  font-size: clamp(1.75rem, 3.2vw, 2.65rem);
   font-weight: 900;
   color: var(--text-heading);
   letter-spacing: -0.03em;
   line-height: 1.15;
-  margin-bottom: var(--space-3, 12px);
+  margin-bottom: var(--space-3, 10px);
   max-width: 820px;
 }
 
 /* Hero Supporting Lead Text */
 .hero-lead-text {
-  font-size: clamp(14.5px, 1.5vw, 16.5px);
-  line-height: 1.6;
+  font-size: clamp(13.5px, 1.15vw, 15.5px);
+  line-height: 1.55;
   color: var(--text-secondary);
   max-width: 680px;
-  margin-bottom: var(--space-6, 24px);
+  margin-bottom: var(--space-5, 20px);
 }
 
 /* Hero CTA Group (2 Primary Actions) */

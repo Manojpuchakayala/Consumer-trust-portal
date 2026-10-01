@@ -425,9 +425,8 @@
 .officer-email {
   font-weight: 600;
   color: var(--brand-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  word-break: break-all;
+  font-size: 11.5px;
 }
 
 /* Card Action */
