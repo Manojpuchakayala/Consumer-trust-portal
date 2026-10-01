@@ -273,69 +273,111 @@ function AdminDashboard() {
       <div className="admin-container">
         {/* Header */}
         <div className="admin-header">
-          <div>
-            <div className="admin-badge">
-              <FaUserShield /> Grievance Administration Portal
+          <div className="admin-header-left">
+            <div className="admin-title-row">
+              <h1>Admin Control Center</h1>
+              <span className="admin-badge">
+                <FaUserShield /> Grievance Administration Portal
+              </span>
             </div>
-            <h1>Admin Control Center</h1>
             <p>Review filed complaints, inspect evidence files, dispatch WhatsApp resolutions, and monitor satisfaction.</p>
+          </div>
+          <div className="admin-header-stats-pill">
+            <span className="live-dot"></span>
+            <span>Live System: <strong>{complaints.length}</strong> active cases</span>
           </div>
         </div>
 
-        {/* Stats Grid */}
+        {/* Stats Grid - Compact Balanced 6-Card Row */}
         <div className="dashboard-cards">
           <div className="dashboard-card total">
-            <div className="card-top-row">
-              <FaClipboardList className="card-icon" />
-              <span>Total Grievances</span>
+            <div className="card-inner">
+              <div className="card-icon-wrap total">
+                <FaClipboardList />
+              </div>
+              <div className="card-content">
+                <span className="card-label">Total Grievances</span>
+                <div className="card-metric-row">
+                  <h2>{stats.total}</h2>
+                  <span className="card-sub-tag">All cases</span>
+                </div>
+              </div>
             </div>
-            <h2>{stats.total}</h2>
-            <p>All time registered cases</p>
           </div>
 
           <div className="dashboard-card pending">
-            <div className="card-top-row">
-              <FaClock className="card-icon" />
-              <span>Pending Review</span>
+            <div className="card-inner">
+              <div className="card-icon-wrap pending">
+                <FaClock />
+              </div>
+              <div className="card-content">
+                <span className="card-label">Pending Review</span>
+                <div className="card-metric-row">
+                  <h2>{stats.pending}</h2>
+                  <span className="card-sub-tag">Awaiting</span>
+                </div>
+              </div>
             </div>
-            <h2>{stats.pending}</h2>
-            <p>Awaiting assignment</p>
           </div>
 
           <div className="dashboard-card progress">
-            <div className="card-top-row">
-              <FaSpinner className="card-icon" />
-              <span>In Progress</span>
+            <div className="card-inner">
+              <div className="card-icon-wrap progress">
+                <FaSpinner />
+              </div>
+              <div className="card-content">
+                <span className="card-label">In Progress</span>
+                <div className="card-metric-row">
+                  <h2>{stats.inProgress}</h2>
+                  <span className="card-sub-tag">Active</span>
+                </div>
+              </div>
             </div>
-            <h2>{stats.inProgress}</h2>
-            <p>Active inquiries</p>
           </div>
 
           <div className="dashboard-card resolved">
-            <div className="card-top-row">
-              <FaCheckCircle className="card-icon" />
-              <span>Resolved</span>
+            <div className="card-inner">
+              <div className="card-icon-wrap resolved">
+                <FaCheckCircle />
+              </div>
+              <div className="card-content">
+                <span className="card-label">Resolved</span>
+                <div className="card-metric-row">
+                  <h2>{stats.resolved}</h2>
+                  <span className="card-sub-tag">Settled</span>
+                </div>
+              </div>
             </div>
-            <h2>{stats.resolved}</h2>
-            <p>Successfully closed</p>
           </div>
 
           <div className="dashboard-card satisfaction">
-            <div className="card-top-row">
-              <FaStar className="card-icon gold" />
-              <span>Citizen Satisfaction</span>
+            <div className="card-inner">
+              <div className="card-icon-wrap satisfaction">
+                <FaStar />
+              </div>
+              <div className="card-content">
+                <span className="card-label">Satisfaction</span>
+                <div className="card-metric-row">
+                  <h2>{stats.avgRating ? `${stats.avgRating}/5` : "4.9/5"}</h2>
+                  <span className="card-sub-tag">{stats.feedbackCount || 0} rev</span>
+                </div>
+              </div>
             </div>
-            <h2>{stats.avgRating ? `${stats.avgRating} / 5.0` : "4.9 / 5.0"}</h2>
-            <p>{stats.feedbackCount || 0} reviews recorded</p>
           </div>
 
           <div className="dashboard-card users">
-            <div className="card-top-row">
-              <FaUsers className="card-icon" />
-              <span>Active Users</span>
+            <div className="card-inner">
+              <div className="card-icon-wrap users">
+                <FaUsers />
+              </div>
+              <div className="card-content">
+                <span className="card-label">Active Users</span>
+                <div className="card-metric-row">
+                  <h2>{stats.activeUsers}</h2>
+                  <span className="card-sub-tag">Citizens</span>
+                </div>
+              </div>
             </div>
-            <h2>{stats.activeUsers}</h2>
-            <p>Registered citizens</p>
           </div>
         </div>
 
