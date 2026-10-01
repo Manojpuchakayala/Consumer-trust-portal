@@ -279,6 +279,11 @@ function AdminDashboard() {
               <span className="admin-badge">
                 <FaUserShield /> Grievance Administration Portal
               </span>
+              {user && (
+                <span className="admin-officer-tag" title={user.email}>
+                  Officer: <strong>{user.name || "Manoj"}</strong>
+                </span>
+              )}
             </div>
             <p>Review filed complaints, inspect evidence files, dispatch WhatsApp resolutions, and monitor satisfaction.</p>
           </div>
@@ -497,9 +502,9 @@ function AdminDashboard() {
                       </td>
                       <td>
                         <div className="complainant-cell">
-                          <strong>{c.name}</strong>
-                          <span>{c.email}</span>
-                          <span>{c.phone}</span>
+                          <strong className="complainant-name">{c.name}</strong>
+                          <span className="complainant-email">{c.email}</span>
+                          {c.phone && <span className="complainant-phone">{c.phone}</span>}
                         </div>
                       </td>
                       <td>

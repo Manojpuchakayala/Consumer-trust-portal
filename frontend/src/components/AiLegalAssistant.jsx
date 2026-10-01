@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   FaRobot,
   FaTimes,
@@ -36,6 +36,7 @@ const QUICK_PROMPTS = [
 
 export default function AiLegalAssistant() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedLang, setSelectedLang] = useState("en-IN");
   const [messages, setMessages] = useState([
@@ -161,6 +162,10 @@ export default function AiLegalAssistant() {
     setIsOpen(false);
     navigate("/register?prefill=true");
   };
+
+  if (location.pathname.startsWith("/admin")) {
+    return null;
+  }
 
   return (
     <>

@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { FaShieldAlt, FaDownload, FaTimes } from "react-icons/fa";
 import "./InstallAppBanner.css";
 
 export default function InstallAppBanner() {
+  const location = useLocation();
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [visible, setVisible] = useState(false);
 
@@ -39,7 +41,7 @@ export default function InstallAppBanner() {
     localStorage.setItem("ctp_pwa_dismissed", Date.now().toString());
   };
 
-  if (!visible) return null;
+  if (!visible || location.pathname.startsWith("/admin")) return null;
 
   return (
     <div className="pwa-banner-root" role="alert">

@@ -92,6 +92,24 @@
   font-weight: 700;
 }
 
+.admin-officer-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.admin-officer-tag strong {
+  color: #15803d;
+  font-weight: 800;
+}
+
 .admin-header p {
   color: var(--text-muted, #64748b);
   font-size: 12.5px;
@@ -477,27 +495,35 @@
 
 .table-responsive {
   width: 100%;
+  max-height: 540px;
+  overflow-y: auto;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  position: relative;
 }
 
 .admin-table {
   width: 100%;
-  min-width: 1020px;
-  border-collapse: collapse;
+  min-width: 1040px;
+  border-collapse: separate;
+  border-spacing: 0;
   text-align: left;
   font-size: 12.5px;
 }
 
 .admin-table th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
   background: #f8fafc;
   padding: 8px 12px;
   font-size: 10.5px;
-  font-weight: 700;
-  color: #64748b;
+  font-weight: 800;
+  color: #475569;
   text-transform: uppercase;
   letter-spacing: 0.4px;
-  border-bottom: 1.5px solid #e2e8f0;
+  border-bottom: 2px solid #cbd5e1;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   white-space: nowrap;
 }
 
@@ -505,6 +531,7 @@
   padding: 8px 12px;
   border-bottom: 1px solid #f1f5f9;
   vertical-align: middle;
+  background: #ffffff;
 }
 
 .admin-table tr:hover td {
@@ -552,15 +579,23 @@
   word-break: break-word;
 }
 
-.complainant-cell strong {
+.complainant-name {
   color: #0f172a;
-  font-size: 12px;
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 1.3;
 }
 
-.complainant-cell span {
+.complainant-email {
+  font-size: 11px;
+  color: #475569;
+  word-break: break-all;
+}
+
+.complainant-phone {
   font-size: 10.5px;
   color: #64748b;
-  word-break: break-all;
+  font-family: monospace;
 }
 
 .category-pill {
